@@ -25,17 +25,19 @@ export function HatGraphic({
   videoWidth,
   videoHeight 
 }: HatGraphicProps) {
-  if (!facePosition) {
+  const defaultHatSize = Math.min(containerWidth * 0.3, 80);
+  
+  if (!facePosition || containerWidth === 0 || containerHeight === 0 || videoWidth === 0 || videoHeight === 0) {
     return (
       <div 
         className="absolute animate-float"
         style={{
           left: '50%',
-          top: '8%',
+          top: '10%',
           transform: 'translateX(-50%)',
         }}
       >
-        {renderHatSVG(hat.id, 100)}
+        {renderHatSVG(hat.id, defaultHatSize)}
       </div>
     );
   }
@@ -43,21 +45,34 @@ export function HatGraphic({
   const scaleX = containerWidth / videoWidth;
   const scaleY = containerHeight / videoHeight;
   
-  const hatWidth = facePosition.width * scaleX * 1.3;
-  const hatHeight = hatWidth * 0.8;
+  const minHatWidth = 60;
+  const maxHatWidth = containerWidth * 0.35;
+  const scaledFaceWidth = facePosition.width * scaleX;
+  const hatWidth = Math.max(minHatWidth, Math.min(maxHatWidth, scaledFaceWidth * 0.7));
   
   const mirroredX = videoWidth - facePosition.x;
-  const hatX = mirroredX * scaleX;
-  const hatY = facePosition.y * scaleY - hatHeight * 0.5;
+  const hatX = Math.max(hatWidth / 2, Math.min(containerWidth - hatWidth / 2, mirroredX * scaleX));
+  
+  const hatY = Math.max(5, Math.min(containerHeight * 0.4, facePosition.y * scaleY));
+
+  console.log('[HatGraphic] Position:', { 
+    faceX: facePosition.x.toFixed(0), 
+    faceY: facePosition.y.toFixed(0),
+    faceW: facePosition.width.toFixed(0),
+    hatX: hatX.toFixed(0), 
+    hatY: hatY.toFixed(0),
+    hatW: hatWidth.toFixed(0)
+  });
 
   return (
     <div 
-      className="absolute transition-all duration-100 ease-out"
+      className="absolute"
       style={{
         left: `${hatX}px`,
-        top: `${Math.max(0, hatY)}px`,
+        top: `${hatY}px`,
         transform: 'translateX(-50%)',
         filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))',
+        transition: 'left 80ms ease-out, top 80ms ease-out',
       }}
     >
       {renderHatSVG(hat.id, hatWidth)}

@@ -10,6 +10,7 @@ import { PhotoEditor } from './components/PhotoEditor';
 import { Collection } from './components/Collection';
 import { Settings } from './components/Settings';
 import { ProfileSelect } from './components/ProfileSelect';
+import { HatDebug } from './components/HatDebug';
 import { getUserProgress, getCurrentProfileId, getProfile } from './services/database';
 import type { GamePhase, UserProgress, ZoneProgress, Creature, Hat, Region, UserProfile } from './types';
 
@@ -128,6 +129,10 @@ function App() {
     setPhase('settings');
   }
 
+  function handleHatDebug() {
+    setPhase('hat-debug');
+  }
+
   if (phase === 'profile-select') {
     return (
       <div className="h-full w-full overflow-hidden">
@@ -158,7 +163,7 @@ function App() {
       )}
       
       {phase === 'settings' && (
-        <Settings onBack={handleGoHome} />
+        <Settings onBack={handleGoHome} onHatDebug={handleHatDebug} />
       )}
       
       {phase === 'camera-check' && (
@@ -225,6 +230,10 @@ function App() {
           userProgress={userProgress}
           onBack={handleGoHome}
         />
+      )}
+      
+      {phase === 'hat-debug' && (
+        <HatDebug onBack={handleGoHome} />
       )}
     </div>
   );

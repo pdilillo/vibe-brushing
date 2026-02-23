@@ -132,4 +132,5 @@ export type GamePhase =
   | 'capture'
   | 'photos'
   | 'editor'
-  | 'collection';
+  | 'collection'
+  | 'hat-debug';
