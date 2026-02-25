@@ -165,7 +165,8 @@ export function CaptureGame({
       setCaptureRate(rate);
       setBallType(getBallType(cleaningPercentage));
       
-      const wobbles = creature.rarity === 'legendary' ? 4 + Math.floor(Math.random() * 2) :
+      const wobbles = creature.rarity === 'mythic' ? 6 + Math.floor(Math.random() * 2) :
+                      creature.rarity === 'legendary' ? 4 + Math.floor(Math.random() * 2) :
                       creature.rarity === 'rare' ? 3 + Math.floor(Math.random() * 2) :
                       2 + Math.floor(Math.random() * 2);
       setWobbleState(prev => ({ ...prev, maxWobbles: wobbles }));
@@ -198,7 +199,7 @@ export function CaptureGame({
       } else {
         setPhase('impact');
         setShowFlash(true);
-        if (creature?.rarity === 'legendary') {
+        if (creature?.rarity === 'legendary' || creature?.rarity === 'mythic') {
           setScreenShake(true);
         }
         playSoundEffect('capture');
@@ -284,7 +285,8 @@ export function CaptureGame({
     const currentCreature = creatureRef.current;
     const currentCaptureRate = captureRateRef.current;
     
-    const suspenseDuration = currentCreature?.rarity === 'legendary' ? 2500 : 
+    const suspenseDuration = currentCreature?.rarity === 'mythic' ? 3500 :
+                             currentCreature?.rarity === 'legendary' ? 2500 : 
                              currentCreature?.rarity === 'rare' ? 1800 : 1200;
     
     console.log('[CaptureGame] Starting suspense with capture rate:', currentCaptureRate);
@@ -361,16 +363,17 @@ export function CaptureGame({
         {phase === 'intro' && (
           <div className="text-center animate-bounce-gentle">
             <div className="text-xl text-white mb-2 drop-shadow-lg">A wild creature appeared!</div>
-            <div className="relative">
+            <div className="relative inline-block">
               <CreatureArt creature={creature} size={150} animated={true} />
-              {creature.rarity === 'legendary' && (
+              {(creature.rarity === 'legendary' || creature.rarity === 'mythic') && (
                 <div className="absolute inset-0 animate-pulse">
-                  <div className="absolute inset-0 bg-yellow-400/20 rounded-full blur-xl" />
+                  <div className={`absolute inset-0 ${creature.rarity === 'mythic' ? 'bg-orange-400/30' : 'bg-yellow-400/20'} rounded-full blur-xl`} />
                 </div>
               )}
             </div>
             <div className="text-2xl font-bold text-white mt-3 drop-shadow-lg">{creature.name}</div>
             <div className={`text-lg mt-1 font-semibold ${
+              creature.rarity === 'mythic' ? 'text-orange-400 animate-pulse' :
               creature.rarity === 'legendary' ? 'text-yellow-400 animate-pulse' :
               creature.rarity === 'rare' ? 'text-purple-400' : 'text-gray-300'
             }`}>
@@ -384,7 +387,7 @@ export function CaptureGame({
         
         {(phase === 'ready' || phase === 'throwing' || phase === 'impact' || phase === 'wobble' || phase === 'suspense') && (
           <>
-            <div className={`absolute top-1/4 ${phase === 'impact' ? 'animate-shake' : 'animate-float'}`}>
+            <div className={`absolute top-1/4 left-1/2 -translate-x-1/2 ${phase === 'impact' ? 'animate-shake' : 'animate-float'}`}>
               {phase !== 'impact' && phase !== 'wobble' && phase !== 'suspense' ? (
                 <CreatureArt creature={creature} size={120} animated={true} />
               ) : (
@@ -452,7 +455,7 @@ export function CaptureGame({
                 </div>
                 <button
                   onClick={handleThrow}
-                  className="px-8 py-4 text-2xl font-bold text-white bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl shadow-lg active:scale-95 transition-transform animate-pulse-glow"
+                  className="px-8 py-4 text-2xl font-bold text-white bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl shadow-lg active:scale-95 transition-transform animate-button-glow"
                 >
                   Throw Sparkle Ball! ✨
                 </button>
@@ -476,7 +479,7 @@ export function CaptureGame({
                 <div className="text-4xl text-yellow-400 font-bold mb-4 animate-bounce-gentle drop-shadow-lg">
                   CAUGHT!
                 </div>
-                <div className="relative">
+                <div className="relative inline-block">
                   <CreatureArt creature={creature} size={150} animated={true} />
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     {[...Array(8)].map((_, i) => (
@@ -503,7 +506,7 @@ export function CaptureGame({
                 <div className="text-3xl text-red-400 font-bold mb-4">
                   Oh no! It escaped!
                 </div>
-                <div className="opacity-50">
+                <div className="opacity-50 inline-block">
                   <CreatureArt creature={creature} size={120} animated={false} />
                 </div>
                 <div className="text-xl text-purple-200 mt-4 max-w-xs mx-auto">

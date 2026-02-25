@@ -12,8 +12,9 @@ import { Settings } from './components/Settings';
 import { ProfileSelect } from './components/ProfileSelect';
 import { HatDebug } from './components/HatDebug';
 import { GraphicsDebug } from './components/GraphicsDebug';
-import { getUserProgress, getCurrentProfileId, getProfile } from './services/database';
-import type { GamePhase, UserProgress, ZoneProgress, Creature, Hat, Region, UserProfile } from './types';
+import { getUserProgress, getCurrentProfileId, getProfile, addSession } from './services/database';
+import { getSessionDurationSeconds } from './services/settings';
+import type { GamePhase, UserProgress, ZoneProgress, Creature, Hat, Region, UserProfile, BrushingSession as BrushingSessionType } from './types';
 
 function App() {
   const [phase, setPhase] = useState<GamePhase>('profile-select');
@@ -83,7 +84,7 @@ function App() {
     setPhase('brushing');
   }
 
-  function handleBrushingComplete(results: {
+  async function handleBrushingComplete(results: {
     cleaningPercentage: number;
     zoneProgress: ZoneProgress[];
     photos: string[];
@@ -92,6 +93,22 @@ function App() {
   }) {
     setSessionResults(results);
     setPhase('results');
+    
+    const session: BrushingSessionType = {
+      id: `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      date: new Date(),
+      duration: getSessionDurationSeconds(),
+      cleaningPercentage: results.cleaningPercentage,
+      zoneProgress: results.zoneProgress,
+      photos: results.photos
+    };
+    
+    try {
+      await addSession(session);
+      await loadUserProgress();
+    } catch (err) {
+      console.error('Failed to save session:', err);
+    }
   }
 
   function handleResultsContinue() {
@@ -225,6 +242,11 @@ function App() {
       {phase === 'editor' && selectedPhoto && (
         <PhotoEditor
           photo={selectedPhoto}
+          capturedCreatures={
+            capturedCreature && !userProgress.capturedCreatures.some(c => c.id === capturedCreature.id)
+              ? [{ ...capturedCreature, capturedAt: new Date() }, ...userProgress.capturedCreatures]
+              : userProgress.capturedCreatures
+          }
           onDone={handleEditorDone}
           onBack={() => setPhase('photos')}
         />

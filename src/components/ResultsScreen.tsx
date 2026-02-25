@@ -1,5 +1,4 @@
 import type { ZoneProgress } from '../types';
-import { MOUTH_ZONES } from '../services/motionDetector';
 
 interface ResultsScreenProps {
   cleaningPercentage: number;
@@ -7,8 +6,9 @@ interface ResultsScreenProps {
   onContinue: () => void;
 }
 
-export function ResultsScreen({ cleaningPercentage, zoneProgress, onContinue }: ResultsScreenProps) {
+export function ResultsScreen({ cleaningPercentage, onContinue }: ResultsScreenProps) {
   const rating = getRating(cleaningPercentage);
+  const isComplete = cleaningPercentage >= 100;
   
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center">
@@ -26,36 +26,31 @@ export function ResultsScreen({ cleaningPercentage, zoneProgress, onContinue }: 
         {rating.message}
       </p>
       
-      <div className="grid grid-cols-3 gap-3 w-full max-w-xs mb-8">
-        {MOUTH_ZONES.map(zone => {
-          const progress = zoneProgress.find(p => p.zoneId === zone.id);
-          const isComplete = progress?.isComplete || false;
-          const percentage = Math.round(progress?.cleaningProgress || 0);
-          
-          return (
-            <div
-              key={zone.id}
-              className={`p-3 rounded-xl ${
-                isComplete ? 'bg-green-900/50' : 'bg-purple-900/50'
+      <div className="w-full max-w-xs mb-8">
+        <div className={`p-4 rounded-xl ${isComplete ? 'bg-green-900/50' : 'bg-purple-900/50'}`}>
+          <div className="text-4xl mb-2">
+            {isComplete ? '✨' : '🦷'}
+          </div>
+          <div className="text-sm text-purple-300 mb-2">Brushing Score</div>
+          <div className="h-4 bg-black/30 rounded-full overflow-hidden">
+            <div 
+              className={`h-full rounded-full transition-all duration-500 ${
+                isComplete 
+                  ? 'bg-gradient-to-r from-yellow-400 to-amber-500'
+                  : 'bg-gradient-to-r from-purple-500 to-pink-500'
               }`}
-            >
-              <div className="text-2xl mb-1">
-                {isComplete ? '✨' : '🦷'}
-              </div>
-              <div className="text-xs text-purple-300">{zone.label}</div>
-              <div className={`text-sm font-bold ${
-                isComplete ? 'text-green-400' : 'text-purple-400'
-              }`}>
-                {percentage}%
-              </div>
-            </div>
-          );
-        })}
+              style={{ width: `${cleaningPercentage}%` }}
+            />
+          </div>
+          <div className={`text-lg font-bold mt-2 ${isComplete ? 'text-green-400' : 'text-purple-400'}`}>
+            {isComplete ? 'Complete!' : 'Keep practicing!'}
+          </div>
+        </div>
       </div>
       
       <button
         onClick={onContinue}
-        className="w-full max-w-xs py-4 text-xl font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl animate-pulse-glow"
+        className="w-full max-w-xs py-4 text-xl font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl animate-button-glow"
       >
         Catch a Creature! 🎯
       </button>

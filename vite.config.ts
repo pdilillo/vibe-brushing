@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: '/vibe-brushing/',
   plugins: [
     react(),
     VitePWA({
@@ -30,7 +31,9 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,mp3,ogg}']
+        globPatterns: ['**/*.{js,css,html,ico,svg,mp3,ogg}'],
+        globIgnores: ['**/creatures/**'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
       }
     })
   ],

@@ -32,3 +32,83 @@ body {
   user-select: none;
   -webkit-user-select: none;
 }
+
+/* Creature idle animation - gentle bobbing and breathing */
+@keyframes creature-idle {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-3px) scale(1.02);
+  }
+  50% {
+    transform: translateY(0) scale(1);
+  }
+  75% {
+    transform: translateY(2px) scale(0.98);
+  }
+}
+
+.animate-creature-idle {
+  animation: creature-idle 2s ease-in-out infinite;
+}
+
+/* Gunk drip animation */
+@keyframes gunk-drip {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: var(--gunk-opacity, 0.8);
+  }
+  50% {
+    transform: translateY(3px);
+    opacity: calc(var(--gunk-opacity, 0.8) * 0.9);
+  }
+}
+
+.animate-gunk-drip {
+  animation: gunk-drip 1.5s ease-in-out infinite;
+}
+
+/* Pulsing glow for possessed eyes */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    filter: blur(2px);
+  }
+  50% {
+    opacity: 0.6;
+    filter: blur(4px);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 1s ease-in-out infinite;
+}
+
+/* Button glow animation - uses box-shadow to avoid blurring text */
+@keyframes button-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.6), 0 0 40px rgba(236, 72, 153, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.8), 0 0 60px rgba(236, 72, 153, 0.6);
+  }
+}
+
+.animate-button-glow {
+  animation: button-glow 2s ease-in-out infinite;
+}
+
+/* Float animation for general use */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-float {
+  animation: float 2s ease-in-out infinite;
+}

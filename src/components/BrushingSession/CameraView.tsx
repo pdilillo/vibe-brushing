@@ -16,12 +16,13 @@ interface CameraViewProps {
   selectedHat: Hat | null;
   facePosition?: FacePosition | null;
   onVideoReady?: (video: HTMLVideoElement) => void;
+  onContainerSize?: (width: number, height: number) => void;
   isBrushing?: boolean;
   debugMode?: boolean;
   getDebugInfo?: () => DebugInfo | null;
 }
 
-export function CameraView({ selectedHat, facePosition, onVideoReady, isBrushing = false, debugMode = false, getDebugInfo }: CameraViewProps) {
+export function CameraView({ selectedHat, facePosition, onVideoReady, onContainerSize, isBrushing = false, debugMode = false, getDebugInfo }: CameraViewProps) {
   const { isReady, error, registerVideoElement } = useSharedCamera();
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -73,10 +74,10 @@ export function CameraView({ selectedHat, facePosition, onVideoReady, isBrushing
     if (!container) return;
 
     const updateSize = () => {
-      setContainerSize({
-        width: container.clientWidth,
-        height: container.clientHeight
-      });
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      setContainerSize({ width, height });
+      onContainerSize?.(width, height);
     };
 
     updateSize();
@@ -84,7 +85,7 @@ export function CameraView({ selectedHat, facePosition, onVideoReady, isBrushing
     resizeObserver.observe(container);
 
     return () => resizeObserver.disconnect();
-  }, []);
+  }, [onContainerSize]);
 
   useEffect(() => {
     console.log('[CameraView] Mounted/Updated', {

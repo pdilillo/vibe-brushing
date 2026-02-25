@@ -5,13 +5,13 @@ export const ALL_HATS: Hat[] = [
   {
     id: 'crown',
     name: 'Royal Crown',
-    imageUrl: '👑',
+    imageUrl: '/creatures/hat-crown.png',
     unlockCondition: 'starter'
   },
   {
     id: 'party',
     name: 'Party Hat',
-    imageUrl: '🎉',
+    imageUrl: '/creatures/hat-party.png',
     unlockCondition: 'starter'
   },
   
@@ -19,28 +19,28 @@ export const ALL_HATS: Hat[] = [
   {
     id: 'wizard',
     name: 'Wizard Hat',
-    imageUrl: '🧙',
+    imageUrl: '/creatures/hat-wizard.png',
     unlockCondition: 'sessions',
     unlockThreshold: 10
   },
   {
     id: 'cowboy',
     name: 'Cowboy Hat',
-    imageUrl: '🤠',
+    imageUrl: '/creatures/hat-cowboy.png',
     unlockCondition: 'sessions',
     unlockThreshold: 25
   },
   {
     id: 'chef',
     name: 'Chef Hat',
-    imageUrl: '👨‍🍳',
+    imageUrl: '/creatures/hat-chef.png',
     unlockCondition: 'sessions',
     unlockThreshold: 50
   },
   {
     id: 'astronaut',
     name: 'Space Helmet',
-    imageUrl: '👨‍🚀',
+    imageUrl: '/creatures/hat-astronaut.png',
     unlockCondition: 'sessions',
     unlockThreshold: 100
   },
@@ -49,14 +49,14 @@ export const ALL_HATS: Hat[] = [
   {
     id: 'pirate',
     name: 'Pirate Hat',
-    imageUrl: '🏴‍☠️',
+    imageUrl: '/creatures/hat-pirate.png',
     unlockCondition: 'streak',
     unlockThreshold: 7
   },
   {
     id: 'princess',
     name: 'Princess Tiara',
-    imageUrl: '👸',
+    imageUrl: '/creatures/hat-princess.png',
     unlockCondition: 'streak',
     unlockThreshold: 30
   },
@@ -65,14 +65,14 @@ export const ALL_HATS: Hat[] = [
   {
     id: 'unicorn-horn',
     name: 'Unicorn Horn',
-    imageUrl: '🦄',
+    imageUrl: '/creatures/hat-unicorn-horn.png',
     unlockCondition: 'creature',
     unlockThreshold: 5
   },
   {
     id: 'dragon-horns',
     name: 'Dragon Horns',
-    imageUrl: '🐉',
+    imageUrl: '/creatures/hat-dragon-horns.png',
     unlockCondition: 'creature',
     unlockThreshold: 10
   }

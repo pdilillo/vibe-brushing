@@ -7,11 +7,11 @@ import { DebugOverlay } from './BrushingSession/DebugOverlay';
 import type { Hat } from '../types';
 
 const DEBUG_HATS: Hat[] = [
-  { id: 'cowboy', name: 'Cowboy Hat', rarity: 'common', unlocked: true },
-  { id: 'crown', name: 'Royal Crown', rarity: 'rare', unlocked: true },
-  { id: 'tophat', name: 'Top Hat', rarity: 'common', unlocked: true },
-  { id: 'wizard', name: 'Wizard Hat', rarity: 'epic', unlocked: true },
-  { id: 'cap', name: 'Baseball Cap', rarity: 'common', unlocked: true },
+  { id: 'cowboy', name: 'Cowboy Hat', imageUrl: '', unlockCondition: 'starter' },
+  { id: 'crown', name: 'Royal Crown', imageUrl: '', unlockCondition: 'streak', unlockThreshold: 7 },
+  { id: 'tophat', name: 'Top Hat', imageUrl: '', unlockCondition: 'sessions', unlockThreshold: 10 },
+  { id: 'wizard', name: 'Wizard Hat', imageUrl: '', unlockCondition: 'creature' },
+  { id: 'cap', name: 'Baseball Cap', imageUrl: '', unlockCondition: 'starter' },
 ];
 
 interface HatDebugProps {

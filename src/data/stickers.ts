@@ -34,14 +34,14 @@ export const ALL_STICKERS: Sticker[] = [
 ];
 
 export const ALL_BACKGROUNDS: Background[] = [
-  { id: 'none', name: 'None', imageUrl: '' },
-  { id: 'rainbow', name: 'Rainbow', imageUrl: 'linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff)' },
-  { id: 'purple', name: 'Purple Dream', imageUrl: 'linear-gradient(135deg, #667eea, #764ba2)' },
-  { id: 'sunset', name: 'Sunset', imageUrl: 'linear-gradient(135deg, #fa709a, #fee140)' },
-  { id: 'ocean', name: 'Ocean', imageUrl: 'linear-gradient(135deg, #2193b0, #6dd5ed)' },
-  { id: 'forest', name: 'Forest', imageUrl: 'linear-gradient(135deg, #11998e, #38ef7d)' },
-  { id: 'candy', name: 'Candy', imageUrl: 'linear-gradient(135deg, #f093fb, #f5576c)' },
-  { id: 'night', name: 'Night Sky', imageUrl: 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)' },
-  { id: 'gold', name: 'Golden', imageUrl: 'linear-gradient(135deg, #f7971e, #ffd200)' },
+  { id: 'none', name: 'Squeaky Clean', imageUrl: '' },
+  { id: 'rainbow', name: 'Unicorn Burp', imageUrl: 'linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff)' },
+  { id: 'purple', name: 'Grape Soda Pop', imageUrl: 'linear-gradient(135deg, #667eea, #764ba2)' },
+  { id: 'sunset', name: 'Peachy Keen', imageUrl: 'linear-gradient(135deg, #fa709a, #fee140)' },
+  { id: 'ocean', name: 'Mermaid Splash', imageUrl: 'linear-gradient(135deg, #2193b0, #6dd5ed)' },
+  { id: 'forest', name: 'Froggy Pond', imageUrl: 'linear-gradient(135deg, #11998e, #38ef7d)' },
+  { id: 'candy', name: 'Bubblegum Blast', imageUrl: 'linear-gradient(135deg, #f093fb, #f5576c)' },
+  { id: 'night', name: 'Sleepy Time', imageUrl: 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)' },
+  { id: 'gold', name: 'Cheesy Grin', imageUrl: 'linear-gradient(135deg, #f7971e, #ffd200)' },
   { id: 'mint', name: 'Mint Fresh', imageUrl: 'linear-gradient(135deg, #00b09b, #96c93d)' },
 ];

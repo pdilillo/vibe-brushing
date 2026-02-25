@@ -31,11 +31,14 @@ export interface RegionData {
 export interface Creature {
   id: string;
   name: string;
-  region: Region;
-  rarity: 'common' | 'rare' | 'legendary';
+  region: Region | 'all';
+  rarity: 'common' | 'rare' | 'legendary' | 'mythic';
   description: string;
   robotParts: string[];
   monsterType: string;
+  height: number;
+  weight: number;
+  requiresAllCreatures?: boolean;
 }
 
 export interface CapturedCreature extends Creature {

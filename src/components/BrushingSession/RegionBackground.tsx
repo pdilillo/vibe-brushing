@@ -17,9 +17,20 @@ interface Particle {
   drift: number;
 }
 
+const REGION_BACKGROUNDS: Record<Region, string> = {
+  grassland: '/creatures/bg-grassland.png',
+  coastal: '/creatures/bg-coastal.png',
+  lava: '/creatures/bg-lava.png',
+  city: '/creatures/bg-city.png',
+  sky: '/creatures/bg-sky.png',
+};
+
 export function RegionBackground({ region }: RegionBackgroundProps) {
   const regionData = getRegionData(region);
   const [particles, setParticles] = useState<Particle[]>([]);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  const backgroundImage = REGION_BACKGROUNDS[region];
 
   const gradientStyle = useMemo(() => {
     const { colors } = regionData;
@@ -71,6 +82,13 @@ export function RegionBackground({ region }: RegionBackgroundProps) {
   }, [region, regionData]);
 
   useEffect(() => {
+    setImageLoaded(false);
+    const img = new Image();
+    img.src = backgroundImage;
+    img.onload = () => setImageLoaded(true);
+  }, [backgroundImage]);
+
+  useEffect(() => {
     const newParticles: Particle[] = [];
     const particleCount = 12;
     
@@ -95,6 +113,25 @@ export function RegionBackground({ region }: RegionBackgroundProps) {
       className="absolute inset-0 overflow-hidden transition-all duration-1000"
       style={gradientStyle}
     >
+      {/* Background Image */}
+      <div
+        className="absolute inset-0 transition-opacity duration-500"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: imageLoaded ? 1 : 0,
+        }}
+      />
+      
+      {/* Overlay for better contrast with UI elements */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.3) 100%)',
+        }}
+      />
+
       {region === 'lava' && (
         <div className="absolute inset-0">
           <div 

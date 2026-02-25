@@ -51,11 +51,12 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
   const lastMotionTime = useRef<number>(Date.now());
   const pauseCheckInterval = useRef<number | null>(null);
   
-  const { startCamera, captureFrame, stopCamera, registerVideoElement } = useSharedCamera();
+  const { startCamera, captureFrameWithHat, stopCamera, registerVideoElement } = useSharedCamera();
   const pauseVideoRef = useRef<HTMLVideoElement | null>(null);
+  const containerSizeRef = useRef({ width: 0, height: 0 });
   
-  const isLegendary = creature?.rarity === 'legendary';
-  const music = useRegionMusic(region, isLegendary);
+  const isLegendaryOrMythic = creature?.rarity === 'legendary' || creature?.rarity === 'mythic';
+  const music = useRegionMusic(region, isLegendaryOrMythic);
   
   const setPauseVideoRef = useCallback((el: HTMLVideoElement | null) => {
     pauseVideoRef.current = el;
@@ -99,7 +100,7 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
     const selectedCreature = getRandomCreatureForScore(85, capturedCreatureIds, region);
     setCreature(selectedCreature);
     
-    if (selectedCreature?.rarity === 'legendary') {
+    if (selectedCreature?.rarity === 'legendary' || selectedCreature?.rarity === 'mythic') {
       playSoundEffect('legendary-intro');
     }
   }, [region, capturedCreatureIds]);
@@ -159,6 +160,21 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
     lastMotionTime.current = Date.now();
   }, [startDetection, startTracking]);
 
+  const handleContainerSize = useCallback((width: number, height: number) => {
+    containerSizeRef.current = { width, height };
+  }, []);
+
+  const capturePhotoWithHat = useCallback(async () => {
+    const hatOverlay = selectedHat ? {
+      imageUrl: selectedHat.imageUrl,
+      facePosition: facePosition || null,
+      containerWidth: containerSizeRef.current.width,
+      containerHeight: containerSizeRef.current.height,
+    } : null;
+    
+    return captureFrameWithHat(hatOverlay);
+  }, [selectedHat, facePosition, captureFrameWithHat]);
+
   const toggleDebugMode = useCallback(() => {
     setDebugModeState(prev => {
       const newValue = !prev;
@@ -206,13 +222,14 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
     photoIntervals.forEach(interval => {
       if (elapsed >= interval && !photoCapturedAt.current.has(interval)) {
         photoCapturedAt.current.add(interval);
-        const frame = captureFrame();
-        if (frame) {
-          setPhotos(prev => [...prev, frame]);
-        }
+        capturePhotoWithHat().then(frame => {
+          if (frame) {
+            setPhotos(prev => [...prev, frame]);
+          }
+        });
       }
     });
-  }, [timeRemaining, phase, captureFrame]);
+  }, [timeRemaining, phase, capturePhotoWithHat, photoIntervals, sessionDuration]);
 
   useEffect(() => {
     if (phase === 'brushing' && !musicStartedRef.current) {
@@ -239,13 +256,13 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
     }
   }, [timeRemaining, phase, music]);
 
-  const handleSessionComplete = useCallback(() => {
+  const handleSessionComplete = useCallback(async () => {
     setPhase('complete');
     music.stop();
     stopDetection();
     stopTracking();
     
-    const finalFrame = captureFrame();
+    const finalFrame = await capturePhotoWithHat();
     const allPhotos = finalFrame ? [...photos, finalFrame] : photos;
     
     setTimeout(() => {
@@ -258,7 +275,7 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
         creature,
       });
     }, 500);
-  }, [stopDetection, stopTracking, captureFrame, photos, overallProgress, zoneProgress, onComplete, stopCamera, music, region, creature]);
+  }, [stopDetection, stopTracking, capturePhotoWithHat, photos, overallProgress, zoneProgress, onComplete, stopCamera, music, region, creature]);
 
   const handleResume = useCallback(() => {
     lastMotionTime.current = Date.now();
@@ -266,12 +283,12 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
     setPauseReason('');
   }, []);
 
-  const handleManualCapture = useCallback(() => {
-    const frame = captureFrame();
+  const handleManualCapture = useCallback(async () => {
+    const frame = await capturePhotoWithHat();
     if (frame) {
       setPhotos(prev => [...prev, frame]);
     }
-  }, [captureFrame]);
+  }, [capturePhotoWithHat]);
 
   const handleCancel = useCallback(() => {
     music.stop();
@@ -300,6 +317,7 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
             <div className="mt-6 text-center">
               <div className="text-lg text-white/70">Today's creature:</div>
               <div className={`text-2xl font-bold ${
+                creature.rarity === 'mythic' ? 'text-orange-400 animate-pulse' :
                 creature.rarity === 'legendary' ? 'text-yellow-400 animate-pulse' :
                 creature.rarity === 'rare' ? 'text-purple-400' : 'text-white'
               }`}>
@@ -377,6 +395,7 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
             selectedHat={selectedHat}
             facePosition={facePosition}
             onVideoReady={handleVideoReady}
+            onContainerSize={handleContainerSize}
             isBrushing={motionResults.some(r => r.hasMotion)}
             debugMode={debugMode}
             getDebugInfo={getDebugInfo}
@@ -413,7 +432,6 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
           {creature ? (
             <CreatureCleaning
               creature={creature}
-              zoneProgress={zoneProgress}
               activeZones={activeZones}
               overallProgress={overallProgress}
             />

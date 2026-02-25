@@ -1,5 +1,19 @@
 import React, { createContext, useContext, useRef, useState, useCallback, useEffect } from 'react';
 
+interface FacePosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface HatOverlay {
+  imageUrl: string;
+  facePosition: FacePosition | null;
+  containerWidth: number;
+  containerHeight: number;
+}
+
 interface CameraContextType {
   videoRef: React.RefObject<HTMLVideoElement | null>;
   stream: MediaStream | null;
@@ -8,6 +22,7 @@ interface CameraContextType {
   startCamera: () => Promise<void>;
   stopCamera: () => void;
   captureFrame: () => string | null;
+  captureFrameWithHat: (hatOverlay: HatOverlay | null) => Promise<string | null>;
   registerVideoElement: (video: HTMLVideoElement | null) => void;
 }
 
@@ -263,6 +278,83 @@ export function CameraProvider({ children }: { children: React.ReactNode }) {
     return canvas.toDataURL('image/jpeg', 0.8);
   }, []);
 
+  const captureFrameWithHat = useCallback(async (hatOverlay: HatOverlay | null): Promise<string | null> => {
+    if (!videoRef.current) return null;
+    
+    const video = videoRef.current;
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+      return null;
+    }
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    
+    ctx.save();
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, 0, 0);
+    ctx.restore();
+    
+    if (hatOverlay && hatOverlay.imageUrl) {
+      try {
+        const hatImg = new Image();
+        hatImg.crossOrigin = 'anonymous';
+        
+        await new Promise<void>((resolve, reject) => {
+          hatImg.onload = () => resolve();
+          hatImg.onerror = reject;
+          hatImg.src = hatOverlay.imageUrl;
+        });
+        
+        const videoWidth = video.videoWidth;
+        const videoHeight = video.videoHeight;
+        const { containerWidth, containerHeight, facePosition } = hatOverlay;
+        
+        const scaleX = containerWidth / videoWidth;
+        const scaleY = containerHeight / videoHeight;
+        
+        let hatWidth: number;
+        let hatX: number;
+        let hatY: number;
+        
+        if (facePosition && containerWidth > 0 && containerHeight > 0) {
+          const minHatWidth = 50 / scaleX;
+          const maxHatWidth = (containerWidth * 0.25) / scaleX;
+          const scaledFaceWidth = facePosition.width;
+          hatWidth = Math.max(minHatWidth, Math.min(maxHatWidth, scaledFaceWidth * 0.5));
+          
+          hatX = videoWidth / 2;
+          
+          const faceTopY = facePosition.y;
+          const hatOffset = hatWidth * 0.55;
+          hatY = Math.max(5 / scaleY, faceTopY - hatOffset);
+        } else {
+          hatWidth = videoWidth * 0.2;
+          hatX = videoWidth / 2;
+          hatY = videoHeight * 0.1;
+        }
+        
+        const hatHeight = hatWidth * (hatImg.height / hatImg.width);
+        
+        ctx.drawImage(
+          hatImg,
+          hatX - hatWidth / 2,
+          hatY,
+          hatWidth,
+          hatHeight
+        );
+      } catch (err) {
+        console.error('Failed to load hat image for capture:', err);
+      }
+    }
+    
+    return canvas.toDataURL('image/jpeg', 0.8);
+  }, []);
+
   useEffect(() => {
     return () => {
       if (streamRef.current) {
@@ -280,6 +372,7 @@ export function CameraProvider({ children }: { children: React.ReactNode }) {
       startCamera,
       stopCamera,
       captureFrame,
+      captureFrameWithHat,
       registerVideoElement
     }}>
       {children}

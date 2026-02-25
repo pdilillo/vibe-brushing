@@ -1,27 +1,18 @@
 import { useMemo } from 'react';
 import { CreatureArt } from '../CreatureArt';
-import type { Creature, ZoneProgress } from '../../types';
+import type { Creature } from '../../types';
 import { REGIONS } from '../../data/regions';
 
 interface CreatureCleaningProps {
   creature: Creature;
-  zoneProgress: ZoneProgress[];
   activeZones: string[];
   overallProgress: number;
   compact?: boolean;
 }
 
-const ZONE_TO_BODY_PART: Record<string, string> = {
-  topLeft: 'Left Ear',
-  topCenter: 'Head',
-  topRight: 'Right Ear',
-  bottomLeft: 'Left Side',
-  bottomCenter: 'Belly',
-  bottomRight: 'Right Side',
-};
-
-export function CreatureCleaning({ creature, zoneProgress, activeZones, overallProgress, compact = false }: CreatureCleaningProps) {
-  const regionData = REGIONS[creature.region];
+export function CreatureCleaning({ creature, activeZones, overallProgress, compact = false }: CreatureCleaningProps) {
+  const regionKey = creature.region === 'all' ? 'grassland' : creature.region;
+  const regionData = REGIONS[regionKey];
   const gunkLevel = Math.max(0, 100 - overallProgress);
   
   const creatureState = useMemo(() => {
@@ -39,9 +30,6 @@ export function CreatureCleaning({ creature, zoneProgress, activeZones, overallP
     happy: '😊',
     sparkling: '🤩',
   }[creatureState];
-
-  const completedZones = zoneProgress.filter(z => z.isComplete).length;
-  const totalZones = zoneProgress.length;
 
   if (compact) {
     return (
@@ -68,9 +56,10 @@ export function CreatureCleaning({ creature, zoneProgress, activeZones, overallP
             <span className="text-sm font-medium text-white truncate">{creature.name}</span>
             {creature.rarity !== 'common' && (
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                creature.rarity === 'mythic' ? 'bg-orange-500' :
                 creature.rarity === 'legendary' ? 'bg-yellow-500' : 'bg-purple-500'
               }`}>
-                {creature.rarity === 'legendary' ? '★' : '◆'}
+                {creature.rarity === 'mythic' ? '🐉' : creature.rarity === 'legendary' ? '★' : '◆'}
               </span>
             )}
           </div>
@@ -86,7 +75,9 @@ export function CreatureCleaning({ creature, zoneProgress, activeZones, overallP
           </div>
           
           <div className="flex justify-between mt-1">
-            <span className="text-[10px] text-purple-300">{completedZones}/{totalZones} clean</span>
+            <span className="text-[10px] text-purple-300">
+              {overallProgress >= 100 ? '✨ Clean!' : 'Keep brushing'}
+            </span>
             <span className="text-[10px] text-purple-300">{Math.round(overallProgress)}%</span>
           </div>
         </div>
@@ -95,27 +86,29 @@ export function CreatureCleaning({ creature, zoneProgress, activeZones, overallP
   }
 
   return (
-    <div className="flex gap-3 h-full">
+    <div className="relative h-full flex flex-col">
       <div 
-        className="relative shrink-0 w-32 rounded-xl overflow-hidden p-2 flex items-center justify-center"
+        className="flex-1 relative rounded-xl overflow-hidden flex items-center justify-center"
         style={{
           background: `linear-gradient(135deg, ${regionData.colors.background}80, ${regionData.colors.primary}40)`,
-          boxShadow: creature.rarity === 'legendary' 
-            ? `0 0 20px ${regionData.colors.accent}60`
+          boxShadow: creature.rarity === 'mythic'
+            ? `0 0 40px #F97316, 0 0 60px #F9731680`
+            : creature.rarity === 'legendary' 
+            ? `0 0 30px ${regionData.colors.accent}60`
             : creature.rarity === 'rare'
-            ? `0 0 15px ${regionData.colors.primary}40`
+            ? `0 0 20px ${regionData.colors.primary}40`
             : 'none',
         }}
       >
         {activeZones.length > 0 && (
           <div className="absolute inset-0 pointer-events-none">
-            {[...Array(4)].map((_, i) => (
+            {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="absolute w-1.5 h-1.5 rounded-full animate-ping"
+                className="absolute w-2 h-2 rounded-full animate-ping"
                 style={{
-                  left: `${20 + Math.random() * 60}%`,
-                  top: `${20 + Math.random() * 60}%`,
+                  left: `${15 + Math.random() * 70}%`,
+                  top: `${15 + Math.random() * 70}%`,
                   backgroundColor: regionData.colors.accent,
                   animationDelay: `${i * 0.1}s`,
                   animationDuration: '1s',
@@ -128,102 +121,77 @@ export function CreatureCleaning({ creature, zoneProgress, activeZones, overallP
         <div className={`relative ${activeZones.length > 0 ? 'animate-wiggle' : ''}`}>
           <CreatureArt
             creature={creature}
-            size={100}
+            size={140}
             showGunk={true}
             gunkLevel={gunkLevel}
             animated={true}
           />
 
           {overallProgress >= 100 && (
-            <div className="absolute -top-1 -right-1 text-xl">✨</div>
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute text-xl animate-sparkle-float"
+                  style={{
+                    left: `${10 + (i % 4) * 25}%`,
+                    top: `${10 + Math.floor(i / 4) * 40}%`,
+                    animationDelay: `${i * 0.15}s`,
+                  }}
+                >
+                  ✨
+                </div>
+              ))}
+            </div>
           )}
         </div>
 
         <div 
-          className="absolute bottom-1 left-1 right-1 flex items-center justify-center gap-1 px-2 py-0.5 rounded-full text-white text-xs"
+          className="absolute top-2 left-2 flex items-center gap-1.5 px-2 py-1 rounded-full text-white text-sm"
           style={{ backgroundColor: `${regionData.colors.primary}CC` }}
         >
-          <span>{stateEmoji}</span>
-          <span className="font-medium truncate">{creature.name}</span>
-        </div>
-      </div>
-
-      <div className="flex-1 flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <div className="flex-1">
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-purple-300">Overall</span>
-              <span className="text-white font-bold">{Math.round(overallProgress)}%</span>
-            </div>
-            <div className="h-2 bg-purple-900/50 rounded-full overflow-hidden">
-              <div 
-                className="h-full rounded-full transition-all duration-300"
-                style={{ 
-                  width: `${overallProgress}%`,
-                  backgroundColor: overallProgress >= 100 ? '#22C55E' : regionData.colors.primary,
-                }}
-              />
-            </div>
-          </div>
+          <span className="text-base">{stateEmoji}</span>
+          <span className="font-medium">{creature.name}</span>
           {creature.rarity !== 'common' && (
             <span 
               className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                creature.rarity === 'mythic' ? 'bg-orange-500' :
                 creature.rarity === 'legendary' ? 'bg-yellow-500' : 'bg-purple-500'
               }`}
             >
-              {creature.rarity.toUpperCase()}
+              {creature.rarity === 'mythic' ? '🐉' : creature.rarity === 'legendary' ? '★' : '◆'}
             </span>
           )}
         </div>
 
-        <div className="grid grid-cols-3 gap-1 flex-1">
-          {zoneProgress.map((zone) => {
-            const isActive = activeZones.includes(zone.zoneId);
-            const bodyPart = ZONE_TO_BODY_PART[zone.zoneId] || zone.zoneId;
-            
-            return (
-              <div
-                key={zone.zoneId}
-                className={`
-                  relative px-1.5 py-1 rounded-lg text-[10px] text-center transition-all
-                  ${zone.isComplete 
-                    ? 'bg-green-500/30 text-green-300' 
-                    : isActive 
-                    ? 'bg-yellow-500/30 text-yellow-300 animate-pulse' 
-                    : 'bg-purple-900/30 text-purple-300'
-                  }
-                `}
-              >
-                <div className="font-medium truncate">{bodyPart}</div>
-                <div className="flex items-center justify-center gap-0.5">
-                  <div className="h-1 flex-1 rounded-full bg-purple-900/50 overflow-hidden">
-                    <div 
-                      className="h-full rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${zone.cleaningProgress}%`,
-                        backgroundColor: zone.isComplete 
-                          ? '#22C55E' 
-                          : isActive 
-                          ? '#FBBF24' 
-                          : regionData.colors.primary,
-                      }}
-                    />
-                  </div>
-                  {zone.isComplete && <span className="text-[8px]">✨</span>}
-                </div>
+        <div className="absolute top-2 right-2 px-2 py-1 rounded-full text-white text-sm font-bold bg-black/40 backdrop-blur-sm">
+          {Math.round(overallProgress)}%
+        </div>
+
+        <div className="absolute bottom-2 left-2 right-2">
+          <div className="h-4 bg-black/30 rounded-full overflow-hidden backdrop-blur-sm relative">
+            <div 
+              className="h-full rounded-full transition-all duration-300"
+              style={{ 
+                width: `${overallProgress}%`,
+                backgroundColor: overallProgress >= 100 ? '#22C55E' : regionData.colors.accent,
+              }}
+            />
+            {activeZones.length > 0 && overallProgress < 100 && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-[10px] font-bold text-white drop-shadow animate-pulse">
+                  Brushing...
+                </span>
               </div>
-            );
-          })}
-        </div>
-
-        <div className="text-xs text-purple-300 text-center">
-          {overallProgress < 100 ? (
-            <>Clean to catch! ({completedZones}/{totalZones} parts)</>
-          ) : (
-            <span className="text-green-400 font-bold animate-pulse">
-              Sparkly clean! 🎉
-            </span>
-          )}
+            )}
+            {overallProgress >= 100 && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-[10px] font-bold text-white drop-shadow">
+                  ✨ Clean! ✨
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

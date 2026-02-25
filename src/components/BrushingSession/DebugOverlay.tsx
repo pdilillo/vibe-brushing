@@ -104,21 +104,22 @@ export function DebugOverlay({
                 y={toScreenY(zoneY)}
                 width={zoneW * scale}
                 height={zoneH * scale}
-                fill={zone.hasMotion ? 'rgba(0, 255, 0, 0.4)' : 'rgba(255, 255, 255, 0.1)'}
-                stroke={zone.hasMotion ? '#00ff00' : 'rgba(255, 255, 255, 0.5)'}
-                strokeWidth={zone.hasMotion ? 2 : 1}
+                fill={zone.hasMotion ? 'rgba(0, 255, 0, 0.35)' : 'rgba(100, 200, 255, 0.15)'}
+                stroke={zone.hasMotion ? '#00ff00' : '#66ccff'}
+                strokeWidth={zone.hasMotion ? 3 : 2}
+                rx={8}
               />
               <text
                 x={toScreenX(zoneX + zoneW / 2)}
                 y={toScreenY(zoneY + zoneH / 2)}
                 fill={zone.hasMotion ? '#00ff00' : '#ffffff'}
-                fontSize="11"
+                fontSize="14"
                 fontWeight="bold"
                 textAnchor="middle"
                 dominantBaseline="middle"
-                style={{ textShadow: '0 0 3px black' }}
+                style={{ textShadow: '0 0 4px black, 0 0 2px black' }}
               >
-                {zone.motionLevel.toFixed(0)}%
+                {zone.hasMotion ? `BRUSHING ${zone.motionLevel.toFixed(0)}%` : 'Move toothbrush here'}
               </text>
             </g>
           );
@@ -127,13 +128,17 @@ export function DebugOverlay({
 
       <div className="absolute top-2 left-2 bg-black/90 text-white text-xs p-2 rounded font-mono max-w-[220px]">
         <div className="font-bold mb-1 text-yellow-400">DEBUG MODE</div>
-        <div className={debugInfo.handMotionDetected ? 'text-green-400 font-bold' : 'text-gray-400'}>
-          Brushing: {debugInfo.handMotionDetected ? 'DETECTED' : 'none'}
+        <div className={debugInfo.handMotionDetected ? 'text-green-400 font-bold text-sm' : 'text-gray-400'}>
+          {debugInfo.handMotionDetected ? '✓ BRUSHING DETECTED' : '○ No motion'}
         </div>
-        <div className="text-gray-300">Motion: {debugInfo.frameMotionTotal.toFixed(0)}</div>
-        <div className="text-gray-300">Zones: {debugInfo.zones.filter(z => z.hasMotion).length}/6 active</div>
+        <div className="text-gray-300">Motion level: {debugInfo.frameMotionTotal.toFixed(0)}</div>
+        {debugInfo.zones[0] && (
+          <div className="text-gray-300">
+            Zone motion: {debugInfo.zones[0].motionLevel.toFixed(1)}%
+          </div>
+        )}
         <div className="mt-1 pt-1 border-t border-gray-600 text-[10px] text-gray-400">
-          <span className="text-green-400">Green dashed</span> = brush area<br/>
+          <span className="text-cyan-400">Blue box</span> = detection zone<br/>
           <span className="text-orange-400">Orange</span> = face | <span className="text-red-400">Red</span> = ignored
         </div>
       </div>

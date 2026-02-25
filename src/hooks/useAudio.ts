@@ -17,9 +17,15 @@ const NOTE_FREQS: Record<string, number> = {
   C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.00, A3: 220.00, B3: 246.94,
   C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
   C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00, B5: 987.77,
-  C6: 1046.50, D6: 1174.66, E6: 1318.51,
-  'Eb3': 155.56, 'Bb3': 233.08, 'Eb4': 311.13, 'Bb4': 466.16, 'Eb5': 622.25,
-  'F#3': 185.00, 'F#4': 369.99, 'F#5': 739.99,
+  C6: 1046.50, D6: 1174.66, E6: 1318.51, F6: 1396.91, G6: 1567.98,
+  'Db2': 69.30, 'Eb2': 77.78, 'Gb2': 92.50, 'Ab2': 103.83, 'Bb2': 116.54,
+  'Db3': 138.59, 'Eb3': 155.56, 'Gb3': 185.00, 'Ab3': 207.65, 'Bb3': 233.08,
+  'Db4': 277.18, 'Eb4': 311.13, 'Gb4': 369.99, 'Ab4': 415.30, 'Bb4': 466.16,
+  'Db5': 554.37, 'Eb5': 622.25, 'Gb5': 739.99, 'Ab5': 830.61, 'Bb5': 932.33,
+  'Db6': 1108.73, 'Eb6': 1244.51,
+  'C#3': 138.59, 'C#4': 277.18, 'C#5': 554.37,
+  'F#2': 92.50, 'F#3': 185.00, 'F#4': 369.99, 'F#5': 739.99, 'F#6': 1479.98,
+  'G#3': 207.65, 'G#4': 415.30, 'G#5': 830.61,
 };
 
 interface RegionMusicConfig {
@@ -32,98 +38,196 @@ interface RegionMusicConfig {
   arpExcited: number[][];
   pulseWidth: number;
   drumStyle: 'soft' | 'punchy' | 'electronic' | 'heavy' | 'airy';
+  melodyWave: OscillatorType;
+  bassWave: OscillatorType;
+  arpWave: OscillatorType;
+  vibratoRate: number;
+  vibratoDepth: number;
+  filterFreq: number;
+  filterType: BiquadFilterType;
+  attackTime: number;
+  releaseTime: number;
+  arpSpeed: number;
 }
 
 const REGION_MUSIC: Record<Region, RegionMusicConfig> = {
   grassland: {
-    tempo: { calm: 100, excited: 130 },
+    tempo: { calm: 100, excited: 128 },
     melodyCalm: [
-      [NOTE_FREQS.C4, NOTE_FREQS.E4, NOTE_FREQS.G4, NOTE_FREQS.E4, NOTE_FREQS.C4, NOTE_FREQS.G3, NOTE_FREQS.E4, NOTE_FREQS.G4],
-      [NOTE_FREQS.G4, NOTE_FREQS.E4, NOTE_FREQS.C4, NOTE_FREQS.D4, NOTE_FREQS.E4, NOTE_FREQS.G4, NOTE_FREQS.C5, NOTE_FREQS.G4],
-      [NOTE_FREQS.A4, NOTE_FREQS.G4, NOTE_FREQS.E4, NOTE_FREQS.C4, NOTE_FREQS.D4, NOTE_FREQS.E4, NOTE_FREQS.G4, NOTE_FREQS.E4],
+      [NOTE_FREQS.G4, NOTE_FREQS.A4, NOTE_FREQS.B4, NOTE_FREQS.D5, NOTE_FREQS.B4, NOTE_FREQS.A4, NOTE_FREQS.G4, NOTE_FREQS.E4],
+      [NOTE_FREQS.E4, NOTE_FREQS.G4, NOTE_FREQS.A4, NOTE_FREQS.B4, NOTE_FREQS.A4, NOTE_FREQS.G4, NOTE_FREQS.E4, NOTE_FREQS.D4],
+      [NOTE_FREQS.D4, NOTE_FREQS.E4, NOTE_FREQS.G4, NOTE_FREQS.A4, NOTE_FREQS.G4, NOTE_FREQS.E4, NOTE_FREQS.G4, NOTE_FREQS.A4],
+      [NOTE_FREQS.B4, NOTE_FREQS.A4, NOTE_FREQS.G4, NOTE_FREQS.E4, NOTE_FREQS.D4, NOTE_FREQS.E4, NOTE_FREQS.G4, NOTE_FREQS.B4],
     ],
     melodyExcited: [
-      [NOTE_FREQS.C5, NOTE_FREQS.E5, NOTE_FREQS.G5, NOTE_FREQS.C6, NOTE_FREQS.G5, NOTE_FREQS.E5, NOTE_FREQS.G5, NOTE_FREQS.C6],
-      [NOTE_FREQS.G5, NOTE_FREQS.A5, NOTE_FREQS.B5, NOTE_FREQS.C6, NOTE_FREQS.B5, NOTE_FREQS.G5, NOTE_FREQS.E5, NOTE_FREQS.G5],
+      [NOTE_FREQS.G5, NOTE_FREQS.A5, NOTE_FREQS.B5, NOTE_FREQS.D6, NOTE_FREQS.B5, NOTE_FREQS.G5, NOTE_FREQS.A5, NOTE_FREQS.B5],
+      [NOTE_FREQS.E5, NOTE_FREQS.G5, NOTE_FREQS.A5, NOTE_FREQS.B5, NOTE_FREQS.D6, NOTE_FREQS.B5, NOTE_FREQS.A5, NOTE_FREQS.G5],
+      [NOTE_FREQS.D5, NOTE_FREQS.E5, NOTE_FREQS.G5, NOTE_FREQS.A5, NOTE_FREQS.B5, NOTE_FREQS.A5, NOTE_FREQS.G5, NOTE_FREQS.E5],
     ],
-    bassCalm: [[NOTE_FREQS.C3, 0, NOTE_FREQS.G3, 0, NOTE_FREQS.C3, 0, NOTE_FREQS.E3, 0]],
-    bassExcited: [[NOTE_FREQS.C3, NOTE_FREQS.C3, NOTE_FREQS.G3, NOTE_FREQS.G3, NOTE_FREQS.E3, NOTE_FREQS.E3, NOTE_FREQS.G3, NOTE_FREQS.G3]],
-    arpCalm: [[0, 4, 7, 12]],
-    arpExcited: [[0, 4, 7, 12, 16, 12, 7, 4]],
+    bassCalm: [
+      [NOTE_FREQS.G2, 0, NOTE_FREQS.D3, 0, NOTE_FREQS.G2, 0, NOTE_FREQS.B2, 0],
+      [NOTE_FREQS.E2, 0, NOTE_FREQS.B2, 0, NOTE_FREQS.E2, 0, NOTE_FREQS.G2, 0],
+    ],
+    bassExcited: [
+      [NOTE_FREQS.G2, NOTE_FREQS.G2, NOTE_FREQS.D3, NOTE_FREQS.D3, NOTE_FREQS.B2, NOTE_FREQS.B2, NOTE_FREQS.D3, NOTE_FREQS.G2],
+    ],
+    arpCalm: [[0, 4, 7, 11, 12]],
+    arpExcited: [[0, 4, 7, 11, 14, 11, 7, 4]],
     pulseWidth: 0.5,
     drumStyle: 'soft',
+    melodyWave: 'square',
+    bassWave: 'triangle',
+    arpWave: 'square',
+    vibratoRate: 4,
+    vibratoDepth: 0.003,
+    filterFreq: 3000,
+    filterType: 'lowpass',
+    attackTime: 0.01,
+    releaseTime: 0.3,
+    arpSpeed: 1.0,
   },
   coastal: {
-    tempo: { calm: 95, excited: 125 },
+    tempo: { calm: 88, excited: 116 },
     melodyCalm: [
-      [NOTE_FREQS.D4, NOTE_FREQS.F4, NOTE_FREQS.A4, NOTE_FREQS.F4, NOTE_FREQS.D4, NOTE_FREQS.A3, NOTE_FREQS.D4, NOTE_FREQS.F4],
-      [NOTE_FREQS.A4, NOTE_FREQS.F4, NOTE_FREQS.D4, NOTE_FREQS.E4, NOTE_FREQS.F4, NOTE_FREQS.A4, NOTE_FREQS.D5, NOTE_FREQS.A4],
-      [NOTE_FREQS.G4, NOTE_FREQS.F4, NOTE_FREQS.E4, NOTE_FREQS.D4, NOTE_FREQS.E4, NOTE_FREQS.F4, NOTE_FREQS.A4, NOTE_FREQS.F4],
+      [NOTE_FREQS.D4, NOTE_FREQS.E4, NOTE_FREQS.A4, 0, NOTE_FREQS.B4, NOTE_FREQS.A4, NOTE_FREQS.E4, 0],
+      [NOTE_FREQS.E4, NOTE_FREQS['F#4'], NOTE_FREQS.A4, NOTE_FREQS.B4, 0, NOTE_FREQS.A4, NOTE_FREQS['F#4'], NOTE_FREQS.E4],
+      [NOTE_FREQS['F#4'], NOTE_FREQS.A4, NOTE_FREQS.B4, NOTE_FREQS.D5, NOTE_FREQS.B4, 0, NOTE_FREQS.A4, NOTE_FREQS['F#4']],
+      [NOTE_FREQS.A4, 0, NOTE_FREQS.E4, NOTE_FREQS['F#4'], NOTE_FREQS.A4, 0, NOTE_FREQS.D4, NOTE_FREQS.E4],
     ],
     melodyExcited: [
-      [NOTE_FREQS.D5, NOTE_FREQS.F5, NOTE_FREQS.A5, NOTE_FREQS.D6, NOTE_FREQS.A5, NOTE_FREQS.F5, NOTE_FREQS.A5, NOTE_FREQS.D6],
-      [NOTE_FREQS.A5, NOTE_FREQS.B5, NOTE_FREQS.C6, NOTE_FREQS.D6, NOTE_FREQS.C6, NOTE_FREQS.A5, NOTE_FREQS.F5, NOTE_FREQS.A5],
+      [NOTE_FREQS.D5, NOTE_FREQS.E5, NOTE_FREQS['F#5'], NOTE_FREQS.A5, NOTE_FREQS.B5, NOTE_FREQS.A5, NOTE_FREQS['F#5'], NOTE_FREQS.E5],
+      [NOTE_FREQS.A5, NOTE_FREQS.B5, NOTE_FREQS.D6, NOTE_FREQS.E6, NOTE_FREQS.D6, NOTE_FREQS.B5, NOTE_FREQS.A5, NOTE_FREQS['F#5']],
+      [NOTE_FREQS.E5, NOTE_FREQS['F#5'], NOTE_FREQS.A5, NOTE_FREQS.B5, NOTE_FREQS.A5, NOTE_FREQS['F#5'], NOTE_FREQS.E5, NOTE_FREQS.D5],
     ],
-    bassCalm: [[NOTE_FREQS.D3, 0, NOTE_FREQS.A3, 0, NOTE_FREQS.D3, 0, NOTE_FREQS.F3, 0]],
-    bassExcited: [[NOTE_FREQS.D3, NOTE_FREQS.D3, NOTE_FREQS.A3, NOTE_FREQS.A3, NOTE_FREQS.F3, NOTE_FREQS.F3, NOTE_FREQS.A3, NOTE_FREQS.A3]],
-    arpCalm: [[0, 5, 9, 12]],
-    arpExcited: [[0, 5, 9, 12, 17, 12, 9, 5]],
-    pulseWidth: 0.25,
+    bassCalm: [
+      [NOTE_FREQS.D2, 0, 0, NOTE_FREQS.A2, 0, 0, NOTE_FREQS.D2, 0],
+      [NOTE_FREQS.E2, 0, 0, NOTE_FREQS.B2, 0, 0, NOTE_FREQS.E2, 0],
+    ],
+    bassExcited: [
+      [NOTE_FREQS.D2, 0, NOTE_FREQS.A2, 0, NOTE_FREQS.D2, NOTE_FREQS.E2, NOTE_FREQS['F#2'], 0],
+    ],
+    arpCalm: [[0, 4, 9, 12, 16, 12, 9, 4]],
+    arpExcited: [[0, 2, 4, 7, 9, 12, 9, 7, 4, 2]],
+    pulseWidth: 0.3,
     drumStyle: 'soft',
+    melodyWave: 'sine',
+    bassWave: 'sine',
+    arpWave: 'triangle',
+    vibratoRate: 3,
+    vibratoDepth: 0.008,
+    filterFreq: 2500,
+    filterType: 'lowpass',
+    attackTime: 0.05,
+    releaseTime: 0.5,
+    arpSpeed: 1.3,
   },
   lava: {
-    tempo: { calm: 120, excited: 160 },
+    tempo: { calm: 135, excited: 170 },
     melodyCalm: [
-      [NOTE_FREQS.A3, NOTE_FREQS.C4, NOTE_FREQS.E4, NOTE_FREQS.A4, NOTE_FREQS.E4, NOTE_FREQS.C4, NOTE_FREQS.E4, NOTE_FREQS.A4],
-      [NOTE_FREQS.E4, NOTE_FREQS.G4, NOTE_FREQS.A4, NOTE_FREQS.C5, NOTE_FREQS.A4, NOTE_FREQS.G4, NOTE_FREQS.E4, NOTE_FREQS.G4],
-      [NOTE_FREQS.A4, NOTE_FREQS.G4, NOTE_FREQS.E4, NOTE_FREQS.C4, NOTE_FREQS.E4, NOTE_FREQS.G4, NOTE_FREQS.A4, NOTE_FREQS.E4],
+      [NOTE_FREQS.A3, NOTE_FREQS.A3, NOTE_FREQS.C4, NOTE_FREQS.E4, NOTE_FREQS.A4, NOTE_FREQS.E4, NOTE_FREQS.C4, NOTE_FREQS.A3],
+      [NOTE_FREQS.G3, NOTE_FREQS.G3, NOTE_FREQS['Bb3'], NOTE_FREQS.D4, NOTE_FREQS.G4, NOTE_FREQS.D4, NOTE_FREQS['Bb3'], NOTE_FREQS.G3],
+      [NOTE_FREQS.F3, NOTE_FREQS.F3, NOTE_FREQS.A3, NOTE_FREQS.C4, NOTE_FREQS.F4, NOTE_FREQS.A4, NOTE_FREQS.C5, NOTE_FREQS.A4],
+      [NOTE_FREQS.E4, NOTE_FREQS.E4, NOTE_FREQS.G4, NOTE_FREQS.A4, NOTE_FREQS.C5, NOTE_FREQS.A4, NOTE_FREQS.G4, NOTE_FREQS.E4],
     ],
     melodyExcited: [
-      [NOTE_FREQS.A4, NOTE_FREQS.C5, NOTE_FREQS.E5, NOTE_FREQS.A5, NOTE_FREQS.E5, NOTE_FREQS.C5, NOTE_FREQS.E5, NOTE_FREQS.A5],
-      [NOTE_FREQS.E5, NOTE_FREQS.G5, NOTE_FREQS.A5, NOTE_FREQS.C6, NOTE_FREQS.A5, NOTE_FREQS.G5, NOTE_FREQS.E5, NOTE_FREQS.G5],
+      [NOTE_FREQS.A4, NOTE_FREQS.C5, NOTE_FREQS.E5, NOTE_FREQS.A5, NOTE_FREQS.A5, NOTE_FREQS.E5, NOTE_FREQS.C5, NOTE_FREQS.A4],
+      [NOTE_FREQS.G4, NOTE_FREQS['Bb4'], NOTE_FREQS.D5, NOTE_FREQS.G5, NOTE_FREQS.G5, NOTE_FREQS.D5, NOTE_FREQS['Bb4'], NOTE_FREQS.G4],
+      [NOTE_FREQS.F4, NOTE_FREQS.A4, NOTE_FREQS.C5, NOTE_FREQS.F5, NOTE_FREQS.A5, NOTE_FREQS.F5, NOTE_FREQS.C5, NOTE_FREQS.A4],
+      [NOTE_FREQS.E4, NOTE_FREQS.G4, NOTE_FREQS.A4, NOTE_FREQS.C5, NOTE_FREQS.E5, NOTE_FREQS.G5, NOTE_FREQS.E5, NOTE_FREQS.C5],
     ],
-    bassCalm: [[NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.E3, 0, NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.G3, 0]],
-    bassExcited: [[NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.E3, NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.G3]],
-    arpCalm: [[0, 3, 7, 12]],
-    arpExcited: [[0, 3, 7, 10, 12, 10, 7, 3]],
+    bassCalm: [
+      [NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.E2, NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.G2, NOTE_FREQS.E2],
+      [NOTE_FREQS.G2, NOTE_FREQS.G2, NOTE_FREQS.G2, NOTE_FREQS.D2, NOTE_FREQS.G2, NOTE_FREQS.G2, NOTE_FREQS.F2, NOTE_FREQS.D2],
+    ],
+    bassExcited: [
+      [NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.E2, NOTE_FREQS.E2, NOTE_FREQS.G2, NOTE_FREQS.G2],
+      [NOTE_FREQS.F2, NOTE_FREQS.F2, NOTE_FREQS.F2, NOTE_FREQS.F2, NOTE_FREQS.E2, NOTE_FREQS.E2, NOTE_FREQS.E2, NOTE_FREQS.E2],
+    ],
+    arpCalm: [[0, 3, 7, 10, 12, 10, 7, 3]],
+    arpExcited: [[0, 3, 7, 12, 15, 19, 15, 12, 7, 3, 0, 3]],
     pulseWidth: 0.125,
     drumStyle: 'heavy',
+    melodyWave: 'sawtooth',
+    bassWave: 'sawtooth',
+    arpWave: 'square',
+    vibratoRate: 6,
+    vibratoDepth: 0.002,
+    filterFreq: 4500,
+    filterType: 'lowpass',
+    attackTime: 0.002,
+    releaseTime: 0.15,
+    arpSpeed: 0.7,
   },
   city: {
-    tempo: { calm: 110, excited: 140 },
+    tempo: { calm: 115, excited: 145 },
     melodyCalm: [
-      [NOTE_FREQS.E4, NOTE_FREQS.G4, NOTE_FREQS.B4, NOTE_FREQS.E5, NOTE_FREQS.B4, NOTE_FREQS.G4, NOTE_FREQS.B4, NOTE_FREQS.E5],
-      [NOTE_FREQS.B4, NOTE_FREQS.D5, NOTE_FREQS.E5, NOTE_FREQS.G5, NOTE_FREQS.E5, NOTE_FREQS.D5, NOTE_FREQS.B4, NOTE_FREQS.D5],
-      [NOTE_FREQS.A4, NOTE_FREQS.B4, NOTE_FREQS.D5, NOTE_FREQS.E5, NOTE_FREQS.D5, NOTE_FREQS.B4, NOTE_FREQS.A4, NOTE_FREQS.G4],
+      [NOTE_FREQS['Eb4'], NOTE_FREQS.G4, NOTE_FREQS['Bb4'], 0, NOTE_FREQS['Eb5'], 0, NOTE_FREQS['Bb4'], NOTE_FREQS.G4],
+      [NOTE_FREQS.F4, NOTE_FREQS['Ab4'], NOTE_FREQS.C5, 0, NOTE_FREQS.F5, 0, NOTE_FREQS.C5, NOTE_FREQS['Ab4']],
+      [NOTE_FREQS.G4, NOTE_FREQS['Bb4'], NOTE_FREQS.D5, NOTE_FREQS.F5, 0, NOTE_FREQS.D5, NOTE_FREQS['Bb4'], 0],
+      [NOTE_FREQS['Ab4'], NOTE_FREQS.C5, NOTE_FREQS['Eb5'], NOTE_FREQS.G5, NOTE_FREQS['Eb5'], NOTE_FREQS.C5, NOTE_FREQS['Ab4'], 0],
     ],
     melodyExcited: [
-      [NOTE_FREQS.E5, NOTE_FREQS.G5, NOTE_FREQS.B5, NOTE_FREQS.E6, NOTE_FREQS.B5, NOTE_FREQS.G5, NOTE_FREQS.B5, NOTE_FREQS.E6],
-      [NOTE_FREQS.B5, NOTE_FREQS.D6, NOTE_FREQS.E6, NOTE_FREQS.G5, NOTE_FREQS.E6, NOTE_FREQS.D6, NOTE_FREQS.B5, NOTE_FREQS.D6],
+      [NOTE_FREQS['Eb5'], NOTE_FREQS.G5, NOTE_FREQS['Bb5'], NOTE_FREQS['Eb6'], NOTE_FREQS['Bb5'], NOTE_FREQS.G5, NOTE_FREQS['Bb5'], NOTE_FREQS['Eb6']],
+      [NOTE_FREQS.F5, NOTE_FREQS['Ab5'], NOTE_FREQS.C6, NOTE_FREQS.F6, NOTE_FREQS.C6, NOTE_FREQS['Ab5'], NOTE_FREQS.C6, NOTE_FREQS.F6],
+      [NOTE_FREQS.G5, NOTE_FREQS['Bb5'], NOTE_FREQS.D6, NOTE_FREQS.G6, NOTE_FREQS.D6, NOTE_FREQS['Bb5'], NOTE_FREQS.G5, NOTE_FREQS.D6],
     ],
-    bassCalm: [[NOTE_FREQS.E3, 0, NOTE_FREQS.B3, 0, NOTE_FREQS.E3, 0, NOTE_FREQS.G3, 0]],
-    bassExcited: [[NOTE_FREQS.E3, NOTE_FREQS.E3, NOTE_FREQS.B3, NOTE_FREQS.B3, NOTE_FREQS.G3, NOTE_FREQS.G3, NOTE_FREQS.B3, NOTE_FREQS.B3]],
-    arpCalm: [[0, 4, 7, 11]],
-    arpExcited: [[0, 4, 7, 11, 12, 11, 7, 4]],
+    bassCalm: [
+      [NOTE_FREQS['Eb2'], 0, NOTE_FREQS['Bb2'], 0, NOTE_FREQS['Eb2'], 0, NOTE_FREQS.G2, 0],
+      [NOTE_FREQS.F2, 0, NOTE_FREQS.C3, 0, NOTE_FREQS.F2, 0, NOTE_FREQS['Ab2'], 0],
+    ],
+    bassExcited: [
+      [NOTE_FREQS['Eb2'], NOTE_FREQS['Eb2'], NOTE_FREQS['Bb2'], NOTE_FREQS['Bb2'], NOTE_FREQS.G2, NOTE_FREQS.G2, NOTE_FREQS['Bb2'], NOTE_FREQS['Eb2']],
+    ],
+    arpCalm: [[0, 3, 7, 10, 12, 15, 12, 10, 7, 3]],
+    arpExcited: [[0, 3, 7, 10, 12, 15, 19, 22, 19, 15, 12, 10, 7, 3]],
     pulseWidth: 0.5,
     drumStyle: 'electronic',
+    melodyWave: 'square',
+    bassWave: 'sawtooth',
+    arpWave: 'sawtooth',
+    vibratoRate: 8,
+    vibratoDepth: 0.001,
+    filterFreq: 5000,
+    filterType: 'lowpass',
+    attackTime: 0.001,
+    releaseTime: 0.2,
+    arpSpeed: 0.5,
   },
   sky: {
-    tempo: { calm: 85, excited: 115 },
+    tempo: { calm: 72, excited: 100 },
     melodyCalm: [
-      [NOTE_FREQS.G4, NOTE_FREQS.B4, NOTE_FREQS.D5, NOTE_FREQS.G5, NOTE_FREQS.D5, NOTE_FREQS.B4, NOTE_FREQS.D5, NOTE_FREQS.G5],
-      [NOTE_FREQS.D5, NOTE_FREQS.E5, NOTE_FREQS.G5, NOTE_FREQS.A5, NOTE_FREQS.G5, NOTE_FREQS.E5, NOTE_FREQS.D5, NOTE_FREQS.B4],
-      [NOTE_FREQS.C5, NOTE_FREQS.D5, NOTE_FREQS.E5, NOTE_FREQS.G5, NOTE_FREQS.E5, NOTE_FREQS.D5, NOTE_FREQS.C5, NOTE_FREQS.B4],
+      [NOTE_FREQS.C5, 0, NOTE_FREQS.G5, 0, NOTE_FREQS.E5, 0, NOTE_FREQS.G5, 0],
+      [NOTE_FREQS.D5, 0, NOTE_FREQS.A5, 0, NOTE_FREQS['F#5'], 0, NOTE_FREQS.A5, 0],
+      [NOTE_FREQS.E5, 0, NOTE_FREQS.B5, 0, NOTE_FREQS['G#5'], 0, NOTE_FREQS.B5, 0],
+      [NOTE_FREQS.G5, 0, NOTE_FREQS.D6, 0, NOTE_FREQS.B5, 0, NOTE_FREQS.G5, 0],
     ],
     melodyExcited: [
-      [NOTE_FREQS.G5, NOTE_FREQS.B5, NOTE_FREQS.D6, NOTE_FREQS.G5, NOTE_FREQS.D6, NOTE_FREQS.B5, NOTE_FREQS.D6, NOTE_FREQS.G5],
-      [NOTE_FREQS.D6, NOTE_FREQS.E6, NOTE_FREQS.G5, NOTE_FREQS.A5, NOTE_FREQS.G5, NOTE_FREQS.E6, NOTE_FREQS.D6, NOTE_FREQS.B5],
+      [NOTE_FREQS.C5, NOTE_FREQS.E5, NOTE_FREQS.G5, NOTE_FREQS.C6, NOTE_FREQS.E6, NOTE_FREQS.C6, NOTE_FREQS.G5, NOTE_FREQS.E5],
+      [NOTE_FREQS.D5, NOTE_FREQS['F#5'], NOTE_FREQS.A5, NOTE_FREQS.D6, NOTE_FREQS['F#6'], NOTE_FREQS.D6, NOTE_FREQS.A5, NOTE_FREQS['F#5']],
+      [NOTE_FREQS.E5, NOTE_FREQS['G#5'], NOTE_FREQS.B5, NOTE_FREQS.E6, NOTE_FREQS.B5, NOTE_FREQS['G#5'], NOTE_FREQS.E5, NOTE_FREQS.B4],
     ],
-    bassCalm: [[NOTE_FREQS.G2, 0, 0, NOTE_FREQS.D3, 0, 0, NOTE_FREQS.G2, 0]],
-    bassExcited: [[NOTE_FREQS.G2, 0, NOTE_FREQS.D3, 0, NOTE_FREQS.G2, 0, NOTE_FREQS.D3, 0]],
-    arpCalm: [[0, 4, 7, 12, 16]],
-    arpExcited: [[0, 4, 7, 12, 16, 19, 16, 12]],
+    bassCalm: [
+      [NOTE_FREQS.C3, 0, 0, 0, NOTE_FREQS.G3, 0, 0, 0],
+      [NOTE_FREQS.D3, 0, 0, 0, NOTE_FREQS.A3, 0, 0, 0],
+      [NOTE_FREQS.E3, 0, 0, 0, NOTE_FREQS.B3, 0, 0, 0],
+    ],
+    bassExcited: [
+      [NOTE_FREQS.C3, 0, NOTE_FREQS.G3, 0, NOTE_FREQS.C3, 0, NOTE_FREQS.E3, 0],
+    ],
+    arpCalm: [[0, 7, 12, 19, 24, 19, 12, 7]],
+    arpExcited: [[0, 4, 7, 12, 16, 19, 24, 19, 16, 12, 7, 4]],
     pulseWidth: 0.25,
     drumStyle: 'airy',
+    melodyWave: 'sine',
+    bassWave: 'sine',
+    arpWave: 'sine',
+    vibratoRate: 2,
+    vibratoDepth: 0.015,
+    filterFreq: 2000,
+    filterType: 'lowpass',
+    attackTime: 0.1,
+    releaseTime: 0.8,
+    arpSpeed: 1.8,
   },
 };
 
@@ -145,6 +249,16 @@ const LEGENDARY_MUSIC: RegionMusicConfig = {
   arpExcited: [[0, 4, 7, 12, 16, 19, 24, 19, 16, 12, 7, 4]],
   pulseWidth: 0.125,
   drumStyle: 'heavy',
+  melodyWave: 'sawtooth',
+  bassWave: 'sawtooth',
+  arpWave: 'square',
+  vibratoRate: 7,
+  vibratoDepth: 0.003,
+  filterFreq: 5000,
+  filterType: 'lowpass',
+  attackTime: 0.002,
+  releaseTime: 0.15,
+  arpSpeed: 0.6,
 };
 
 export function useRegionMusic(region: Region, isLegendary: boolean = false): BrushingMusicController {
@@ -176,17 +290,18 @@ export function useRegionMusic(region: Region, isLegendary: boolean = false): Br
     startTime: number, 
     duration: number, 
     volume: number,
-    _pulseWidth: number
+    config: RegionMusicConfig
   ) => {
     const ctx = getAudioContext();
     
     const osc1 = ctx.createOscillator();
     const osc2 = ctx.createOscillator();
     const gainNode = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
     const masterGain = ctx.createGain();
     
-    osc1.type = 'square';
-    osc2.type = 'square';
+    osc1.type = config.melodyWave;
+    osc2.type = config.melodyWave;
     
     osc1.frequency.setValueAtTime(frequency, startTime);
     osc2.frequency.setValueAtTime(frequency * 1.003, startTime);
@@ -197,53 +312,77 @@ export function useRegionMusic(region: Region, isLegendary: boolean = false): Br
     const lfo = ctx.createOscillator();
     const lfoGain = ctx.createGain();
     lfo.type = 'sine';
-    lfo.frequency.value = 5;
-    lfoGain.gain.value = frequency * 0.005;
+    lfo.frequency.value = config.vibratoRate;
+    lfoGain.gain.value = frequency * config.vibratoDepth;
     lfo.connect(lfoGain);
     lfoGain.connect(osc1.frequency);
     
+    filter.type = config.filterType;
+    filter.frequency.setValueAtTime(config.filterFreq, startTime);
+    filter.Q.value = 1;
+    
     osc1.connect(gainNode);
     osc2.connect(gainNode);
-    gainNode.connect(masterGain);
+    gainNode.connect(filter);
+    filter.connect(masterGain);
     masterGain.connect(ctx.destination);
     
+    const attackEnd = startTime + config.attackTime;
     gainNode.gain.setValueAtTime(0, startTime);
-    gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.005);
-    gainNode.gain.setValueAtTime(volume * 0.7, startTime + 0.01);
+    gainNode.gain.linearRampToValueAtTime(volume, attackEnd);
+    gainNode.gain.setValueAtTime(volume * 0.7, attackEnd + 0.005);
     gainNode.gain.setValueAtTime(volume * 0.6, startTime + duration * 0.3);
-    gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
+    gainNode.gain.linearRampToValueAtTime(0, startTime + duration + config.releaseTime * 0.5);
     
     masterGain.gain.value = 0.5;
     
+    const stopTime = startTime + duration + config.releaseTime;
     osc1.start(startTime);
     osc2.start(startTime);
     lfo.start(startTime);
-    osc1.stop(startTime + duration);
-    osc2.stop(startTime + duration);
-    lfo.stop(startTime + duration);
+    osc1.stop(stopTime);
+    osc2.stop(stopTime);
+    lfo.stop(stopTime);
   }, [getAudioContext]);
 
-  const playChiptuneBass = useCallback((frequency: number, startTime: number, duration: number, volume: number) => {
+  const playChiptuneBass = useCallback((
+    frequency: number, 
+    startTime: number, 
+    duration: number, 
+    volume: number,
+    config: RegionMusicConfig
+  ) => {
     const ctx = getAudioContext();
     
     const osc = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
     const gainNode = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
     
-    osc.type = 'triangle';
+    osc.type = config.bassWave;
+    osc2.type = config.bassWave;
     
     osc.frequency.setValueAtTime(frequency * 1.5, startTime);
     osc.frequency.exponentialRampToValueAtTime(frequency, startTime + 0.03);
+    osc2.frequency.setValueAtTime(frequency * 0.5, startTime);
+    
+    filter.type = 'lowpass';
+    filter.frequency.value = Math.min(config.filterFreq * 0.5, 800);
     
     osc.connect(gainNode);
-    gainNode.connect(ctx.destination);
+    osc2.connect(gainNode);
+    gainNode.connect(filter);
+    filter.connect(ctx.destination);
     
     gainNode.gain.setValueAtTime(0, startTime);
-    gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.008);
+    gainNode.gain.linearRampToValueAtTime(volume, startTime + config.attackTime * 0.5);
     gainNode.gain.setValueAtTime(volume * 0.8, startTime + 0.02);
     gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
     
     osc.start(startTime);
+    osc2.start(startTime);
     osc.stop(startTime + duration);
+    osc2.stop(startTime + duration);
   }, [getAudioContext]);
 
   const playChiptuneDrum = useCallback((startTime: number, type: 'kick' | 'snare' | 'hihat', style: string) => {
@@ -356,10 +495,16 @@ export function useRegionMusic(region: Region, isLegendary: boolean = false): Br
     startTime: number, 
     totalDuration: number, 
     volume: number,
-    _pulseWidth: number
+    config: RegionMusicConfig
   ) => {
     const ctx = getAudioContext();
-    const noteDuration = totalDuration / pattern.length;
+    const adjustedDuration = totalDuration * config.arpSpeed;
+    const noteDuration = adjustedDuration / pattern.length;
+    
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = 400;
+    filter.connect(ctx.destination);
     
     pattern.forEach((semitones, i) => {
       const freq = baseFreq * Math.pow(2, semitones / 12);
@@ -368,19 +513,19 @@ export function useRegionMusic(region: Region, isLegendary: boolean = false): Br
       const osc = ctx.createOscillator();
       const gainNode = ctx.createGain();
       
-      osc.type = 'square';
+      osc.type = config.arpWave;
       osc.frequency.setValueAtTime(freq, noteStart);
       
       osc.connect(gainNode);
-      gainNode.connect(ctx.destination);
+      gainNode.connect(filter);
       
       gainNode.gain.setValueAtTime(0, noteStart);
-      gainNode.gain.linearRampToValueAtTime(volume, noteStart + 0.002);
+      gainNode.gain.linearRampToValueAtTime(volume, noteStart + config.attackTime * 0.3);
       gainNode.gain.setValueAtTime(volume * 0.7, noteStart + 0.005);
       gainNode.gain.linearRampToValueAtTime(0, noteStart + noteDuration * 0.9);
       
       osc.start(noteStart);
-      osc.stop(noteStart + noteDuration);
+      osc.stop(noteStart + noteDuration + 0.01);
     });
   }, [getAudioContext]);
 
@@ -426,19 +571,19 @@ export function useRegionMusic(region: Region, isLegendary: boolean = false): Br
       const melodyNote = melody[beat];
       if (melodyNote > 0) {
         const volume = isLegendaryRef.current ? 0.08 : 0.06;
-        playChiptuneNote(melodyNote, nextNoteTimeRef.current, secondsPerBeat * 0.8, volume, config.pulseWidth);
+        playChiptuneNote(melodyNote, nextNoteTimeRef.current, secondsPerBeat * 0.8, volume, config);
       }
       
       const bassNote = bass[beat];
       if (bassNote > 0) {
         const volume = isLegendaryRef.current ? 0.1 : 0.08;
-        playChiptuneBass(bassNote, nextNoteTimeRef.current, secondsPerBeat * 0.9, volume);
+        playChiptuneBass(bassNote, nextNoteTimeRef.current, secondsPerBeat * 0.9, volume, config);
       }
       
       if (beat % 4 === 0) {
         const arpBase = NOTE_FREQS.C4;
         const volume = isLegendaryRef.current ? 0.04 : 0.03;
-        playChiptuneArpeggio(arpBase, arpPattern, nextNoteTimeRef.current, secondsPerBeat * 2, volume, config.pulseWidth);
+        playChiptuneArpeggio(arpBase, arpPattern, nextNoteTimeRef.current, secondsPerBeat * 2, volume, config);
       }
       
       if (beat === 7) {

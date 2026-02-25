@@ -1,22 +1,15 @@
 import type { MouthZone } from '../types';
 
-export const MOUTH_ZONES: MouthZone[] = [
-  { id: 'topLeft', label: 'Top Left', x: 0.15, y: 0.50, w: 0.23, h: 0.22 },
-  { id: 'topCenter', label: 'Top Front', x: 0.38, y: 0.50, w: 0.24, h: 0.22 },
-  { id: 'topRight', label: 'Top Right', x: 0.62, y: 0.50, w: 0.23, h: 0.22 },
-  { id: 'bottomLeft', label: 'Bottom Left', x: 0.15, y: 0.72, w: 0.23, h: 0.22 },
-  { id: 'bottomCenter', label: 'Bottom Front', x: 0.38, y: 0.72, w: 0.24, h: 0.22 },
-  { id: 'bottomRight', label: 'Bottom Right', x: 0.62, y: 0.72, w: 0.23, h: 0.22 }
-];
+// Single default zone centered on face area (fallback when no face detected)
+const DEFAULT_ZONE: MouthZone = { id: 'faceZone', label: 'Face', x: 0.30, y: 0.25, w: 0.40, h: 0.50 };
 
-export const CENTER_ZONES = ['topCenter', 'bottomCenter'];
+// Export single zone array for external use
+export const MOUTH_ZONES: MouthZone[] = [DEFAULT_ZONE];
+
+// Legacy exports for compatibility (no longer used for multi-zone logic)
+export const CENTER_ZONES = ['faceZone'];
 export const ZONE_NEIGHBORS: Record<string, string[]> = {
-  topCenter: ['topLeft', 'topRight', 'bottomCenter'],
-  bottomCenter: ['bottomLeft', 'bottomRight', 'topCenter'],
-  topLeft: ['topCenter', 'bottomLeft'],
-  topRight: ['topCenter', 'bottomRight'],
-  bottomLeft: ['bottomCenter', 'topLeft'],
-  bottomRight: ['bottomCenter', 'topRight']
+  faceZone: []
 };
 
 export interface MotionResult {
@@ -56,6 +49,10 @@ export class MotionDetector {
   private frameCount = 0;
   private debugMode = false;
   private lastDebugInfo: DebugInfo | null = null;
+  
+  // Smoothed face position for stable zone tracking
+  private smoothedFaceCenter: { x: number; y: number; w: number; h: number } | null = null;
+  private readonly smoothingFactor = 0.15; // Lower = smoother/slower tracking
 
   constructor() {
     this.canvas = document.createElement('canvas');
@@ -64,12 +61,70 @@ export class MotionDetector {
     this.ctx = ctx;
   }
 
+  // Calculate single zone centered on detected face
+  private getZonesForFace(faceRegion: FaceRegion | null, videoWidth: number, videoHeight: number): MouthZone[] {
+    if (!faceRegion || videoWidth === 0 || videoHeight === 0) {
+      return [DEFAULT_ZONE];
+    }
+
+    // Normalize face position to 0-1 range
+    const faceNormX = faceRegion.x / videoWidth;
+    const faceNormY = faceRegion.y / videoHeight;
+    const faceNormW = faceRegion.width / videoWidth;
+    const faceNormH = faceRegion.height / videoHeight;
+
+    // Smooth the face center position to avoid jittery zone
+    const targetCenter = {
+      x: faceNormX,
+      y: faceNormY + faceNormH * 0.5, // Center on face
+      w: faceNormW,
+      h: faceNormH
+    };
+
+    if (!this.smoothedFaceCenter) {
+      this.smoothedFaceCenter = targetCenter;
+    } else {
+      // Apply exponential smoothing
+      this.smoothedFaceCenter = {
+        x: this.smoothedFaceCenter.x + (targetCenter.x - this.smoothedFaceCenter.x) * this.smoothingFactor,
+        y: this.smoothedFaceCenter.y + (targetCenter.y - this.smoothedFaceCenter.y) * this.smoothingFactor,
+        w: this.smoothedFaceCenter.w + (targetCenter.w - this.smoothedFaceCenter.w) * this.smoothingFactor,
+        h: this.smoothedFaceCenter.h + (targetCenter.h - this.smoothedFaceCenter.h) * this.smoothingFactor
+      };
+    }
+
+    const fc = this.smoothedFaceCenter;
+    
+    // Single zone dimensions: covers the face area with some padding
+    // Zone is slightly larger than face to capture brushing motion around it
+    const zoneW = Math.max(0.30, Math.min(0.50, fc.w * 1.4));
+    const zoneH = Math.max(0.35, Math.min(0.55, fc.h * 1.2));
+    
+    // Center zone on face
+    const zoneX = fc.x - zoneW / 2;
+    const zoneY = fc.y - zoneH / 2;
+
+    // Clamp zone to stay within frame
+    const clamp = (val: number, min: number, max: number) => Math.max(min, Math.min(max, val));
+    const clampedX = clamp(zoneX, 0.02, 1 - zoneW - 0.02);
+    const clampedY = clamp(zoneY, 0.05, 1 - zoneH - 0.05);
+
+    return [
+      { id: 'faceZone', label: 'Face', x: clampedX, y: clampedY, w: zoneW, h: zoneH }
+    ];
+  }
+
   setDebugMode(enabled: boolean): void {
     this.debugMode = enabled;
   }
 
   getDebugInfo(): DebugInfo | null {
     return this.lastDebugInfo;
+  }
+
+  // Get current active zones (for external display/debugging)
+  getCurrentZones(faceRegion: FaceRegion | null, videoWidth: number, videoHeight: number): MouthZone[] {
+    return this.getZonesForFace(faceRegion, videoWidth, videoHeight);
   }
 
   private getFaceRegionNormalized(faceRegion: FaceRegion | null, width: number, height: number): { x: number; y: number; w: number; h: number } | null {
@@ -143,8 +198,11 @@ export class MotionDetector {
   detectMotion(video: HTMLVideoElement, faceRegion: FaceRegion | null = null): MotionResult[] {
     this.frameCount++;
     
+    // Get dynamic zones based on face position
+    const activeZones = this.getZonesForFace(faceRegion, video.videoWidth, video.videoHeight);
+    
     if (!video.videoWidth || !video.videoHeight) {
-      return MOUTH_ZONES.map(zone => ({
+      return activeZones.map(zone => ({
         zoneId: zone.id,
         motionLevel: 0,
         hasMotion: false
@@ -165,7 +223,7 @@ export class MotionDetector {
       this.ctx.drawImage(video, 0, 0, width, height);
     } catch (err) {
       console.error('[MotionDetector] Failed to draw video frame:', err);
-      return MOUTH_ZONES.map(zone => ({
+      return activeZones.map(zone => ({
         zoneId: zone.id,
         motionLevel: 0,
         hasMotion: false
@@ -176,7 +234,7 @@ export class MotionDetector {
 
     if (!this.previousFrame) {
       this.previousFrame = currentFrame;
-      return MOUTH_ZONES.map(zone => ({
+      return activeZones.map(zone => ({
         zoneId: zone.id,
         motionLevel: 0,
         hasMotion: false
@@ -187,7 +245,7 @@ export class MotionDetector {
     let handMotionDetected = false;
     const debugZones: DebugInfo['zones'] = [];
 
-    const results = MOUTH_ZONES.map(zone => {
+    const results = activeZones.map(zone => {
       const zoneX = Math.floor(zone.x * width);
       const zoneY = Math.floor(zone.y * height);
       const zoneW = Math.floor(zone.w * width);
@@ -280,5 +338,6 @@ export class MotionDetector {
   reset(): void {
     this.previousFrame = null;
     this.frameCount = 0;
+    this.smoothedFaceCenter = null;
   }
 }

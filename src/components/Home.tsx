@@ -69,7 +69,7 @@ export function Home({ userProgress, currentProfile, onStartBrushing, onViewColl
       <div className="flex flex-col gap-4 w-full max-w-xs pb-8">
         <button
           onClick={onStartBrushing}
-          className="w-full py-5 px-8 text-2xl font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl shadow-lg animate-pulse-glow active:scale-95 transition-transform"
+          className="w-full py-5 px-8 text-2xl font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl shadow-lg animate-button-glow active:scale-95 transition-transform"
         >
           Start Brushing! 🪥
         </button>

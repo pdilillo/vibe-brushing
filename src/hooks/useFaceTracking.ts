@@ -54,8 +54,6 @@ export function useFaceTracking(): UseFaceTrackingReturn {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const prevFrameRef = useRef<ImageData | null>(null);
   const lastPositionRef = useRef<FacePosition | null>(null);
-  const lastGoodXRef = useRef<number | null>(null);
-  const motionFramesRef = useRef<number>(0);
   const isDetectingRef = useRef<boolean>(false);
   const isRunningRef = useRef<boolean>(false);
   const initPromiseRef = useRef<Promise<boolean> | null>(null);
@@ -75,7 +73,7 @@ export function useFaceTracking(): UseFaceTrackingReturn {
             maxDetectedFaces: 1,
             fastMode: true
           });
-          await detector.detect(document.createElement('canvas'));
+          await detector.detect(document.createElement('video'));
           nativeDetectorRef.current = detector;
           detectorTypeRef.current = 'native';
           setIsLoading(false);
