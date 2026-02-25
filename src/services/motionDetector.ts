@@ -1,13 +1,23 @@
 import type { MouthZone } from '../types';
 
 export const MOUTH_ZONES: MouthZone[] = [
-  { id: 'topLeft', label: 'Top Left', x: 0.1, y: 0.55, w: 0.25, h: 0.2 },
-  { id: 'topCenter', label: 'Top Front', x: 0.35, y: 0.55, w: 0.3, h: 0.2 },
-  { id: 'topRight', label: 'Top Right', x: 0.65, y: 0.55, w: 0.25, h: 0.2 },
-  { id: 'bottomLeft', label: 'Bottom Left', x: 0.1, y: 0.75, w: 0.25, h: 0.2 },
-  { id: 'bottomCenter', label: 'Bottom Front', x: 0.35, y: 0.75, w: 0.3, h: 0.2 },
-  { id: 'bottomRight', label: 'Bottom Right', x: 0.65, y: 0.75, w: 0.25, h: 0.2 }
+  { id: 'topLeft', label: 'Top Left', x: 0.15, y: 0.50, w: 0.23, h: 0.22 },
+  { id: 'topCenter', label: 'Top Front', x: 0.38, y: 0.50, w: 0.24, h: 0.22 },
+  { id: 'topRight', label: 'Top Right', x: 0.62, y: 0.50, w: 0.23, h: 0.22 },
+  { id: 'bottomLeft', label: 'Bottom Left', x: 0.15, y: 0.72, w: 0.23, h: 0.22 },
+  { id: 'bottomCenter', label: 'Bottom Front', x: 0.38, y: 0.72, w: 0.24, h: 0.22 },
+  { id: 'bottomRight', label: 'Bottom Right', x: 0.62, y: 0.72, w: 0.23, h: 0.22 }
 ];
+
+export const CENTER_ZONES = ['topCenter', 'bottomCenter'];
+export const ZONE_NEIGHBORS: Record<string, string[]> = {
+  topCenter: ['topLeft', 'topRight', 'bottomCenter'],
+  bottomCenter: ['bottomLeft', 'bottomRight', 'topCenter'],
+  topLeft: ['topCenter', 'bottomLeft'],
+  topRight: ['topCenter', 'bottomRight'],
+  bottomLeft: ['bottomCenter', 'topLeft'],
+  bottomRight: ['bottomCenter', 'topRight']
+};
 
 export interface MotionResult {
   zoneId: string;
@@ -22,13 +32,30 @@ export interface FaceRegion {
   height: number;
 }
 
+export interface DebugInfo {
+  faceRegion: FaceRegion | null;
+  brushingRegion: { x: number; y: number; width: number; height: number } | null;
+  zones: Array<{
+    id: string;
+    bounds: { x: number; y: number; width: number; height: number };
+    motionLevel: number;
+    hasMotion: boolean;
+    motionPixels: number;
+    totalPixels: number;
+  }>;
+  frameMotionTotal: number;
+  handMotionDetected: boolean;
+}
+
 export class MotionDetector {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private previousFrame: ImageData | null = null;
-  private pixelThreshold = 10;
-  private motionThresholdPercent = 0.3;
+  private pixelThreshold = 20;
+  private motionThresholdPercent = 2.5;
   private frameCount = 0;
+  private debugMode = false;
+  private lastDebugInfo: DebugInfo | null = null;
 
   constructor() {
     this.canvas = document.createElement('canvas');
@@ -37,22 +64,80 @@ export class MotionDetector {
     this.ctx = ctx;
   }
 
-  private isInFaceRegion(x: number, y: number, faceRegion: FaceRegion | null, width: number, height: number): boolean {
-    if (!faceRegion) return false;
+  setDebugMode(enabled: boolean): void {
+    this.debugMode = enabled;
+  }
+
+  getDebugInfo(): DebugInfo | null {
+    return this.lastDebugInfo;
+  }
+
+  private getFaceRegionNormalized(faceRegion: FaceRegion | null, width: number, height: number): { x: number; y: number; w: number; h: number } | null {
+    if (!faceRegion) return null;
     
-    const faceX = (faceRegion.x - faceRegion.width / 2) / (width / 0.25);
-    const faceY = faceRegion.y / (height / 0.25);
-    const faceW = faceRegion.width / (width / 0.25);
-    const faceH = faceRegion.height / (height / 0.25);
+    const scaleFactor = 0.25;
+    const faceX = (faceRegion.x - faceRegion.width / 2) / (width / scaleFactor);
+    const faceY = faceRegion.y / (height / scaleFactor);
+    const faceW = faceRegion.width / (width / scaleFactor);
+    const faceH = faceRegion.height / (height / scaleFactor);
     
-    const padding = 0.1;
-    const expandedX = faceX - faceW * padding;
-    const expandedY = faceY - faceH * padding;
-    const expandedW = faceW * (1 + padding * 2);
-    const expandedH = faceH * (1 + padding * 2) * 0.7;
+    return { x: faceX, y: faceY, w: faceW, h: faceH };
+  }
+
+  private isInFaceCore(x: number, y: number, faceRegion: FaceRegion | null, width: number, height: number): boolean {
+    const face = this.getFaceRegionNormalized(faceRegion, width, height);
+    if (!face) return false;
     
-    return x >= expandedX && x <= expandedX + expandedW &&
-           y >= expandedY && y <= expandedY + expandedH;
+    const coreX = face.x + face.w * 0.15;
+    const coreY = face.y + face.h * 0.1;
+    const coreW = face.w * 0.7;
+    const coreH = face.h * 0.5;
+    
+    return x >= coreX && x <= coreX + coreW &&
+           y >= coreY && y <= coreY + coreH;
+  }
+
+  private isInBrushingRegion(x: number, y: number, faceRegion: FaceRegion | null, width: number, height: number): boolean {
+    const face = this.getFaceRegionNormalized(faceRegion, width, height);
+    if (!face) {
+      return y > 0.2;
+    }
+    
+    const brushX = face.x - face.w * 1.0;
+    const brushY = face.y - face.h * 0.1;
+    const brushW = face.w * 3.0;
+    const brushH = face.h * 2.5;
+    
+    return x >= brushX && x <= brushX + brushW &&
+           y >= brushY && y <= brushY + brushH;
+  }
+
+  getBrushingRegion(faceRegion: FaceRegion | null, videoWidth: number, videoHeight: number): { x: number; y: number; width: number; height: number } | null {
+    const scaleFactor = 0.25;
+    const width = videoWidth * scaleFactor;
+    const height = videoHeight * scaleFactor;
+    
+    const face = this.getFaceRegionNormalized(faceRegion, width, height);
+    if (!face) {
+      return {
+        x: 0,
+        y: 0.2 * videoHeight,
+        width: videoWidth,
+        height: 0.8 * videoHeight
+      };
+    }
+    
+    const brushX = face.x - face.w * 1.0;
+    const brushY = face.y - face.h * 0.1;
+    const brushW = face.w * 3.0;
+    const brushH = face.h * 2.5;
+    
+    return {
+      x: Math.max(0, brushX * videoWidth),
+      y: Math.max(0, brushY * videoHeight),
+      width: Math.min(brushW * videoWidth, videoWidth),
+      height: Math.min(brushH * videoHeight, videoHeight)
+    };
   }
 
   detectMotion(video: HTMLVideoElement, faceRegion: FaceRegion | null = null): MotionResult[] {
@@ -98,6 +183,10 @@ export class MotionDetector {
       }));
     }
 
+    let totalFrameMotion = 0;
+    let handMotionDetected = false;
+    const debugZones: DebugInfo['zones'] = [];
+
     const results = MOUTH_ZONES.map(zone => {
       const zoneX = Math.floor(zone.x * width);
       const zoneY = Math.floor(zone.y * height);
@@ -112,7 +201,11 @@ export class MotionDetector {
           const normalizedX = x / width;
           const normalizedY = y / height;
           
-          if (faceRegion && this.isInFaceRegion(normalizedX, normalizedY, faceRegion, width, height)) {
+          if (this.isInFaceCore(normalizedX, normalizedY, faceRegion, width, height)) {
+            continue;
+          }
+          
+          if (!this.isInBrushingRegion(normalizedX, normalizedY, faceRegion, width, height)) {
             continue;
           }
           
@@ -126,25 +219,59 @@ export class MotionDetector {
           
           if (avgDiff > this.pixelThreshold) {
             motionPixels++;
+            totalFrameMotion += avgDiff;
           }
           validPixels++;
         }
       }
 
       const motionPercentage = validPixels > 0 ? (motionPixels / validPixels) * 100 : 0;
+      const hasMotion = motionPercentage > this.motionThresholdPercent;
+      
+      if (hasMotion) {
+        handMotionDetected = true;
+      }
+
+      if (this.debugMode) {
+        debugZones.push({
+          id: zone.id,
+          bounds: {
+            x: zone.x,
+            y: zone.y,
+            width: zone.w,
+            height: zone.h
+          },
+          motionLevel: Math.min(motionPercentage * 2, 100),
+          hasMotion,
+          motionPixels,
+          totalPixels: validPixels
+        });
+      }
       
       return {
         zoneId: zone.id,
         motionLevel: Math.min(motionPercentage * 2, 100),
-        hasMotion: motionPercentage > this.motionThresholdPercent
+        hasMotion
       };
     });
+
+    if (this.debugMode) {
+      const brushingRegion = this.getBrushingRegion(faceRegion, width / 0.25, height / 0.25);
+      this.lastDebugInfo = {
+        faceRegion,
+        brushingRegion,
+        zones: debugZones,
+        frameMotionTotal: totalFrameMotion,
+        handMotionDetected
+      };
+    }
 
     this.previousFrame = currentFrame;
     
     if (this.frameCount % 20 === 0) {
       const activeZones = results.filter(r => r.hasMotion).length;
-      console.log('[MotionDetector] Frame', this.frameCount, '- Active zones:', activeZones);
+      console.log('[MotionDetector] Frame', this.frameCount, '- Active zones:', activeZones, 
+        '- Hand motion:', handMotionDetected, '- Total motion:', totalFrameMotion.toFixed(0));
     }
     
     return results;

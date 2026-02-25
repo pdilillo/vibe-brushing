@@ -11,6 +11,7 @@ import { Collection } from './components/Collection';
 import { Settings } from './components/Settings';
 import { ProfileSelect } from './components/ProfileSelect';
 import { HatDebug } from './components/HatDebug';
+import { GraphicsDebug } from './components/GraphicsDebug';
 import { getUserProgress, getCurrentProfileId, getProfile } from './services/database';
 import type { GamePhase, UserProgress, ZoneProgress, Creature, Hat, Region, UserProfile } from './types';
 
@@ -133,6 +134,10 @@ function App() {
     setPhase('hat-debug');
   }
 
+  function handleGraphicsDebug() {
+    setPhase('graphics-debug');
+  }
+
   if (phase === 'profile-select') {
     return (
       <div className="h-full w-full overflow-hidden">
@@ -163,7 +168,7 @@ function App() {
       )}
       
       {phase === 'settings' && (
-        <Settings onBack={handleGoHome} onHatDebug={handleHatDebug} />
+        <Settings onBack={handleGoHome} onHatDebug={handleHatDebug} onGraphicsDebug={handleGraphicsDebug} />
       )}
       
       {phase === 'camera-check' && (
@@ -234,6 +239,10 @@ function App() {
       
       {phase === 'hat-debug' && (
         <HatDebug onBack={handleGoHome} />
+      )}
+      
+      {phase === 'graphics-debug' && (
+        <GraphicsDebug onBack={handleGoHome} />
       )}
     </div>
   );

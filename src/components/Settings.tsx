@@ -4,9 +4,10 @@ import { getSettings, saveSettings, type AppSettings } from '../services/setting
 interface SettingsProps {
   onBack: () => void;
   onHatDebug?: () => void;
+  onGraphicsDebug?: () => void;
 }
 
-export function Settings({ onBack, onHatDebug }: SettingsProps) {
+export function Settings({ onBack, onHatDebug, onGraphicsDebug }: SettingsProps) {
   const [settings, setSettings] = useState<AppSettings>(getSettings);
 
   useEffect(() => {
@@ -96,18 +97,33 @@ export function Settings({ onBack, onHatDebug }: SettingsProps) {
           </div>
         </div>
 
-        {onHatDebug && (
+        {(onHatDebug || onGraphicsDebug) && (
           <div className="bg-gray-900/50 rounded-2xl p-4 border border-gray-700">
             <h2 className="text-lg font-bold mb-2 text-gray-300">Developer Tools</h2>
-            <button
-              onClick={onHatDebug}
-              className="w-full p-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-left transition-colors"
-            >
-              <div className="font-bold text-green-400">Hat Debug Mode</div>
-              <div className="text-xs text-gray-400 mt-1">
-                Test face tracking with debug overlay showing detected face rectangle
-              </div>
-            </button>
+            <div className="space-y-2">
+              {onGraphicsDebug && (
+                <button
+                  onClick={onGraphicsDebug}
+                  className="w-full p-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-left transition-colors"
+                >
+                  <div className="font-bold text-purple-400">Graphics Debug Menu</div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    Preview all creatures and hat graphics in a gallery view
+                  </div>
+                </button>
+              )}
+              {onHatDebug && (
+                <button
+                  onClick={onHatDebug}
+                  className="w-full p-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-left transition-colors"
+                >
+                  <div className="font-bold text-green-400">Hat Debug Mode</div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    Test face tracking with debug overlay showing detected face rectangle
+                  </div>
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>

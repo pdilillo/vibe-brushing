@@ -179,6 +179,7 @@ export function useFaceTracking(): UseFaceTrackingReturn {
     let motionX = 0;
     let motionY = 0;
     let motionWeight = 0;
+    const motionColumns = new Array(width).fill(0);
     
     let skinX = 0;
     let skinY = 0;
@@ -209,11 +210,12 @@ export function useFaceTracking(): UseFaceTrackingReturn {
           const pb = prevData[i + 2];
           const diff = Math.abs(r - pr) + Math.abs(g - pg) + Math.abs(b - pb);
           
-          if (diff > 30) {
+          if (diff > 40) {
             const weight = diff * (1 + (1 - y / upperRegion));
             motionWeight += weight;
             motionX += x * weight;
             motionY += y * weight;
+            motionColumns[x] += diff;
           }
         }
       }
@@ -222,42 +224,59 @@ export function useFaceTracking(): UseFaceTrackingReturn {
     prevFrameRef.current = currentFrame;
     
     const lastPos = lastPositionRef.current;
-    const baseWidth = video.videoWidth * 0.22;
-    let estimatedFaceWidth = baseWidth;
+    let estimatedFaceWidth: number;
     
-    if (lastPos && motionWeight > 50000) {
-      const centerY = skinWeight > 0 ? (skinY / skinWeight) / scale : video.videoHeight * 0.25;
-      const yRatio = Math.max(0, Math.min(1, centerY / (video.videoHeight * 0.5)));
-      estimatedFaceWidth = video.videoWidth * (0.15 + yRatio * 0.25);
+    if (motionWeight > 20000) {
+      const motionCenterX = Math.floor(motionX / motionWeight);
+      const maxMotion = Math.max(...motionColumns);
+      const threshold = maxMotion * 0.15;
+      
+      let leftEdge = motionCenterX;
+      let rightEdge = motionCenterX;
+      
+      for (let x = motionCenterX; x >= 0 && motionCenterX - x < width * 0.4; x--) {
+        if (motionColumns[x] >= threshold) leftEdge = x;
+        else if (x < motionCenterX - 5) break;
+      }
+      
+      for (let x = motionCenterX; x < width && x - motionCenterX < width * 0.4; x++) {
+        if (motionColumns[x] >= threshold) rightEdge = x;
+        else if (x > motionCenterX + 5) break;
+      }
+      
+      const motionSpan = (rightEdge - leftEdge) / scale;
+      const minW = video.videoWidth * 0.1;
+      const maxW = video.videoWidth * 0.4;
+      estimatedFaceWidth = Math.max(minW, Math.min(maxW, motionSpan * 1.5));
+      
+      console.log(`[FaceTracking] Motion: center=${motionCenterX}, span=${motionSpan.toFixed(0)}px → faceW: ${estimatedFaceWidth.toFixed(0)}`);
     } else if (lastPos) {
       estimatedFaceWidth = lastPos.width;
+    } else {
+      estimatedFaceWidth = video.videoWidth * 0.2;
     }
 
-    let faceX: number;
+    const faceX = video.videoWidth / 2;
     let method: string;
 
-    if (motionWeight > 50000 && skinWeight > 100) {
-      faceX = (motionX / motionWeight) / scale;
-      lastGoodXRef.current = faceX;
-      motionFramesRef.current = 10;
+    if (motionWeight > 20000) {
       method = 'motion';
-    } else if (motionFramesRef.current > 0 && lastGoodXRef.current !== null) {
-      faceX = lastGoodXRef.current;
-      motionFramesRef.current--;
-      method = 'hold';
     } else if (skinWeight > 100) {
-      faceX = (skinX / skinWeight) / scale;
-      if (lastGoodXRef.current === null) {
-        lastGoodXRef.current = faceX;
-      }
       method = 'skin';
     } else {
-      faceX = video.videoWidth / 2;
       method = 'center';
     }
     
-    const skinCenterY = skinWeight > 100 ? (skinY / skinWeight) / scale : video.videoHeight * 0.35;
-    const faceY = skinCenterY * 0.5;
+    let faceY: number;
+    if (motionWeight > 20000) {
+      const motionCenterY = (motionY / motionWeight) / scale;
+      faceY = Math.max(video.videoHeight * 0.05, motionCenterY * 0.6);
+    } else if (skinWeight > 100) {
+      const skinCenterY = (skinY / skinWeight) / scale;
+      faceY = Math.max(video.videoHeight * 0.05, skinCenterY * 0.5);
+    } else {
+      faceY = video.videoHeight * 0.15;
+    }
 
     console.log(`[FaceTracking] Fallback (${method}): x=${faceX.toFixed(0)}, y=${faceY.toFixed(0)}, w=${estimatedFaceWidth.toFixed(0)}`);
 

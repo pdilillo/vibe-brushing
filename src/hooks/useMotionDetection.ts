@@ -1,11 +1,14 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
-import { MotionDetector, MOUTH_ZONES, type MotionResult, type FaceRegion } from '../services/motionDetector';
+import { MotionDetector, MOUTH_ZONES, CENTER_ZONES, ZONE_NEIGHBORS, type MotionResult, type FaceRegion, type DebugInfo } from '../services/motionDetector';
 import type { ZoneProgress } from '../types';
+
+const SPILLOVER_RATE = 0.25;
 
 interface UseMotionDetectionOptions {
   targetCleaningTime?: number;
   detectionInterval?: number;
   decayRate?: number;
+  debugMode?: boolean;
 }
 
 interface UseMotionDetectionReturn {
@@ -17,10 +20,12 @@ interface UseMotionDetectionReturn {
   stopDetection: () => void;
   reset: () => void;
   setFaceRegion: (region: FaceRegion | null) => void;
+  setDebugMode: (enabled: boolean) => void;
+  getDebugInfo: () => DebugInfo | null;
 }
 
 export function useMotionDetection(options: UseMotionDetectionOptions = {}): UseMotionDetectionReturn {
-  const { targetCleaningTime = 20, detectionInterval = 100, decayRate = 0.15 } = options;
+  const { targetCleaningTime = 20, detectionInterval = 100, decayRate = 0.15, debugMode: initialDebugMode = false } = options;
   
   const detectorRef = useRef<MotionDetector | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -28,6 +33,7 @@ export function useMotionDetection(options: UseMotionDetectionOptions = {}): Use
   const cleaningTimeRef = useRef<Record<string, number>>({});
   const noMotionCountRef = useRef<Record<string, number>>({});
   const faceRegionRef = useRef<FaceRegion | null>(null);
+  const debugModeRef = useRef<boolean>(initialDebugMode);
   
   const [zoneProgress, setZoneProgress] = useState<ZoneProgress[]>(() =>
     MOUTH_ZONES.map(zone => ({
@@ -47,6 +53,17 @@ export function useMotionDetection(options: UseMotionDetectionOptions = {}): Use
 
   const setFaceRegion = useCallback((region: FaceRegion | null) => {
     faceRegionRef.current = region;
+  }, []);
+
+  const setDebugMode = useCallback((enabled: boolean) => {
+    debugModeRef.current = enabled;
+    if (detectorRef.current) {
+      detectorRef.current.setDebugMode(enabled);
+    }
+  }, []);
+
+  const getDebugInfo = useCallback((): DebugInfo | null => {
+    return detectorRef.current?.getDebugInfo() ?? null;
   }, []);
 
   const calculateProgress = useCallback(() => {
@@ -80,13 +97,23 @@ export function useMotionDetection(options: UseMotionDetectionOptions = {}): Use
     const results = detectorRef.current.detectMotion(video, faceRegionRef.current);
     setMotionResults(results);
     
+    const spilloverCredits: Record<string, number> = {};
+    
     results.forEach(result => {
       const currentTime = cleaningTimeRef.current[result.zoneId] || 0;
       
       if (result.hasMotion) {
         noMotionCountRef.current[result.zoneId] = 0;
-        const increment = (detectionInterval / 1000) * (result.motionLevel / 30);
+        const increment = (detectionInterval / 1000) * (result.motionLevel / 60);
         cleaningTimeRef.current[result.zoneId] = currentTime + increment;
+        
+        if (CENTER_ZONES.includes(result.zoneId)) {
+          const neighbors = ZONE_NEIGHBORS[result.zoneId] || [];
+          neighbors.forEach(neighborId => {
+            const spillover = increment * SPILLOVER_RATE;
+            spilloverCredits[neighborId] = (spilloverCredits[neighborId] || 0) + spillover;
+          });
+        }
       } else {
         const noMotionCount = (noMotionCountRef.current[result.zoneId] || 0) + 1;
         noMotionCountRef.current[result.zoneId] = noMotionCount;
@@ -96,6 +123,11 @@ export function useMotionDetection(options: UseMotionDetectionOptions = {}): Use
           cleaningTimeRef.current[result.zoneId] = Math.max(0, currentTime - decay);
         }
       }
+    });
+    
+    Object.entries(spilloverCredits).forEach(([zoneId, credit]) => {
+      const currentTime = cleaningTimeRef.current[zoneId] || 0;
+      cleaningTimeRef.current[zoneId] = currentTime + credit;
     });
     
     calculateProgress();
@@ -123,6 +155,7 @@ export function useMotionDetection(options: UseMotionDetectionOptions = {}): Use
       detectorRef.current = new MotionDetector();
     }
     
+    detectorRef.current.setDebugMode(debugModeRef.current);
     videoRef.current = video;
     
     if (intervalRef.current) {
@@ -175,6 +208,8 @@ export function useMotionDetection(options: UseMotionDetectionOptions = {}): Use
     startDetection,
     stopDetection,
     reset,
-    setFaceRegion
+    setFaceRegion,
+    setDebugMode,
+    getDebugInfo
   };
 }

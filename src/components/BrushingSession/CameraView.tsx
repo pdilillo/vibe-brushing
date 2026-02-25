@@ -1,7 +1,9 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useSharedCamera } from '../../contexts/CameraContext';
 import { HatGraphic } from '../HatGraphic';
+import { DebugOverlay } from './DebugOverlay';
 import type { Hat } from '../../types';
+import type { DebugInfo } from '../../services/motionDetector';
 
 interface FacePosition {
   x: number;
@@ -14,9 +16,12 @@ interface CameraViewProps {
   selectedHat: Hat | null;
   facePosition?: FacePosition | null;
   onVideoReady?: (video: HTMLVideoElement) => void;
+  isBrushing?: boolean;
+  debugMode?: boolean;
+  getDebugInfo?: () => DebugInfo | null;
 }
 
-export function CameraView({ selectedHat, facePosition, onVideoReady }: CameraViewProps) {
+export function CameraView({ selectedHat, facePosition, onVideoReady, isBrushing = false, debugMode = false, getDebugInfo }: CameraViewProps) {
   const { isReady, error, registerVideoElement } = useSharedCamera();
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -95,7 +100,7 @@ export function CameraView({ selectedHat, facePosition, onVideoReady }: CameraVi
   });
 
   return (
-    <div ref={containerRef} className="relative w-full aspect-[4/3] max-h-[35vh] bg-purple-900/30 rounded-2xl overflow-hidden">
+    <div ref={containerRef} className="relative w-full h-full bg-purple-900/30 rounded-2xl overflow-hidden">
       <video
         ref={setVideoRef}
         autoPlay
@@ -125,6 +130,17 @@ export function CameraView({ selectedHat, facePosition, onVideoReady }: CameraVi
         <HatGraphic
           hat={selectedHat}
           facePosition={facePosition || null}
+          containerWidth={containerSize.width}
+          containerHeight={containerSize.height}
+          videoWidth={videoSize.width}
+          videoHeight={videoSize.height}
+          isBrushing={isBrushing}
+        />
+      )}
+      
+      {debugMode && getDebugInfo && containerSize.width > 0 && (
+        <DebugOverlay
+          getDebugInfo={getDebugInfo}
           containerWidth={containerSize.width}
           containerHeight={containerSize.height}
           videoWidth={videoSize.width}

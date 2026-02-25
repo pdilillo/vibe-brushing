@@ -64,14 +64,18 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
     }
   }, [registerVideoElement]);
   
+  const [debugMode, setDebugModeState] = useState(false);
+  
   const { 
     zoneProgress, 
     motionResults, 
     overallProgress, 
     startDetection, 
     stopDetection,
-    setFaceRegion
-  } = useMotionDetection({ targetCleaningTime: 15 });
+    setFaceRegion,
+    setDebugMode,
+    getDebugInfo
+  } = useMotionDetection({ targetCleaningTime: 25 });
   const { facePosition, startTracking, stopTracking } = useFaceTracking();
   
   const completedZonesRef = useRef<Set<string>>(new Set());
@@ -154,6 +158,14 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
     startTracking(video);
     lastMotionTime.current = Date.now();
   }, [startDetection, startTracking]);
+
+  const toggleDebugMode = useCallback(() => {
+    setDebugModeState(prev => {
+      const newValue = !prev;
+      setDebugMode(newValue);
+      return newValue;
+    });
+  }, [setDebugMode]);
 
   useEffect(() => {
     if (phase !== 'countdown') return;
@@ -359,30 +371,45 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
         <RegionBackground region={region} />
       </div>
       
-      <div className="relative z-10 flex flex-col h-full p-4 gap-3">
-        <div className="flex justify-between items-start">
-          <button
-            onClick={handleCancel}
-            className="px-4 py-2 text-sm text-white/80 bg-black/30 rounded-xl backdrop-blur-sm"
-          >
-            ✕ Stop
-          </button>
-          <Timer timeRemaining={timeRemaining} totalTime={sessionDuration} />
-          <button
-            onClick={handleManualCapture}
-            className="px-4 py-2 text-sm text-white bg-pink-600/80 rounded-xl active:scale-95 backdrop-blur-sm"
-          >
-            📸
-          </button>
-        </div>
-        
-        <div className="flex-1 flex flex-col gap-3 overflow-hidden">
+      <div className="relative z-10 flex flex-col h-full p-2 gap-2">
+        <div className="h-2/3 relative overflow-hidden">
           <CameraView
             selectedHat={selectedHat}
             facePosition={facePosition}
             onVideoReady={handleVideoReady}
+            isBrushing={motionResults.some(r => r.hasMotion)}
+            debugMode={debugMode}
+            getDebugInfo={getDebugInfo}
           />
           
+          <div className="absolute top-2 left-2 right-2 flex justify-between items-start pointer-events-auto z-20">
+            <button
+              onClick={handleCancel}
+              className="px-3 py-1.5 text-sm text-white/80 bg-black/50 rounded-xl backdrop-blur-sm pointer-events-auto"
+            >
+              ✕
+            </button>
+            <Timer timeRemaining={timeRemaining} totalTime={sessionDuration} />
+            <div className="flex gap-1">
+              <button
+                onClick={toggleDebugMode}
+                className={`px-2 py-1.5 text-sm rounded-xl active:scale-95 backdrop-blur-sm pointer-events-auto ${
+                  debugMode ? 'text-yellow-400 bg-yellow-900/80' : 'text-white/60 bg-black/50'
+                }`}
+              >
+                🔧
+              </button>
+              <button
+                onClick={handleManualCapture}
+                className="px-2 py-1.5 text-sm text-white bg-pink-600/80 rounded-xl active:scale-95 backdrop-blur-sm pointer-events-auto"
+              >
+                📸
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="h-1/3 overflow-auto">
           {creature ? (
             <CreatureCleaning
               creature={creature}
