@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Comic Sans MS"', 'Chalkboard', '"Comic Neue"', 'cursive', 'sans-serif'],
+        sans: ['Nunito', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
       },
       animation: {
         'sparkle': 'sparkle 1.5s ease-in-out infinite',

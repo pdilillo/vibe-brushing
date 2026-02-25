@@ -192,7 +192,7 @@ export function CreatureArt({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundImage: 'url(/creatures/gunk-overlay.png)',
+    backgroundImage: `url(${import.meta.env.BASE_URL}creatures/gunk-overlay.png)`,
     backgroundSize: 'cover',
     backgroundPosition: 'center top',
     opacity: gunkOpacity,
@@ -234,7 +234,7 @@ export function CreatureArt({
             className={animated ? 'animate-creature-idle' : ''}
           >
             <img
-              src={`/creatures/${creature.id}-possessed.png`}
+              src={`${import.meta.env.BASE_URL}creatures/${creature.id}-possessed.png`}
               alt={`${creature.name} (Possessed)`}
               style={possessedImageStyle}
               onError={() => setPossessedImageError(true)}
@@ -273,7 +273,7 @@ export function CreatureArt({
       const spriteStyle: React.CSSProperties = {
         width: displayWidth,
         height: displayHeight,
-        backgroundImage: `url(/creatures/${creature.id}-spritesheet.png)`,
+        backgroundImage: `url(${import.meta.env.BASE_URL}creatures/${creature.id}-spritesheet.png)`,
         backgroundSize: `${spriteConfig.cols * 100}% ${spriteConfig.rows * 100}%`,
         backgroundPosition: '0% 0%',
         backgroundRepeat: 'no-repeat',
@@ -312,7 +312,7 @@ export function CreatureArt({
           className={animated ? 'animate-creature-idle' : ''}
         >
           <img
-            src={`/creatures/${creature.id}.png`}
+            src={`${import.meta.env.BASE_URL}creatures/${creature.id}.png`}
             alt={creature.name}
             style={imageStyle}
             onError={() => setImageError(true)}

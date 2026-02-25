@@ -23,7 +23,7 @@ html, body, #root {
 }
 
 body {
-  font-family: 'Comic Sans MS', 'Chalkboard', 'Comic Neue', cursive, sans-serif;
+  font-family: 'Nunito', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4C1D95 100%);
   color: white;
   -webkit-font-smoothing: antialiased;

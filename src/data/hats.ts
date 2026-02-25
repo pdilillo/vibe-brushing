@@ -1,17 +1,19 @@
 import type { Hat } from '../types';
 
+const base = import.meta.env.BASE_URL;
+
 export const ALL_HATS: Hat[] = [
   // Starter hats
   {
     id: 'crown',
     name: 'Royal Crown',
-    imageUrl: '/creatures/hat-crown.png',
+    imageUrl: `${base}creatures/hat-crown.png`,
     unlockCondition: 'starter'
   },
   {
     id: 'party',
     name: 'Party Hat',
-    imageUrl: '/creatures/hat-party.png',
+    imageUrl: `${base}creatures/hat-party.png`,
     unlockCondition: 'starter'
   },
   
@@ -19,28 +21,28 @@ export const ALL_HATS: Hat[] = [
   {
     id: 'wizard',
     name: 'Wizard Hat',
-    imageUrl: '/creatures/hat-wizard.png',
+    imageUrl: `${base}creatures/hat-wizard.png`,
     unlockCondition: 'sessions',
     unlockThreshold: 10
   },
   {
     id: 'cowboy',
     name: 'Cowboy Hat',
-    imageUrl: '/creatures/hat-cowboy.png',
+    imageUrl: `${base}creatures/hat-cowboy.png`,
     unlockCondition: 'sessions',
     unlockThreshold: 25
   },
   {
     id: 'chef',
     name: 'Chef Hat',
-    imageUrl: '/creatures/hat-chef.png',
+    imageUrl: `${base}creatures/hat-chef.png`,
     unlockCondition: 'sessions',
     unlockThreshold: 50
   },
   {
     id: 'astronaut',
     name: 'Space Helmet',
-    imageUrl: '/creatures/hat-astronaut.png',
+    imageUrl: `${base}creatures/hat-astronaut.png`,
     unlockCondition: 'sessions',
     unlockThreshold: 100
   },
@@ -49,14 +51,14 @@ export const ALL_HATS: Hat[] = [
   {
     id: 'pirate',
     name: 'Pirate Hat',
-    imageUrl: '/creatures/hat-pirate.png',
+    imageUrl: `${base}creatures/hat-pirate.png`,
     unlockCondition: 'streak',
     unlockThreshold: 7
   },
   {
     id: 'princess',
     name: 'Princess Tiara',
-    imageUrl: '/creatures/hat-princess.png',
+    imageUrl: `${base}creatures/hat-princess.png`,
     unlockCondition: 'streak',
     unlockThreshold: 30
   },
@@ -65,14 +67,14 @@ export const ALL_HATS: Hat[] = [
   {
     id: 'unicorn-horn',
     name: 'Unicorn Horn',
-    imageUrl: '/creatures/hat-unicorn-horn.png',
+    imageUrl: `${base}creatures/hat-unicorn-horn.png`,
     unlockCondition: 'creature',
     unlockThreshold: 5
   },
   {
     id: 'dragon-horns',
     name: 'Dragon Horns',
-    imageUrl: '/creatures/hat-dragon-horns.png',
+    imageUrl: `${base}creatures/hat-dragon-horns.png`,
     unlockCondition: 'creature',
     unlockThreshold: 10
   }

@@ -17,12 +17,16 @@ interface Particle {
   drift: number;
 }
 
-const REGION_BACKGROUNDS: Record<Region, string> = {
-  grassland: '/creatures/bg-grassland.png',
-  coastal: '/creatures/bg-coastal.png',
-  lava: '/creatures/bg-lava.png',
-  city: '/creatures/bg-city.png',
-  sky: '/creatures/bg-sky.png',
+const getRegionBackground = (region: Region): string => {
+  const base = import.meta.env.BASE_URL;
+  const backgrounds: Record<Region, string> = {
+    grassland: `${base}creatures/bg-grassland.png`,
+    coastal: `${base}creatures/bg-coastal.png`,
+    lava: `${base}creatures/bg-lava.png`,
+    city: `${base}creatures/bg-city.png`,
+    sky: `${base}creatures/bg-sky.png`,
+  };
+  return backgrounds[region];
 };
 
 export function RegionBackground({ region }: RegionBackgroundProps) {
@@ -30,7 +34,7 @@ export function RegionBackground({ region }: RegionBackgroundProps) {
   const [particles, setParticles] = useState<Particle[]>([]);
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const backgroundImage = REGION_BACKGROUNDS[region];
+  const backgroundImage = getRegionBackground(region);
 
   const gradientStyle = useMemo(() => {
     const { colors } = regionData;

@@ -17,10 +17,10 @@ interface DraggableSticker extends PlacedSticker {
 }
 
 const SIZE_PRESETS = [
-  { label: 'XS', scale: 0.5 },
   { label: 'S', scale: 0.75 },
   { label: 'M', scale: 1.0 },
   { label: 'L', scale: 1.5 },
+  { label: 'XL', scale: 2.0 },
 ] as const;
 
 const STICKER_BASE_SIZE = 80;
@@ -60,7 +60,7 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack }: PhotoE
       id: uuidv4(),
       stickerId: creature.id,
       creatureId: creature.id,
-      imageUrl: `/creatures/${creature.id}.png`,
+      imageUrl: `${import.meta.env.BASE_URL}creatures/${creature.id}.png`,
       x,
       y,
       scale: 1,
@@ -133,17 +133,24 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack }: PhotoE
     setSelectedBackground(ALL_BACKGROUNDS[nextIndex]);
   }, [selectedBackground]);
 
-  const handleRemoveSelectedSticker = useCallback(() => {
-    if (selectedStickerId) {
-      handleRemoveSticker(selectedStickerId);
-    }
-  }, [selectedStickerId, handleRemoveSticker]);
-
   const handleCycleSelectedSize = useCallback(() => {
     if (selectedStickerId) {
       handleCycleSize(selectedStickerId);
     }
   }, [selectedStickerId, handleCycleSize]);
+
+  const handleRotateSticker = useCallback((stickerId: string) => {
+    setPlacedStickers(prev => prev.map(s => {
+      if (s.id !== stickerId) return s;
+      return { ...s, rotation: (s.rotation + 45) % 360 };
+    }));
+  }, []);
+
+  const handleRotateSelectedSticker = useCallback(() => {
+    if (selectedStickerId) {
+      handleRotateSticker(selectedStickerId);
+    }
+  }, [selectedStickerId, handleRotateSticker]);
 
   const triggerExplosion = useCallback(() => {
     setIsExploding(true);
@@ -362,20 +369,36 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack }: PhotoE
               onTouchStart={(e) => handleDragStart(sticker.id, e)}
               onClick={(e) => handleStickerClick(sticker.id, e)}
             >
-              <div
-                className={`relative ${isSelected ? 'ring-2 ring-yellow-400 ring-offset-2 ring-offset-transparent rounded-lg' : ''}`}
-                style={{
-                  transform: `scale(${sticker.scale}) rotate(${sticker.rotation}deg)`,
-                  transition: isDragging ? 'none' : 'transform 0.15s'
-                }}
-              >
-                <img
-                  src={sticker.imageUrl}
-                  alt="Sticker"
-                  className="pointer-events-none"
-                  style={{ width: STICKER_BASE_SIZE, height: STICKER_BASE_SIZE, objectFit: 'contain' }}
-                  draggable={false}
-                />
+              <div className="relative">
+                <div
+                  className={`relative ${isSelected ? 'ring-2 ring-yellow-400 ring-offset-2 ring-offset-transparent rounded-lg' : ''}`}
+                  style={{
+                    transform: `scale(${sticker.scale}) rotate(${sticker.rotation}deg)`,
+                    transition: isDragging ? 'none' : 'transform 0.15s'
+                  }}
+                >
+                  <img
+                    src={sticker.imageUrl}
+                    alt="Sticker"
+                    className="pointer-events-none"
+                    style={{ width: STICKER_BASE_SIZE, height: STICKER_BASE_SIZE, objectFit: 'contain' }}
+                    draggable={false}
+                  />
+                </div>
+                {isSelected && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveSticker(sticker.id);
+                    }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white text-sm shadow-lg hover:bg-red-500 active:scale-90 transition-transform"
+                    style={{ transform: `scale(${1 / sticker.scale})` }}
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
             </div>
           );
@@ -445,7 +468,7 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack }: PhotoE
               className="h-12 flex-shrink-0 bg-green-700/50 rounded-xl flex items-center gap-2 px-3 active:scale-95 transition-transform hover:bg-green-600/50"
             >
               <img
-                src={`/creatures/${lastAddedCreature.id}.png`}
+                src={`${import.meta.env.BASE_URL}creatures/${lastAddedCreature.id}.png`}
                 alt={lastAddedCreature.name}
                 className="w-8 h-8 object-contain"
               />
@@ -475,10 +498,21 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack }: PhotoE
               </button>
               
               <button
-                onClick={handleRemoveSelectedSticker}
-                className="w-12 h-12 flex-shrink-0 bg-red-600 rounded-xl flex items-center justify-center text-xl text-white active:scale-95 transition-transform shadow-lg"
+                onClick={handleRotateSelectedSticker}
+                className="w-12 h-12 flex-shrink-0 bg-orange-600 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-lg"
               >
-                ✕
+                <svg 
+                  viewBox="0 0 24 24" 
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 12a9 9 0 1 1-9-9" />
+                  <path d="M21 3v9h-9" />
+                </svg>
               </button>
             </>
           )}
@@ -614,7 +648,7 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack }: PhotoE
                     className="aspect-square bg-purple-800/50 rounded-xl p-2 flex flex-col items-center justify-center gap-1 hover:bg-purple-700/50 active:scale-95 transition-all"
                   >
                     <img
-                      src={`/creatures/${creature.id}.png`}
+                      src={`${import.meta.env.BASE_URL}creatures/${creature.id}.png`}
                       alt={creature.name}
                       className="w-16 h-16 object-contain"
                     />
