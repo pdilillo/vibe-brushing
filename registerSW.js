@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/vibe-brushing/sw.js', { scope: '/vibe-brushing/' })})}
