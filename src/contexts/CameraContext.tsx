@@ -1,17 +1,12 @@
 import React, { createContext, useContext, useRef, useState, useCallback, useEffect } from 'react';
 
-interface FacePosition {
+interface BuddyOverlay {
+  imageUrl: string;
   x: number;
   y: number;
-  width: number;
-  height: number;
-}
-
-interface HatOverlay {
-  imageUrl: string;
-  facePosition: FacePosition | null;
-  containerWidth: number;
-  containerHeight: number;
+  size: number;
+  rotation: number;
+  flipX: boolean;
 }
 
 interface CameraContextType {
@@ -22,7 +17,7 @@ interface CameraContextType {
   startCamera: () => Promise<void>;
   stopCamera: () => void;
   captureFrame: () => string | null;
-  captureFrameWithHat: (hatOverlay: HatOverlay | null) => Promise<string | null>;
+  captureFrameWithBuddy: (buddyOverlay: BuddyOverlay | null) => Promise<string | null>;
   registerVideoElement: (video: HTMLVideoElement | null) => void;
 }
 
@@ -278,7 +273,7 @@ export function CameraProvider({ children }: { children: React.ReactNode }) {
     return canvas.toDataURL('image/jpeg', 0.8);
   }, []);
 
-  const captureFrameWithHat = useCallback(async (hatOverlay: HatOverlay | null): Promise<string | null> => {
+  const captureFrameWithBuddy = useCallback(async (buddyOverlay: BuddyOverlay | null): Promise<string | null> => {
     if (!videoRef.current) return null;
     
     const video = videoRef.current;
@@ -299,56 +294,34 @@ export function CameraProvider({ children }: { children: React.ReactNode }) {
     ctx.drawImage(video, 0, 0);
     ctx.restore();
     
-    if (hatOverlay && hatOverlay.imageUrl) {
+    if (buddyOverlay && buddyOverlay.imageUrl) {
       try {
-        const hatImg = new Image();
-        hatImg.crossOrigin = 'anonymous';
+        const buddyImg = new Image();
+        buddyImg.crossOrigin = 'anonymous';
         
         await new Promise<void>((resolve, reject) => {
-          hatImg.onload = () => resolve();
-          hatImg.onerror = reject;
-          hatImg.src = hatOverlay.imageUrl;
+          buddyImg.onload = () => resolve();
+          buddyImg.onerror = reject;
+          buddyImg.src = buddyOverlay.imageUrl;
         });
         
-        const videoWidth = video.videoWidth;
-        const videoHeight = video.videoHeight;
-        const { containerWidth, containerHeight, facePosition } = hatOverlay;
+        const { x, y, size, rotation, flipX } = buddyOverlay;
         
-        const scaleX = containerWidth / videoWidth;
-        const scaleY = containerHeight / videoHeight;
-        
-        let hatWidth: number;
-        let hatX: number;
-        let hatY: number;
-        
-        if (facePosition && containerWidth > 0 && containerHeight > 0) {
-          const minHatWidth = 50 / scaleX;
-          const maxHatWidth = (containerWidth * 0.25) / scaleX;
-          const scaledFaceWidth = facePosition.width;
-          hatWidth = Math.max(minHatWidth, Math.min(maxHatWidth, scaledFaceWidth * 0.5));
-          
-          hatX = videoWidth / 2;
-          
-          const faceTopY = facePosition.y;
-          const hatOffset = hatWidth * 0.55;
-          hatY = Math.max(5 / scaleY, faceTopY - hatOffset);
-        } else {
-          hatWidth = videoWidth * 0.2;
-          hatX = videoWidth / 2;
-          hatY = videoHeight * 0.1;
-        }
-        
-        const hatHeight = hatWidth * (hatImg.height / hatImg.width);
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate((rotation * Math.PI) / 180);
+        ctx.scale(flipX ? -1 : 1, 1);
         
         ctx.drawImage(
-          hatImg,
-          hatX - hatWidth / 2,
-          hatY,
-          hatWidth,
-          hatHeight
+          buddyImg,
+          -size / 2,
+          -size / 2,
+          size,
+          size
         );
+        ctx.restore();
       } catch (err) {
-        console.error('Failed to load hat image for capture:', err);
+        console.error('Failed to load buddy image for capture:', err);
       }
     }
     
@@ -372,7 +345,7 @@ export function CameraProvider({ children }: { children: React.ReactNode }) {
       startCamera,
       stopCamera,
       captureFrame,
-      captureFrameWithHat,
+      captureFrameWithBuddy,
       registerVideoElement
     }}>
       {children}

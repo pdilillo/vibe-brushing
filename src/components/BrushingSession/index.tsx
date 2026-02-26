@@ -11,10 +11,10 @@ import { CreatureCleaning } from './CreatureCleaning';
 import { RegionBackground } from './RegionBackground';
 import { ZoneProgress } from './ZoneProgress';
 import { Timer } from './Timer';
-import type { Hat, ZoneProgress as ZoneProgressType, Region, Creature } from '../../types';
+import type { Buddy, ZoneProgress as ZoneProgressType, Region, Creature } from '../../types';
 
 interface BrushingSessionProps {
-  selectedHat: Hat | null;
+  selectedBuddy: Buddy | null;
   capturedCreatureIds: string[];
   onComplete: (results: {
     cleaningPercentage: number;
@@ -34,7 +34,7 @@ function getPhotoIntervals(duration: number): number[] {
   return [45, 90, 135];
 }
 
-export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, onCancel }: BrushingSessionProps) {
+export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete, onCancel }: BrushingSessionProps) {
   const sessionDuration = useMemo(() => getSessionDurationSeconds(), []);
   const photoIntervals = useMemo(() => getPhotoIntervals(sessionDuration), [sessionDuration]);
   
@@ -51,12 +51,13 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
   const lastMotionTime = useRef<number>(Date.now());
   const pauseCheckInterval = useRef<number | null>(null);
   
-  const { startCamera, captureFrameWithHat, stopCamera, registerVideoElement } = useSharedCamera();
+  const { startCamera, captureFrameWithBuddy, stopCamera, registerVideoElement } = useSharedCamera();
+  const buddyStateRef = useRef<{ x: number; y: number; rotation: number; flipX: boolean } | null>(null);
   const pauseVideoRef = useRef<HTMLVideoElement | null>(null);
   const containerSizeRef = useRef({ width: 0, height: 0 });
   
-  const isLegendaryOrMythic = creature?.rarity === 'legendary' || creature?.rarity === 'mythic';
-  const music = useRegionMusic(region, isLegendaryOrMythic);
+  const creatureRarity = creature?.rarity || 'common';
+  const music = useRegionMusic(region, creatureRarity);
   
   const setPauseVideoRef = useCallback((el: HTMLVideoElement | null) => {
     pauseVideoRef.current = el;
@@ -164,16 +165,18 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
     containerSizeRef.current = { width, height };
   }, []);
 
-  const capturePhotoWithHat = useCallback(async () => {
-    const hatOverlay = selectedHat ? {
-      imageUrl: selectedHat.imageUrl,
-      facePosition: facePosition || null,
-      containerWidth: containerSizeRef.current.width,
-      containerHeight: containerSizeRef.current.height,
+  const capturePhotoWithBuddy = useCallback(async () => {
+    const buddyOverlay = selectedBuddy && buddyStateRef.current ? {
+      imageUrl: selectedBuddy.imageUrl,
+      x: buddyStateRef.current.x,
+      y: buddyStateRef.current.y,
+      size: 60,
+      rotation: buddyStateRef.current.rotation,
+      flipX: buddyStateRef.current.flipX,
     } : null;
     
-    return captureFrameWithHat(hatOverlay);
-  }, [selectedHat, facePosition, captureFrameWithHat]);
+    return captureFrameWithBuddy(buddyOverlay);
+  }, [selectedBuddy, captureFrameWithBuddy]);
 
   const toggleDebugMode = useCallback(() => {
     setDebugModeState(prev => {
@@ -222,14 +225,14 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
     photoIntervals.forEach(interval => {
       if (elapsed >= interval && !photoCapturedAt.current.has(interval)) {
         photoCapturedAt.current.add(interval);
-        capturePhotoWithHat().then(frame => {
+        capturePhotoWithBuddy().then(frame => {
           if (frame) {
             setPhotos(prev => [...prev, frame]);
           }
         });
       }
     });
-  }, [timeRemaining, phase, capturePhotoWithHat, photoIntervals, sessionDuration]);
+  }, [timeRemaining, phase, capturePhotoWithBuddy, photoIntervals, sessionDuration]);
 
   useEffect(() => {
     if (phase === 'brushing' && !musicStartedRef.current) {
@@ -262,7 +265,7 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
     stopDetection();
     stopTracking();
     
-    const finalFrame = await capturePhotoWithHat();
+    const finalFrame = await capturePhotoWithBuddy();
     const allPhotos = finalFrame ? [...photos, finalFrame] : photos;
     
     setTimeout(() => {
@@ -275,7 +278,7 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
         creature,
       });
     }, 500);
-  }, [stopDetection, stopTracking, capturePhotoWithHat, photos, overallProgress, zoneProgress, onComplete, stopCamera, music, region, creature]);
+  }, [stopDetection, stopTracking, capturePhotoWithBuddy, photos, overallProgress, zoneProgress, onComplete, stopCamera, music, region, creature]);
 
   const handleResume = useCallback(() => {
     lastMotionTime.current = Date.now();
@@ -284,11 +287,11 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
   }, []);
 
   const handleManualCapture = useCallback(async () => {
-    const frame = await capturePhotoWithHat();
+    const frame = await capturePhotoWithBuddy();
     if (frame) {
       setPhotos(prev => [...prev, frame]);
     }
-  }, [capturePhotoWithHat]);
+  }, [capturePhotoWithBuddy]);
 
   const handleCancel = useCallback(() => {
     music.stop();
@@ -392,11 +395,10 @@ export function BrushingSession({ selectedHat, capturedCreatureIds, onComplete, 
       <div className="relative z-10 flex flex-col h-full p-2 gap-2">
         <div className="h-2/3 relative overflow-hidden">
           <CameraView
-            selectedHat={selectedHat}
-            facePosition={facePosition}
+            selectedBuddy={selectedBuddy}
             onVideoReady={handleVideoReady}
             onContainerSize={handleContainerSize}
-            isBrushing={motionResults.some(r => r.hasMotion)}
+            activityScore={motionResults.reduce((sum, r) => sum + r.motionLevel, 0) / Math.max(motionResults.length, 1)}
             debugMode={debugMode}
             getDebugInfo={getDebugInfo}
           />

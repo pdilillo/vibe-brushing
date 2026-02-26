@@ -1,48 +1,48 @@
 import { useState } from 'react';
 import { CreatureArt } from './CreatureArt';
-import { HatPreview } from './HatPreview';
+import { BuddyPreview } from './BuddyPreview';
 import { ALL_CREATURES } from '../data/creatures';
-import { ALL_HATS } from '../data/hats';
+import { ALL_BUDDIES } from '../data/buddies';
 import type { Region, Creature } from '../types';
 
 interface GraphicsDebugProps {
   onBack: () => void;
 }
 
-type ViewMode = 'creatures' | 'hats';
+type ViewMode = 'creatures' | 'buddies';
 type CreatureFilter = 'all' | Region;
 type RarityFilter = 'all' | 'common' | 'rare' | 'legendary' | 'mythic';
 
 const REGIONS: Region[] = ['grassland', 'coastal', 'lava', 'city', 'sky'];
 
-type DesignStyle = 'pokemon' | 'digimon' | 'yokai' | 'slime';
+type DesignStyle = 'sparklings' | 'mechazoids' | 'mystlings' | 'blobkins';
 
 function getDesignStyle(creature: Creature): DesignStyle {
   const type = creature.monsterType.toLowerCase();
   const id = creature.id.toLowerCase();
   
   if (type.includes('slime') || type.includes('blob') || type.includes('jelly') || type.includes('ghost')) {
-    return 'slime';
+    return 'blobkins';
   }
   if (type.includes('cat') || type.includes('fox') || type.includes('raccoon') || 
       type.includes('tanuki') || type.includes('spirit') || type.includes('kappa') ||
       type.includes('owl') || id.includes('yokai') || id.includes('spirit')) {
-    return 'yokai';
+    return 'mystlings';
   }
   if (type.includes('dragon') || type.includes('drake') || type.includes('mecha') ||
       type.includes('robo') || type.includes('cyber') || type.includes('dino') ||
       id.includes('gear') || id.includes('mecha') || id.includes('cyber') ||
       id.includes('robo') || id.includes('volt') || id.includes('data')) {
-    return 'digimon';
+    return 'mechazoids';
   }
-  return 'pokemon';
+  return 'sparklings';
 }
 
 const STYLE_INFO: Record<DesignStyle, { label: string; icon: string; color: string; description: string }> = {
-  pokemon: { label: 'Pokemon', icon: '⚡', color: 'bg-yellow-500', description: 'Clean, elemental, iconic' },
-  digimon: { label: 'Digimon', icon: '🤖', color: 'bg-blue-600', description: 'Digital, robotic, tech' },
-  yokai: { label: 'Yokai', icon: '👻', color: 'bg-purple-600', description: 'Spiritual, mystical, Japanese' },
-  slime: { label: 'Slime', icon: '🫧', color: 'bg-lime-500', description: 'Bouncy, happy, DQ style' },
+  sparklings: { label: 'Sparklings', icon: '⚡', color: 'bg-yellow-500', description: 'Clean, elemental, iconic' },
+  mechazoids: { label: 'Mechazoids', icon: '🤖', color: 'bg-blue-600', description: 'Digital, robotic, tech' },
+  mystlings: { label: 'Mystlings', icon: '👻', color: 'bg-purple-600', description: 'Spiritual, mystical, Japanese' },
+  blobkins: { label: 'Blobkins', icon: '🫧', color: 'bg-lime-500', description: 'Bouncy, happy, DQ style' },
 };
 
 const REGION_COLORS: Record<Region | 'all', { bg: string; text: string; border: string }> = {
@@ -175,7 +175,7 @@ export function GraphicsDebug({ onBack }: GraphicsDebugProps) {
   const [gunkLevel, setGunkLevel] = useState(50);
   const [selectedCreature, setSelectedCreature] = useState<Creature | null>(null);
   const [creatureSize, setCreatureSize] = useState(120);
-  const [hatSize, setHatSize] = useState(100);
+  const [buddySize, setBuddySize] = useState(100);
   const [showStyle, setShowStyle] = useState(true);
 
   const filteredCreatures = ALL_CREATURES.filter(creature => {
@@ -188,7 +188,7 @@ export function GraphicsDebug({ onBack }: GraphicsDebugProps) {
     return true;
   });
 
-  const designStyles: DesignStyle[] = ['pokemon', 'digimon', 'yokai', 'slime'];
+  const designStyles: DesignStyle[] = ['sparklings', 'mechazoids', 'mystlings', 'blobkins'];
   const styleStats = designStyles.reduce((acc, style) => {
     acc[style] = ALL_CREATURES.filter(c => getDesignStyle(c) === style).length;
     return acc;
@@ -230,14 +230,14 @@ export function GraphicsDebug({ onBack }: GraphicsDebugProps) {
                 Creatures ({ALL_CREATURES.length})
               </button>
               <button
-                onClick={() => setViewMode('hats')}
+                onClick={() => setViewMode('buddies')}
                 className={`px-4 py-2 rounded-lg transition-all ${
-                  viewMode === 'hats'
+                  viewMode === 'buddies'
                     ? 'bg-purple-600 text-white'
                     : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                 }`}
               >
-                Hats ({ALL_HATS.length})
+                Buddies ({ALL_BUDDIES.length})
               </button>
             </div>
           </div>
@@ -562,9 +562,9 @@ export function GraphicsDebug({ onBack }: GraphicsDebugProps) {
         </>
       )}
 
-      {viewMode === 'hats' && (
+      {viewMode === 'buddies' && (
         <>
-          {/* Hat Controls */}
+          {/* Buddy Controls */}
           <div className="sticky top-[64px] z-10 bg-slate-800/95 backdrop-blur border-b border-slate-700">
             <div className="max-w-7xl mx-auto px-4 py-3">
               <div className="flex flex-wrap items-center gap-4">
@@ -574,40 +574,40 @@ export function GraphicsDebug({ onBack }: GraphicsDebugProps) {
                     type="range"
                     min="60"
                     max="200"
-                    value={hatSize}
-                    onChange={e => setHatSize(Number(e.target.value))}
+                    value={buddySize}
+                    onChange={e => setBuddySize(Number(e.target.value))}
                     className="w-24"
                   />
-                  <span className="w-10">{hatSize}px</span>
+                  <span className="w-10">{buddySize}px</span>
                 </label>
               </div>
             </div>
           </div>
 
-          {/* Hat Grid */}
+          {/* Buddy Grid */}
           <div className="max-w-7xl mx-auto px-4 py-6">
             <div className="text-slate-400 mb-4">
-              Showing all {ALL_HATS.length} hats
+              Showing all {ALL_BUDDIES.length} buddies
             </div>
-            <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${hatSize + 60}px, 1fr))` }}>
-              {ALL_HATS.map(hat => (
+            <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${buddySize + 60}px, 1fr))` }}>
+              {ALL_BUDDIES.map(buddy => (
                 <div
-                  key={hat.id}
+                  key={buddy.id}
                   className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-b from-purple-800 to-purple-900 hover:from-purple-700 hover:to-purple-800 transition-all"
                 >
                   <div className="bg-purple-950/50 rounded-lg p-2 mb-2">
-                    <HatPreview hatId={hat.id} size={hatSize} />
+                    <BuddyPreview buddyId={buddy.id} size={buddySize} />
                   </div>
                   <div className="text-center">
                     <div className="text-white font-medium text-sm">
-                      {hat.name}
+                      {buddy.name}
                     </div>
                     <div className="text-purple-300 text-xs capitalize">
-                      {hat.unlockCondition}
-                      {hat.unlockThreshold && ` (${hat.unlockThreshold})`}
+                      {buddy.unlockCondition}
+                      {buddy.unlockThreshold && ` (${buddy.unlockThreshold})`}
                     </div>
                     <div className="text-purple-400 text-xs mt-1">
-                      ID: {hat.id}
+                      ID: {buddy.id}
                     </div>
                   </div>
                 </div>

@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie';
-import type { BrushingSession, UserProgress, DecoratedPhoto, CapturedCreature, UnlockedHat, UserProfile } from '../types';
+import type { BrushingSession, UserProgress, DecoratedPhoto, CapturedCreature, UnlockedBuddy, UserProfile } from '../types';
 
 const CURRENT_PROFILE_KEY = 'sparkle-brush-current-profile';
 
@@ -16,6 +16,29 @@ class SparkleBrushDatabase extends Dexie {
       userProgress: 'id, profileId',
       photos: 'id, sessionId, createdAt',
       profiles: 'id, name, createdAt'
+    });
+    
+    this.version(3).stores({
+      sessions: 'id, date, profileId',
+      userProgress: 'id, profileId',
+      photos: 'id, sessionId, createdAt',
+      profiles: 'id, name, createdAt'
+    }).upgrade(tx => {
+      return tx.table('userProgress').toCollection().modify(progress => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const oldProgress = progress as any;
+        if (oldProgress.unlockedHats && !progress.unlockedBuddies) {
+          progress.unlockedBuddies = oldProgress.unlockedHats;
+          delete oldProgress.unlockedHats;
+        }
+        if (oldProgress.selectedHatId !== undefined && progress.selectedBuddyId === undefined) {
+          progress.selectedBuddyId = oldProgress.selectedHatId;
+          delete oldProgress.selectedHatId;
+        }
+        if (!progress.unlockedBuddies) {
+          progress.unlockedBuddies = [];
+        }
+      });
     });
   }
 }
@@ -74,7 +97,7 @@ export async function createProfile(name: string): Promise<UserProfile> {
     currentStreak: 0,
     longestStreak: 0,
     capturedCreatures: [],
-    unlockedHats: []
+    unlockedBuddies: []
   };
   await db.userProgress.add(progress);
   
@@ -112,9 +135,21 @@ export async function getUserProgress(profileId?: string): Promise<UserProgress>
       currentStreak: 0,
       longestStreak: 0,
       capturedCreatures: [],
-      unlockedHats: []
+      unlockedBuddies: []
     };
     await db.userProgress.add(progress);
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const oldProgress = progress as any;
+    if (oldProgress.unlockedHats && !progress.unlockedBuddies) {
+      progress.unlockedBuddies = oldProgress.unlockedHats;
+    }
+    if (oldProgress.selectedHatId !== undefined && progress.selectedBuddyId === undefined) {
+      progress.selectedBuddyId = oldProgress.selectedHatId;
+    }
+    if (!progress.unlockedBuddies) {
+      progress.unlockedBuddies = [];
+    }
   }
   
   return progress;
@@ -181,27 +216,27 @@ export async function addCapturedCreature(creature: CapturedCreature): Promise<v
   }
 }
 
-export async function unlockHat(hat: UnlockedHat): Promise<void> {
+export async function unlockBuddy(buddy: UnlockedBuddy): Promise<void> {
   const profileId = getCurrentProfileId();
   if (!profileId) {
     throw new Error('No profile selected');
   }
   
   const progress = await getUserProgress(profileId);
-  const alreadyUnlocked = progress.unlockedHats.some(h => h.id === hat.id);
+  const alreadyUnlocked = progress.unlockedBuddies.some(b => b.id === buddy.id);
   if (!alreadyUnlocked) {
     await updateUserProgress({
-      unlockedHats: [...progress.unlockedHats, hat]
+      unlockedBuddies: [...progress.unlockedBuddies, buddy]
     }, profileId);
   }
 }
 
-export async function setSelectedHat(hatId: string | undefined): Promise<void> {
+export async function setSelectedBuddy(buddyId: string | undefined): Promise<void> {
   const profileId = getCurrentProfileId();
   if (!profileId) {
     throw new Error('No profile selected');
   }
-  await updateUserProgress({ selectedHatId: hatId }, profileId);
+  await updateUserProgress({ selectedBuddyId: buddyId }, profileId);
 }
 
 export async function saveDecoratedPhoto(photo: DecoratedPhoto): Promise<void> {
@@ -236,8 +271,8 @@ export async function migrateDefaultUser(): Promise<void> {
       longestStreak: oldProgress.longestStreak,
       lastSessionDate: oldProgress.lastSessionDate,
       capturedCreatures: oldProgress.capturedCreatures,
-      unlockedHats: oldProgress.unlockedHats,
-      selectedHatId: oldProgress.selectedHatId
+      unlockedBuddies: oldProgress.unlockedBuddies,
+      selectedBuddyId: oldProgress.selectedBuddyId
     }, profile.id);
     
     setCurrentProfileId(profile.id);

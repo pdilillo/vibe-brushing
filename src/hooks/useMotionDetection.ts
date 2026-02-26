@@ -23,8 +23,8 @@ interface UseMotionDetectionReturn {
 }
 
 export function useMotionDetection(options: UseMotionDetectionOptions = {}): UseMotionDetectionReturn {
-  // Increased default decay rate (0.4) to encourage continuous brushing
-  const { targetCleaningTime = 20, detectionInterval = 100, decayRate = 0.4, debugMode: initialDebugMode = false } = options;
+  // Decay rate of 0.8 (doubled from 0.4) to encourage continuous brushing
+  const { targetCleaningTime = 20, detectionInterval = 100, decayRate = 0.8, debugMode: initialDebugMode = false } = options;
   
   const detectorRef = useRef<MotionDetector | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -68,14 +68,12 @@ export function useMotionDetection(options: UseMotionDetectionOptions = {}): Use
   const calculateProgress = useCallback(() => {
     const progress = MOUTH_ZONES.map(zone => {
       const time = cleaningTimeRef.current[zone.id] || 0;
-      // Allow tracking above 100% internally so decay can bring it back down
-      const rawPercentage = (time / targetCleaningTime) * 100;
-      // Display capped at 100%
-      const displayPercentage = Math.min(rawPercentage, 100);
+      // Time is capped at targetCleaningTime, so progress shows decay immediately at 100%
+      const percentage = (time / targetCleaningTime) * 100;
       return {
         zoneId: zone.id,
-        cleaningProgress: displayPercentage,
-        isComplete: displayPercentage >= 100
+        cleaningProgress: percentage,
+        isComplete: percentage >= 100
       };
     });
     setZoneProgress(progress);
@@ -106,7 +104,8 @@ export function useMotionDetection(options: UseMotionDetectionOptions = {}): Use
       if (result.hasMotion) {
         noMotionCountRef.current[result.zoneId] = 0;
         const increment = (detectionInterval / 1000) * (result.motionLevel / 60);
-        cleaningTimeRef.current[result.zoneId] = currentTime + increment;
+        // Cap at targetCleaningTime so decay is visible immediately at 100%
+        cleaningTimeRef.current[result.zoneId] = Math.min(currentTime + increment, targetCleaningTime);
       } else {
         const noMotionCount = (noMotionCountRef.current[result.zoneId] || 0) + 1;
         noMotionCountRef.current[result.zoneId] = noMotionCount;

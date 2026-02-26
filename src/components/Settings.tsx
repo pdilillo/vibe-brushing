@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { getSettings, saveSettings, type AppSettings } from '../services/settings';
+import { version } from '../../package.json';
 
 interface SettingsProps {
   onBack: () => void;
-  onHatDebug?: () => void;
+  onBuddyDebug?: () => void;
   onGraphicsDebug?: () => void;
+  onPhotoDebug?: () => void;
 }
 
-export function Settings({ onBack, onHatDebug, onGraphicsDebug }: SettingsProps) {
+export function Settings({ onBack, onBuddyDebug, onGraphicsDebug, onPhotoDebug }: SettingsProps) {
   const [settings, setSettings] = useState<AppSettings>(getSettings);
 
   useEffect(() => {
@@ -93,11 +95,11 @@ export function Settings({ onBack, onHatDebug, onGraphicsDebug }: SettingsProps)
             catch them, and build your collection.
           </p>
           <div className="mt-4 text-center text-xs text-purple-500">
-            Version 1.0.0
+            Version {version}
           </div>
         </div>
 
-        {(onHatDebug || onGraphicsDebug) && (
+        {(onBuddyDebug || onGraphicsDebug || onPhotoDebug) && (
           <div className="bg-gray-900/50 rounded-2xl p-4 border border-gray-700">
             <h2 className="text-lg font-bold mb-2 text-gray-300">Developer Tools</h2>
             <div className="space-y-2">
@@ -108,18 +110,29 @@ export function Settings({ onBack, onHatDebug, onGraphicsDebug }: SettingsProps)
                 >
                   <div className="font-bold text-purple-400">Graphics Debug Menu</div>
                   <div className="text-xs text-gray-400 mt-1">
-                    Preview all creatures and hat graphics in a gallery view
+                    Preview all creatures and buddy graphics in a gallery view
                   </div>
                 </button>
               )}
-              {onHatDebug && (
+              {onBuddyDebug && (
                 <button
-                  onClick={onHatDebug}
+                  onClick={onBuddyDebug}
                   className="w-full p-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-left transition-colors"
                 >
-                  <div className="font-bold text-green-400">Hat Debug Mode</div>
+                  <div className="font-bold text-green-400">Buddy Debug Mode</div>
                   <div className="text-xs text-gray-400 mt-1">
-                    Test face tracking with debug overlay showing detected face rectangle
+                    Test buddy animation with activity level simulation
+                  </div>
+                </button>
+              )}
+              {onPhotoDebug && (
+                <button
+                  onClick={onPhotoDebug}
+                  className="w-full p-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-left transition-colors"
+                >
+                  <div className="font-bold text-pink-400">Photo Editor Debug</div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    Test photo editing with all stickers unlocked and no limits
                   </div>
                 </button>
               )}

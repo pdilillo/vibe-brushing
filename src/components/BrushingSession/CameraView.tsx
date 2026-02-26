@@ -1,28 +1,20 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useSharedCamera } from '../../contexts/CameraContext';
-import { HatGraphic } from '../HatGraphic';
+import { BuddyGraphic } from '../BuddyGraphic';
 import { DebugOverlay } from './DebugOverlay';
-import type { Hat } from '../../types';
+import type { Buddy } from '../../types';
 import type { DebugInfo } from '../../services/motionDetector';
 
-interface FacePosition {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
 interface CameraViewProps {
-  selectedHat: Hat | null;
-  facePosition?: FacePosition | null;
+  selectedBuddy: Buddy | null;
   onVideoReady?: (video: HTMLVideoElement) => void;
   onContainerSize?: (width: number, height: number) => void;
-  isBrushing?: boolean;
+  activityScore?: number;
   debugMode?: boolean;
   getDebugInfo?: () => DebugInfo | null;
 }
 
-export function CameraView({ selectedHat, facePosition, onVideoReady, onContainerSize, isBrushing = false, debugMode = false, getDebugInfo }: CameraViewProps) {
+export function CameraView({ selectedBuddy, onVideoReady, onContainerSize, activityScore = 0, debugMode = false, getDebugInfo }: CameraViewProps) {
   const { isReady, error, registerVideoElement } = useSharedCamera();
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -127,15 +119,12 @@ export function CameraView({ selectedHat, facePosition, onVideoReady, onContaine
         </div>
       )}
       
-      {selectedHat && isReady && containerSize.width > 0 && (
-        <HatGraphic
-          hat={selectedHat}
-          facePosition={facePosition || null}
+      {selectedBuddy && isReady && containerSize.width > 0 && (
+        <BuddyGraphic
+          buddy={selectedBuddy}
           containerWidth={containerSize.width}
           containerHeight={containerSize.height}
-          videoWidth={videoSize.width}
-          videoHeight={videoSize.height}
-          isBrushing={isBrushing}
+          activityScore={activityScore}
         />
       )}
       

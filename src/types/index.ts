@@ -45,7 +45,7 @@ export interface CapturedCreature extends Creature {
   capturedAt: Date;
 }
 
-export interface Hat {
+export interface Buddy {
   id: string;
   name: string;
   imageUrl: string;
@@ -53,7 +53,7 @@ export interface Hat {
   unlockThreshold?: number;
 }
 
-export interface UnlockedHat extends Hat {
+export interface UnlockedBuddy extends Buddy {
   unlockedAt: Date;
 }
 
@@ -88,8 +88,8 @@ export interface UserProgress {
   longestStreak: number;
   lastSessionDate?: Date;
   capturedCreatures: CapturedCreature[];
-  unlockedHats: UnlockedHat[];
-  selectedHatId?: string;
+  unlockedBuddies: UnlockedBuddy[];
+  selectedBuddyId?: string;
 }
 
 export interface DecoratedPhoto {
@@ -128,7 +128,7 @@ export type GamePhase =
   | 'home'
   | 'settings'
   | 'camera-check'
-  | 'hat-select'
+  | 'buddy-select'
   | 'countdown'
   | 'brushing'
   | 'results'
@@ -136,5 +136,6 @@ export type GamePhase =
   | 'photos'
   | 'editor'
   | 'collection'
-  | 'hat-debug'
-  | 'graphics-debug';
+  | 'buddy-debug'
+  | 'graphics-debug'
+  | 'photo-debug';

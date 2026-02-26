@@ -1,21 +1,21 @@
-import { ALL_HATS, getUnlockedHats } from '../data/hats';
-import type { UserProgress, Hat } from '../types';
-import { HatPreview } from './HatPreview';
+import { ALL_BUDDIES, getUnlockedBuddies } from '../data/buddies';
+import type { UserProgress, Buddy } from '../types';
+import { BuddyPreview } from './BuddyPreview';
 
-interface HatSelectorProps {
+interface BuddySelectorProps {
   userProgress: UserProgress;
-  onSelect: (hat: Hat | null) => void;
+  onSelect: (buddy: Buddy | null) => void;
   onBack: () => void;
 }
 
-export function HatSelector({ userProgress, onSelect, onBack }: HatSelectorProps) {
-  const unlockedHats = getUnlockedHats(
+export function BuddySelector({ userProgress, onSelect, onBack }: BuddySelectorProps) {
+  const unlockedBuddies = getUnlockedBuddies(
     userProgress.totalSessions,
     userProgress.currentStreak,
     userProgress.capturedCreatures.length
   );
   
-  const unlockedIds = new Set(unlockedHats.map(h => h.id));
+  const unlockedIds = new Set(unlockedBuddies.map(b => b.id));
 
   return (
     <div className="flex flex-col h-full p-6">
@@ -26,7 +26,7 @@ export function HatSelector({ userProgress, onSelect, onBack }: HatSelectorProps
         >
           ← Back
         </button>
-        <h1 className="text-xl font-bold">Choose Your Hat!</h1>
+        <h1 className="text-xl font-bold">Choose Your Buddy!</h1>
         <div className="w-16" />
       </div>
       
@@ -37,16 +37,16 @@ export function HatSelector({ userProgress, onSelect, onBack }: HatSelectorProps
             className="aspect-square bg-purple-800/30 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-purple-500/50 active:scale-95 transition-transform"
           >
             <div className="text-3xl mb-1">🚫</div>
-            <div className="text-xs text-purple-300">No Hat</div>
+            <div className="text-xs text-purple-300">No Buddy</div>
           </button>
           
-          {ALL_HATS.map(hat => {
-            const isUnlocked = unlockedIds.has(hat.id);
+          {ALL_BUDDIES.map(buddy => {
+            const isUnlocked = unlockedIds.has(buddy.id);
             
             return (
               <button
-                key={hat.id}
-                onClick={() => isUnlocked && onSelect(hat)}
+                key={buddy.id}
+                onClick={() => isUnlocked && onSelect(buddy)}
                 disabled={!isUnlocked}
                 className={`aspect-square rounded-2xl flex flex-col items-center justify-center transition-all p-2 ${
                   isUnlocked
@@ -56,13 +56,13 @@ export function HatSelector({ userProgress, onSelect, onBack }: HatSelectorProps
               >
                 <div className={`flex-1 flex items-center justify-center w-full ${isUnlocked ? '' : 'grayscale'}`}>
                   {isUnlocked ? (
-                    <HatPreview hatId={hat.id} size={60} />
+                    <BuddyPreview buddyId={buddy.id} size={60} />
                   ) : (
                     <span className="text-4xl">🔒</span>
                   )}
                 </div>
                 <div className="text-xs text-center px-1 truncate w-full mt-1">
-                  {isUnlocked ? hat.name : getUnlockHint(hat)}
+                  {isUnlocked ? buddy.name : getUnlockHint(buddy)}
                 </div>
               </button>
             );
@@ -74,20 +74,20 @@ export function HatSelector({ userProgress, onSelect, onBack }: HatSelectorProps
         onClick={() => onSelect(null)}
         className="w-full py-4 text-xl font-bold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl"
       >
-        Start Without Hat
+        Start Without Buddy
       </button>
     </div>
   );
 }
 
-function getUnlockHint(hat: Hat): string {
-  switch (hat.unlockCondition) {
+function getUnlockHint(buddy: Buddy): string {
+  switch (buddy.unlockCondition) {
     case 'sessions':
-      return `${hat.unlockThreshold} sessions`;
+      return `${buddy.unlockThreshold} sessions`;
     case 'streak':
-      return `${hat.unlockThreshold} day streak`;
+      return `${buddy.unlockThreshold} day streak`;
     case 'creature':
-      return `${hat.unlockThreshold} creatures`;
+      return `${buddy.unlockThreshold} creatures`;
     default:
       return 'Locked';
   }

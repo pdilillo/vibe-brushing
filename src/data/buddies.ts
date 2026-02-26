@@ -1,9 +1,9 @@
-import type { Hat } from '../types';
+import type { Buddy } from '../types';
 
 const base = import.meta.env.BASE_URL;
 
-export const ALL_HATS: Hat[] = [
-  // Starter hats
+export const ALL_BUDDIES: Buddy[] = [
+  // Starter buddies
   {
     id: 'crown',
     name: 'Royal Crown',
@@ -17,7 +17,7 @@ export const ALL_HATS: Hat[] = [
     unlockCondition: 'starter'
   },
   
-  // Session milestone hats
+  // Session milestone buddies
   {
     id: 'wizard',
     name: 'Wizard Hat',
@@ -47,7 +47,7 @@ export const ALL_HATS: Hat[] = [
     unlockThreshold: 100
   },
   
-  // Streak hats
+  // Streak buddies
   {
     id: 'pirate',
     name: 'Pirate Hat',
@@ -63,7 +63,7 @@ export const ALL_HATS: Hat[] = [
     unlockThreshold: 30
   },
   
-  // Creature collection hats
+  // Creature collection buddies
   {
     id: 'unicorn-horn',
     name: 'Unicorn Horn',
@@ -80,25 +80,25 @@ export const ALL_HATS: Hat[] = [
   }
 ];
 
-export function getStarterHats(): Hat[] {
-  return ALL_HATS.filter(h => h.unlockCondition === 'starter');
+export function getStarterBuddies(): Buddy[] {
+  return ALL_BUDDIES.filter(b => b.unlockCondition === 'starter');
 }
 
-export function getUnlockedHats(
+export function getUnlockedBuddies(
   totalSessions: number,
   currentStreak: number,
   creatureCount: number
-): Hat[] {
-  return ALL_HATS.filter(hat => {
-    switch (hat.unlockCondition) {
+): Buddy[] {
+  return ALL_BUDDIES.filter(buddy => {
+    switch (buddy.unlockCondition) {
       case 'starter':
         return true;
       case 'sessions':
-        return totalSessions >= (hat.unlockThreshold || 0);
+        return totalSessions >= (buddy.unlockThreshold || 0);
       case 'streak':
-        return currentStreak >= (hat.unlockThreshold || 0);
+        return currentStreak >= (buddy.unlockThreshold || 0);
       case 'creature':
-        return creatureCount >= (hat.unlockThreshold || 0);
+        return creatureCount >= (buddy.unlockThreshold || 0);
       default:
         return false;
     }

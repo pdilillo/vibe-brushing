@@ -8,6 +8,7 @@ interface PhotoEditorProps {
   capturedCreatures: CapturedCreature[];
   onDone: () => void;
   onBack: () => void;
+  debugMode?: boolean;
 }
 
 interface DraggableSticker extends PlacedSticker {
@@ -28,7 +29,7 @@ const BOMB_HOLD_DURATION = 2000;
 const MAX_STICKERS = 30;
 const STICKER_OFFSET = 5;
 
-export function PhotoEditor({ photo, capturedCreatures, onDone, onBack }: PhotoEditorProps) {
+export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMode = false }: PhotoEditorProps) {
   const [placedStickers, setPlacedStickers] = useState<DraggableSticker[]>([]);
   const [selectedBackground, setSelectedBackground] = useState<Background>(ALL_BACKGROUNDS[0]);
   const [draggedSticker, setDraggedSticker] = useState<string | null>(null);
@@ -42,11 +43,15 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack }: PhotoE
   const canvasRef = useRef<HTMLDivElement>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [showSkipConfirm, setShowSkipConfirm] = useState(false);
+  const [backgroundToast, setBackgroundToast] = useState<string | null>(null);
   const bombTimerRef = useRef<number | null>(null);
   const bombStartRef = useRef<number>(0);
+  const toastTimerRef = useRef<number | null>(null);
+  
+  const maxStickers = debugMode ? 999 : MAX_STICKERS;
 
   const handleAddCreatureSticker = useCallback((creature: CapturedCreature) => {
-    if (placedStickers.length >= MAX_STICKERS) {
+    if (placedStickers.length >= maxStickers) {
       return;
     }
     
@@ -130,7 +135,16 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack }: PhotoE
   const handleCycleBackground = useCallback(() => {
     const currentIndex = ALL_BACKGROUNDS.findIndex(bg => bg.id === selectedBackground.id);
     const nextIndex = (currentIndex + 1) % ALL_BACKGROUNDS.length;
-    setSelectedBackground(ALL_BACKGROUNDS[nextIndex]);
+    const newBackground = ALL_BACKGROUNDS[nextIndex];
+    setSelectedBackground(newBackground);
+    
+    setBackgroundToast(newBackground.name);
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current);
+    }
+    toastTimerRef.current = window.setTimeout(() => {
+      setBackgroundToast(null);
+    }, 1500);
   }, [selectedBackground]);
 
   const handleCycleSelectedSize = useCallback(() => {
@@ -293,16 +307,13 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack }: PhotoE
       if (bombTimerRef.current) {
         cancelAnimationFrame(bombTimerRef.current);
       }
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current);
+      }
     };
   }, [endBombHold]);
 
   const lastAddedCreature = capturedCreatures.find(c => c.id === lastAddedCreatureId);
-
-  const handleAddLastCreature = useCallback(() => {
-    if (lastAddedCreature) {
-      handleAddCreatureSticker(lastAddedCreature);
-    }
-  }, [lastAddedCreature, handleAddCreatureSticker]);
 
   return (
     <div className="flex flex-col h-full">
@@ -393,8 +404,11 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack }: PhotoE
                     }}
                     onMouseDown={(e) => e.stopPropagation()}
                     onTouchStart={(e) => e.stopPropagation()}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white text-sm shadow-lg hover:bg-red-500 active:scale-90 transition-transform"
-                    style={{ transform: `scale(${1 / sticker.scale})` }}
+                    className="absolute w-7 h-7 bg-red-600 rounded-full flex items-center justify-center text-white text-sm shadow-lg hover:bg-red-500 active:scale-90 transition-transform z-10"
+                    style={{ 
+                      top: `${-(STICKER_BASE_SIZE * sticker.scale) / 2 - 4}px`,
+                      right: `${-(STICKER_BASE_SIZE * sticker.scale) / 2 - 4}px`,
+                    }}
                   >
                     ✕
                   </button>
@@ -435,46 +449,52 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack }: PhotoE
             ))}
           </>
         )}
+        
+        {backgroundToast && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none z-50 animate-toast-fade">
+            <div className="bg-black/80 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+              {backgroundToast}
+            </div>
+          </div>
+        )}
       </div>
       
       <div className="bg-purple-900/50 p-3">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowStickerMenu(true)}
-            disabled={placedStickers.length >= MAX_STICKERS}
-            className={`w-12 h-12 flex-shrink-0 rounded-xl flex items-center justify-center text-2xl active:scale-95 transition-transform shadow-lg ${
-              placedStickers.length >= MAX_STICKERS 
+            disabled={placedStickers.length >= maxStickers}
+            className={`w-14 h-14 flex-shrink-0 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-lg relative ${
+              placedStickers.length >= maxStickers 
                 ? 'bg-gray-600 opacity-50 cursor-not-allowed' 
                 : 'bg-purple-600'
             }`}
           >
-            +
+            {lastAddedCreature ? (
+              <>
+                <img
+                  src={`${import.meta.env.BASE_URL}creatures/${lastAddedCreature.id}.png`}
+                  alt={lastAddedCreature.name}
+                  className="w-10 h-10 object-contain"
+                />
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-xs font-bold text-white shadow">
+                  +
+                </div>
+              </>
+            ) : (
+              <span className="text-2xl">+</span>
+            )}
           </button>
           
           <button
             onClick={handleCycleBackground}
-            className="h-12 flex-shrink-0 bg-purple-800/50 rounded-xl flex items-center gap-2 px-3 active:scale-95 transition-transform"
+            className="w-12 h-12 flex-shrink-0 bg-purple-800/50 rounded-xl flex items-center justify-center active:scale-95 transition-transform"
           >
             <div 
               className="w-8 h-8 rounded-lg border-2 border-white/30"
               style={{ background: selectedBackground.imageUrl || '#1E1B4B' }}
             />
-            <span className="text-xs text-purple-200">{selectedBackground.name}</span>
           </button>
-          
-          {lastAddedCreature && placedStickers.length < MAX_STICKERS && (
-            <button
-              onClick={handleAddLastCreature}
-              className="h-12 flex-shrink-0 bg-green-700/50 rounded-xl flex items-center gap-2 px-3 active:scale-95 transition-transform hover:bg-green-600/50"
-            >
-              <img
-                src={`${import.meta.env.BASE_URL}creatures/${lastAddedCreature.id}.png`}
-                alt={lastAddedCreature.name}
-                className="w-8 h-8 object-contain"
-              />
-              <span className="text-xs text-green-200">+ Add</span>
-            </button>
-          )}
           
           <div className="flex-1" />
           
@@ -608,6 +628,15 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack }: PhotoE
                 }
                 .animate-explosion-particle {
                   animation: explosion-particle 0.6s ease-out forwards;
+                }
+                @keyframes toast-fade {
+                  0% { opacity: 0; transform: translate(-50%, 10px); }
+                  15% { opacity: 1; transform: translate(-50%, 0); }
+                  85% { opacity: 1; transform: translate(-50%, 0); }
+                  100% { opacity: 0; transform: translate(-50%, -10px); }
+                }
+                .animate-toast-fade {
+                  animation: toast-fade 1.5s ease-in-out forwards;
                 }
               `}</style>
             </button>

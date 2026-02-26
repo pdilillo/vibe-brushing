@@ -2,11 +2,11 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useSharedCamera } from '../contexts/CameraContext';
 import { useFaceTracking } from '../hooks/useFaceTracking';
 import { useMotionDetection } from '../hooks/useMotionDetection';
-import { HatGraphic } from './HatGraphic';
+import { BuddyGraphic } from './BuddyGraphic';
 import { DebugOverlay } from './BrushingSession/DebugOverlay';
-import type { Hat } from '../types';
+import type { Buddy } from '../types';
 
-const DEBUG_HATS: Hat[] = [
+const DEBUG_BUDDIES: Buddy[] = [
   { id: 'cowboy', name: 'Cowboy Hat', imageUrl: '', unlockCondition: 'starter' },
   { id: 'crown', name: 'Royal Crown', imageUrl: '', unlockCondition: 'streak', unlockThreshold: 7 },
   { id: 'tophat', name: 'Top Hat', imageUrl: '', unlockCondition: 'sessions', unlockThreshold: 10 },
@@ -14,11 +14,11 @@ const DEBUG_HATS: Hat[] = [
   { id: 'cap', name: 'Baseball Cap', imageUrl: '', unlockCondition: 'starter' },
 ];
 
-interface HatDebugProps {
+interface BuddyDebugProps {
   onBack: () => void;
 }
 
-export function HatDebug({ onBack }: HatDebugProps) {
+export function BuddyDebug({ onBack }: BuddyDebugProps) {
   const { isReady, error, registerVideoElement, startCamera } = useSharedCamera();
   const { facePosition, isLoading, startTracking, stopTracking } = useFaceTracking();
   const { 
@@ -31,11 +31,12 @@ export function HatDebug({ onBack }: HatDebugProps) {
   } = useMotionDetection({ targetCleaningTime: 25 });
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [selectedHat, setSelectedHat] = useState<Hat>(DEBUG_HATS[0]);
+  const [selectedBuddy, setSelectedBuddy] = useState<Buddy>(DEBUG_BUDDIES[0]);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const [videoSize, setVideoSize] = useState({ width: 640, height: 480 });
   const [showDebugInfo, setShowDebugInfo] = useState(true);
   const [showBrushingDebug, setShowBrushingDebug] = useState(false);
+  const [simulatedActivity, setSimulatedActivity] = useState(0);
 
   useEffect(() => {
     startCamera();
@@ -119,6 +120,9 @@ export function HatDebug({ onBack }: HatDebugProps) {
     height: facePosition.height * scaleY,
   } : null;
 
+  const actualActivityScore = motionResults.reduce((sum, r) => sum + r.motionLevel, 0) / Math.max(motionResults.length, 1);
+  const displayActivityScore = simulatedActivity > 0 ? simulatedActivity : actualActivityScore;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-indigo-900 to-purple-800 p-4">
       <div className="max-w-4xl mx-auto">
@@ -129,7 +133,7 @@ export function HatDebug({ onBack }: HatDebugProps) {
           >
             ← Back
           </button>
-          <h1 className="text-2xl font-bold text-white">Hat Debug Mode</h1>
+          <h1 className="text-2xl font-bold text-white">Buddy Debug Mode</h1>
           <div className="flex gap-2">
             <button
               onClick={toggleBrushingDebug}
@@ -141,7 +145,7 @@ export function HatDebug({ onBack }: HatDebugProps) {
               onClick={() => setShowDebugInfo(!showDebugInfo)}
               className={`px-4 py-2 rounded-lg text-white ${showDebugInfo ? 'bg-green-600' : 'bg-gray-600'}`}
             >
-              {showDebugInfo ? 'Hat ON' : 'Hat OFF'}
+              {showDebugInfo ? 'Debug ON' : 'Debug OFF'}
             </button>
           </div>
         </div>
@@ -194,25 +198,12 @@ export function HatDebug({ onBack }: HatDebugProps) {
             </div>
           )}
 
-          {showDebugInfo && facePosition && (
-            <div
-              className="absolute w-3 h-3 bg-red-500 rounded-full border-2 border-white pointer-events-none"
-              style={{
-                left: `${containerSize.width / 2}px`,
-                top: `${facePosition.y * scaleY}px`,
-                transform: 'translate(-50%, -50%)',
-              }}
-            />
-          )}
-
-          {selectedHat && isReady && containerSize.width > 0 && (
-            <HatGraphic
-              hat={selectedHat}
-              facePosition={facePosition || null}
+          {selectedBuddy && isReady && containerSize.width > 0 && (
+            <BuddyGraphic
+              buddy={selectedBuddy}
               containerWidth={containerSize.width}
               containerHeight={containerSize.height}
-              videoWidth={videoSize.width}
-              videoHeight={videoSize.height}
+              activityScore={displayActivityScore}
             />
           )}
 
@@ -237,24 +228,45 @@ export function HatDebug({ onBack }: HatDebugProps) {
               </div>
             </div>
           )}
+
+          <div className="absolute top-4 right-4 bg-black/70 px-3 py-2 rounded-lg text-white text-sm">
+            Activity: {displayActivityScore.toFixed(0)}%
+          </div>
         </div>
 
         <div className="bg-purple-800/50 rounded-xl p-4 mb-4">
-          <h2 className="text-white font-semibold mb-3">Select Hat</h2>
+          <h2 className="text-white font-semibold mb-3">Select Buddy</h2>
           <div className="flex flex-wrap gap-2">
-            {DEBUG_HATS.map((hat) => (
+            {DEBUG_BUDDIES.map((buddy) => (
               <button
-                key={hat.id}
-                onClick={() => setSelectedHat(hat)}
+                key={buddy.id}
+                onClick={() => setSelectedBuddy(buddy)}
                 className={`px-4 py-2 rounded-lg transition-all ${
-                  selectedHat.id === hat.id
+                  selectedBuddy.id === buddy.id
                     ? 'bg-yellow-500 text-black font-bold'
                     : 'bg-purple-600 text-white hover:bg-purple-500'
                 }`}
               >
-                {hat.name}
+                {buddy.name}
               </button>
             ))}
+          </div>
+        </div>
+
+        <div className="bg-purple-800/50 rounded-xl p-4 mb-4">
+          <h2 className="text-white font-semibold mb-3">Simulate Activity Level</h2>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={simulatedActivity}
+            onChange={(e) => setSimulatedActivity(Number(e.target.value))}
+            className="w-full"
+          />
+          <div className="flex justify-between text-sm text-purple-300 mt-1">
+            <span>Auto (from motion)</span>
+            <span>{simulatedActivity}%</span>
+            <span>Max Activity</span>
           </div>
         </div>
 
@@ -278,12 +290,8 @@ export function HatDebug({ onBack }: HatDebugProps) {
                 </div>
               </div>
               <div>
-                <div className="text-gray-400 mb-1">Face Size:</div>
-                <div>
-                  {facePosition 
-                    ? `${facePosition.width.toFixed(1)} x ${facePosition.height.toFixed(1)}`
-                    : '-'}
-                </div>
+                <div className="text-gray-400 mb-1">Activity Score:</div>
+                <div>{displayActivityScore.toFixed(1)}%</div>
               </div>
             </div>
             {showBrushingDebug && (
@@ -306,8 +314,8 @@ export function HatDebug({ onBack }: HatDebugProps) {
               </>
             )}
             <div className="mt-4 text-gray-500 text-xs">
-              Green rectangle = detected face area | Red dot = hat anchor point
-              {showBrushingDebug && ' | Green dashed = brushing region | Red shaded = face core (ignored)'}
+              Buddy bounces around the screen | Speed and spin increase with activity
+              {showBrushingDebug && ' | Green dashed = brushing region'}
             </div>
           </div>
         )}

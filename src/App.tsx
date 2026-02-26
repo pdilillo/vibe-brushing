@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Home } from './components/Home';
 import { CameraCheck } from './components/CameraCheck';
-import { HatSelector } from './components/HatSelector';
+import { BuddySelector } from './components/BuddySelector';
 import { BrushingSession } from './components/BrushingSession';
 import { ResultsScreen } from './components/ResultsScreen';
 import { CaptureGame } from './components/CaptureGame';
@@ -10,17 +10,18 @@ import { PhotoEditor } from './components/PhotoEditor';
 import { Collection } from './components/Collection';
 import { Settings } from './components/Settings';
 import { ProfileSelect } from './components/ProfileSelect';
-import { HatDebug } from './components/HatDebug';
+import { BuddyDebug } from './components/BuddyDebug';
 import { GraphicsDebug } from './components/GraphicsDebug';
+import { PhotoDebug } from './components/PhotoDebug';
 import { getUserProgress, getCurrentProfileId, getProfile, addSession } from './services/database';
 import { getSessionDurationSeconds } from './services/settings';
-import type { GamePhase, UserProgress, ZoneProgress, Creature, Hat, Region, UserProfile, BrushingSession as BrushingSessionType } from './types';
+import type { GamePhase, UserProgress, ZoneProgress, Creature, Buddy, Region, UserProfile, BrushingSession as BrushingSessionType } from './types';
 
 function App() {
   const [phase, setPhase] = useState<GamePhase>('profile-select');
   const [currentProfile, setCurrentProfile] = useState<UserProfile | null>(null);
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
-  const [selectedHat, setSelectedHat] = useState<Hat | null>(null);
+  const [selectedBuddy, setSelectedBuddy] = useState<Buddy | null>(null);
   const [sessionResults, setSessionResults] = useState<{
     cleaningPercentage: number;
     zoneProgress: ZoneProgress[];
@@ -76,11 +77,11 @@ function App() {
   }
 
   function handleCameraConfirmed() {
-    setPhase('hat-select');
+    setPhase('buddy-select');
   }
 
-  function handleHatSelected(hat: Hat | null) {
-    setSelectedHat(hat);
+  function handleBuddySelected(buddy: Buddy | null) {
+    setSelectedBuddy(buddy);
     setPhase('brushing');
   }
 
@@ -147,12 +148,16 @@ function App() {
     setPhase('settings');
   }
 
-  function handleHatDebug() {
-    setPhase('hat-debug');
+  function handleBuddyDebug() {
+    setPhase('buddy-debug');
   }
 
   function handleGraphicsDebug() {
     setPhase('graphics-debug');
+  }
+
+  function handlePhotoDebug() {
+    setPhase('photo-debug');
   }
 
   if (phase === 'profile-select') {
@@ -185,7 +190,7 @@ function App() {
       )}
       
       {phase === 'settings' && (
-        <Settings onBack={handleGoHome} onHatDebug={handleHatDebug} onGraphicsDebug={handleGraphicsDebug} />
+        <Settings onBack={handleGoHome} onBuddyDebug={handleBuddyDebug} onGraphicsDebug={handleGraphicsDebug} onPhotoDebug={handlePhotoDebug} />
       )}
       
       {phase === 'camera-check' && (
@@ -195,17 +200,17 @@ function App() {
         />
       )}
       
-      {phase === 'hat-select' && (
-        <HatSelector
+      {phase === 'buddy-select' && (
+        <BuddySelector
           userProgress={userProgress}
-          onSelect={handleHatSelected}
+          onSelect={handleBuddySelected}
           onBack={handleGoHome}
         />
       )}
       
       {phase === 'brushing' && (
         <BrushingSession
-          selectedHat={selectedHat}
+          selectedBuddy={selectedBuddy}
           capturedCreatureIds={userProgress.capturedCreatures.map(c => c.id)}
           onComplete={handleBrushingComplete}
           onCancel={handleGoHome}
@@ -259,12 +264,16 @@ function App() {
         />
       )}
       
-      {phase === 'hat-debug' && (
-        <HatDebug onBack={handleGoHome} />
+      {phase === 'buddy-debug' && (
+        <BuddyDebug onBack={handleGoHome} />
       )}
       
       {phase === 'graphics-debug' && (
         <GraphicsDebug onBack={handleGoHome} />
+      )}
+      
+      {phase === 'photo-debug' && (
+        <PhotoDebug onBack={handleGoHome} />
       )}
     </div>
   );
