@@ -1,29 +1,47 @@
 import { useState } from 'react';
-import { ALL_CREATURES, getElementType } from '../../data/creatures';
+import { ALL_CREATURES, getElementType, getCreaturesBySeries, isSeriesComplete, getUnlockedSeries } from '../../data/creatures';
 import { CreatureArt } from '../CreatureArt';
-import type { UserProgress, Creature, CapturedCreature } from '../../types';
+import type { UserProgress, Creature, CapturedCreature, CreatureSeries } from '../../types';
 
 interface CollectionProps {
   userProgress: UserProgress;
   onBack: () => void;
 }
 
+const SERIES_INFO: Record<CreatureSeries, { name: string; subtitle: string; icon: string; color: string }> = {
+  1: { name: 'Series 1', subtitle: 'Original Collection', icon: '🌟', color: 'from-purple-600 to-blue-600' },
+  2: { name: 'Series 2', subtitle: 'Crystal Caverns', icon: '💎', color: 'from-cyan-500 to-emerald-500' },
+  3: { name: 'Series 3', subtitle: 'Prehistoric Tech', icon: '🦖', color: 'from-orange-500 to-red-500' },
+};
+
 export function Collection({ userProgress, onBack }: CollectionProps) {
   const [selectedCreature, setSelectedCreature] = useState<Creature | null>(null);
+  const [activeSeries, setActiveSeries] = useState<CreatureSeries>(1);
+  
   const capturedIds = new Set(userProgress.capturedCreatures.map(c => c.id));
+  const unlockedSeries = getUnlockedSeries(Array.from(capturedIds));
+  
+  const seriesCreatures = getCreaturesBySeries(activeSeries);
+  const mythicCreature = ALL_CREATURES.find(c => c.rarity === 'mythic');
   
   const groupedCreatures = {
-    mythic: ALL_CREATURES.filter(c => c.rarity === 'mythic'),
-    legendary: ALL_CREATURES.filter(c => c.rarity === 'legendary'),
-    rare: ALL_CREATURES.filter(c => c.rarity === 'rare'),
-    common: ALL_CREATURES.filter(c => c.rarity === 'common')
+    mythic: activeSeries === 1 && mythicCreature ? [mythicCreature] : [],
+    legendary: seriesCreatures.filter(c => c.rarity === 'legendary'),
+    rare: seriesCreatures.filter(c => c.rarity === 'rare'),
+    common: seriesCreatures.filter(c => c.rarity === 'common')
   };
+
+  const seriesCapturedCount = seriesCreatures.filter(c => capturedIds.has(c.id)).length;
+  const totalCaptured = Array.from(capturedIds).length;
+  const totalCreatures = ALL_CREATURES.length;
 
   const handleCreatureClick = (creature: Creature) => {
     if (capturedIds.has(creature.id)) {
       setSelectedCreature(creature);
     }
   };
+
+  const isSeriesLocked = (series: CreatureSeries) => !unlockedSeries.includes(series);
 
   return (
     <div className="flex flex-col h-full">
@@ -36,18 +54,70 @@ export function Collection({ userProgress, onBack }: CollectionProps) {
         </button>
         <h1 className="text-xl font-bold">My Collection</h1>
         <div className="text-sm text-purple-300">
-          {capturedIds.size}/{ALL_CREATURES.length}
+          {totalCaptured}/{totalCreatures}
+        </div>
+      </div>
+
+      <div className="flex gap-2 px-4 pt-3 pb-2 bg-purple-900/30">
+        {([1, 2, 3] as CreatureSeries[]).map(series => {
+          const info = SERIES_INFO[series];
+          const isLocked = isSeriesLocked(series);
+          const isActive = activeSeries === series;
+          const seriesComplete = isSeriesComplete(series, Array.from(capturedIds));
+          const seriesCount = getCreaturesBySeries(series).length;
+          const seriesCaught = getCreaturesBySeries(series).filter(c => capturedIds.has(c.id)).length;
+          
+          return (
+            <button
+              key={series}
+              onClick={() => !isLocked && setActiveSeries(series)}
+              disabled={isLocked}
+              className={`flex-1 py-2 px-3 rounded-xl transition-all relative overflow-hidden ${
+                isActive
+                  ? `bg-gradient-to-r ${info.color} text-white shadow-lg`
+                  : isLocked
+                    ? 'bg-gray-800/50 text-gray-500 cursor-not-allowed'
+                    : 'bg-purple-800/50 text-purple-200 hover:bg-purple-700/50'
+              }`}
+            >
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="text-lg">{isLocked ? '🔒' : info.icon}</span>
+                <span className="text-xs font-bold">{info.name}</span>
+                {!isLocked && (
+                  <span className="text-[10px] opacity-75">
+                    {seriesCaught}/{seriesCount}
+                    {seriesComplete && ' ✓'}
+                  </span>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="px-4 py-2 bg-gradient-to-r from-purple-900/50 to-purple-800/50 border-b border-purple-700/30">
+        <div className="flex items-center gap-2">
+          <span className="text-lg">{SERIES_INFO[activeSeries].icon}</span>
+          <div>
+            <h2 className="font-bold text-white">{SERIES_INFO[activeSeries].name}</h2>
+            <p className="text-xs text-purple-300">{SERIES_INFO[activeSeries].subtitle}</p>
+          </div>
+          <div className="ml-auto text-sm text-purple-300">
+            {seriesCapturedCount}/{seriesCreatures.length}
+          </div>
         </div>
       </div>
       
       <div className="flex-1 overflow-y-auto p-4">
-        <CreatureSection
-          title="🐉 Mythic"
-          creatures={groupedCreatures.mythic}
-          capturedIds={capturedIds}
-          color="rainbow"
-          onCreatureClick={handleCreatureClick}
-        />
+        {activeSeries === 1 && groupedCreatures.mythic.length > 0 && (
+          <CreatureSection
+            title="🐉 Mythic"
+            creatures={groupedCreatures.mythic}
+            capturedIds={capturedIds}
+            color="rainbow"
+            onCreatureClick={handleCreatureClick}
+          />
+        )}
         
         <CreatureSection
           title="✨ Legendary"
@@ -119,6 +189,8 @@ function CreatureSection({ title, creatures, capturedIds, color, onCreatureClick
     purple: 'border-purple-500/30 bg-purple-900/10',
     gray: 'border-gray-500/30 bg-gray-900/10'
   };
+  
+  if (creatures.length === 0) return null;
   
   return (
     <div className={`mb-6 p-4 rounded-2xl border ${colorClasses[color]}`}>
@@ -219,6 +291,10 @@ function CreatureDetailModal({ creature, capturedCreatures, onClose }: CreatureD
           >
             ✕
           </button>
+          
+          <div className="absolute top-3 left-3 px-2 py-1 rounded-full bg-purple-800/80 text-xs text-purple-300">
+            Series {creature.series}
+          </div>
           
           <div className="animate-float">
             <CreatureArt creature={creature} size={120} animated={true} />

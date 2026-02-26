@@ -28,6 +28,8 @@ export interface RegionData {
   particles: string[];
 }
 
+export type CreatureSeries = 1 | 2 | 3;
+
 export interface Creature {
   id: string;
   name: string;
@@ -38,6 +40,7 @@ export interface Creature {
   monsterType: string;
   height: number;
   weight: number;
+  series: CreatureSeries;
   requiresAllCreatures?: boolean;
 }
 
@@ -49,8 +52,9 @@ export interface Buddy {
   id: string;
   name: string;
   imageUrl: string;
-  unlockCondition: 'starter' | 'sessions' | 'streak' | 'creature';
+  unlockCondition: 'starter' | 'sessions' | 'streak' | 'creature' | 'series';
   unlockThreshold?: number;
+  unlockSeries?: CreatureSeries;
 }
 
 export interface UnlockedBuddy extends Buddy {

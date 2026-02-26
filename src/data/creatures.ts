@@ -1,4 +1,4 @@
-import type { Creature, Region } from '../types';
+import type { Creature, Region, CreatureSeries } from '../types';
 
 export function getElementType(region: Region | 'all'): string {
   const mapping: Record<Region | 'all', string> = {
@@ -12,7 +12,11 @@ export function getElementType(region: Region | 'all'): string {
   return mapping[region];
 }
 
-export const ALL_CREATURES: Creature[] = [
+// ============================================================================
+// SERIES 1 - The Original Collection
+// ============================================================================
+
+const SERIES_1_CREATURES: Creature[] = [
   // ==================== GRASSLAND CREATURES ====================
   // Common (8)
   {
@@ -25,6 +29,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'rabbit',
     height: 35,
     weight: 2.5,
+    series: 1,
   },
   {
     id: 'mecha-moth',
@@ -36,6 +41,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'moth',
     height: 15,
     weight: 0.3,
+    series: 1,
   },
   {
     id: 'vine-droid',
@@ -47,6 +53,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'plant',
     height: 45,
     weight: 3.2,
+    series: 1,
   },
   {
     id: 'robo-squirrel',
@@ -58,6 +65,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'squirrel',
     height: 25,
     weight: 1.8,
+    series: 1,
   },
   {
     id: 'buzzer-bee',
@@ -69,6 +77,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'bee',
     height: 12,
     weight: 0.4,
+    series: 1,
   },
   {
     id: 'pixel-fawn',
@@ -80,6 +89,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'deer',
     height: 85,
     weight: 28,
+    series: 1,
   },
   {
     id: 'sprocket-snail',
@@ -91,6 +101,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'snail',
     height: 18,
     weight: 1.2,
+    series: 1,
   },
   {
     id: 'flutter-bot',
@@ -102,6 +113,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'butterfly',
     height: 20,
     weight: 0.5,
+    series: 1,
   },
   // Rare (4)
   {
@@ -114,6 +126,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'stag',
     height: 180,
     weight: 220,
+    series: 1,
   },
   {
     id: 'bloom-guardian',
@@ -125,6 +138,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'treant',
     height: 350,
     weight: 800,
+    series: 1,
   },
   {
     id: 'prism-fox',
@@ -136,6 +150,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'fox',
     height: 65,
     weight: 12,
+    series: 1,
   },
   {
     id: 'echo-owl',
@@ -147,6 +162,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'owl',
     height: 55,
     weight: 4.5,
+    series: 1,
   },
   // Legendary (2)
   {
@@ -159,6 +175,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'nature-titan',
     height: 450,
     weight: 1200,
+    series: 1,
   },
   {
     id: 'leaf-kong',
@@ -170,6 +187,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'gorilla',
     height: 280,
     weight: 450,
+    series: 1,
   },
 
   // ==================== COASTAL CREATURES ====================
@@ -184,6 +202,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'turtle',
     height: 75,
     weight: 45,
+    series: 1,
   },
   {
     id: 'crank-crab',
@@ -195,6 +214,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'crab',
     height: 30,
     weight: 5.5,
+    series: 1,
   },
   {
     id: 'wave-bot',
@@ -206,6 +226,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'fish',
     height: 40,
     weight: 3.8,
+    series: 1,
   },
   {
     id: 'pearl-pup',
@@ -217,6 +238,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'seal',
     height: 95,
     weight: 38,
+    series: 1,
   },
   {
     id: 'coral-crawler',
@@ -228,6 +250,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'octopus',
     height: 60,
     weight: 18,
+    series: 1,
   },
   {
     id: 'shell-shock',
@@ -239,6 +262,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'hermit-crab',
     height: 22,
     weight: 2.8,
+    series: 1,
   },
   {
     id: 'foam-flounder',
@@ -250,6 +274,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'flounder',
     height: 35,
     weight: 4.2,
+    series: 1,
   },
   {
     id: 'anchor-pony',
@@ -261,6 +286,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'seahorse',
     height: 28,
     weight: 1.5,
+    series: 1,
   },
   // Rare (4)
   {
@@ -273,6 +299,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'manta-ray',
     height: 120,
     weight: 85,
+    series: 1,
   },
   {
     id: 'kraken-kit',
@@ -284,6 +311,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'kraken',
     height: 200,
     weight: 350,
+    series: 1,
   },
   {
     id: 'siren-synth',
@@ -295,6 +323,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'mermaid',
     height: 165,
     weight: 55,
+    series: 1,
   },
   {
     id: 'tide-titan',
@@ -306,6 +335,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'water-elemental',
     height: 250,
     weight: 420,
+    series: 1,
   },
   // Legendary (1)
   {
@@ -318,6 +348,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'leviathan',
     height: 1500,
     weight: 8500,
+    series: 1,
   },
 
   // ==================== LAVA CREATURES ====================
@@ -332,6 +363,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'golem',
     height: 150,
     weight: 380,
+    series: 1,
   },
   {
     id: 'pyro-gecko',
@@ -343,6 +375,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'gecko',
     height: 22,
     weight: 0.8,
+    series: 1,
   },
   {
     id: 'ember-mech',
@@ -354,6 +387,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'phoenix',
     height: 45,
     weight: 4.5,
+    series: 1,
   },
   {
     id: 'forge-hound',
@@ -365,6 +399,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'hound',
     height: 70,
     weight: 32,
+    series: 1,
   },
   {
     id: 'cinder-snake',
@@ -376,6 +411,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'snake',
     height: 180,
     weight: 15,
+    series: 1,
   },
   {
     id: 'slag-slime',
@@ -387,6 +423,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'slime',
     height: 35,
     weight: 8.5,
+    series: 1,
   },
   {
     id: 'coal-critter',
@@ -398,6 +435,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'coal-creature',
     height: 28,
     weight: 3.2,
+    series: 1,
   },
   {
     id: 'blast-bat',
@@ -409,6 +447,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'bat',
     height: 38,
     weight: 2.1,
+    series: 1,
   },
   // Rare (4)
   {
@@ -421,6 +460,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'dragon',
     height: 220,
     weight: 380,
+    series: 1,
   },
   {
     id: 'obsidian-knight',
@@ -432,6 +472,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'knight',
     height: 195,
     weight: 180,
+    series: 1,
   },
   {
     id: 'inferno-djinn',
@@ -443,6 +484,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'djinn',
     height: 175,
     weight: 65,
+    series: 1,
   },
   {
     id: 'molten-mammoth',
@@ -454,6 +496,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'mammoth',
     height: 380,
     weight: 2800,
+    series: 1,
   },
   // Legendary (1)
   {
@@ -466,6 +509,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'fire-titan',
     height: 850,
     weight: 12000,
+    series: 1,
   },
 
   // ==================== CITY CREATURES ====================
@@ -480,6 +524,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'rat',
     height: 25,
     weight: 1.2,
+    series: 1,
   },
   {
     id: 'holo-hound',
@@ -491,6 +536,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'dog',
     height: 65,
     weight: 22,
+    series: 1,
   },
   {
     id: 'glitch-cat',
@@ -502,6 +548,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'cat',
     height: 35,
     weight: 5.5,
+    series: 1,
   },
   {
     id: 'drone-pigeon',
@@ -513,6 +560,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'pigeon',
     height: 32,
     weight: 1.8,
+    series: 1,
   },
   {
     id: 'trash-panda-bot',
@@ -524,6 +572,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'raccoon',
     height: 55,
     weight: 12,
+    series: 1,
   },
   {
     id: 'pixel-roach',
@@ -535,6 +584,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'cockroach',
     height: 8,
     weight: 0.15,
+    series: 1,
   },
   {
     id: 'subway-worm',
@@ -546,6 +596,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'worm',
     height: 250,
     weight: 85,
+    series: 1,
   },
   {
     id: 'vending-mimic',
@@ -557,6 +608,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'mimic',
     height: 185,
     weight: 120,
+    series: 1,
   },
   // Rare (4)
   {
@@ -569,6 +621,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'sphinx',
     height: 180,
     weight: 250,
+    series: 1,
   },
   {
     id: 'neon-dragon',
@@ -580,6 +633,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'dragon',
     height: 300,
     weight: 150,
+    series: 1,
   },
   {
     id: 'billboard-beast',
@@ -591,6 +645,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'kaiju',
     height: 450,
     weight: 3500,
+    series: 1,
   },
   {
     id: 'data-phantom',
@@ -602,6 +657,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'ghost',
     height: 165,
     weight: 0.01,
+    series: 1,
   },
   // Legendary (1)
   {
@@ -614,6 +670,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'city-spirit',
     height: 500,
     weight: 0.1,
+    series: 1,
   },
 
   // ==================== SKY CREATURES ====================
@@ -628,6 +685,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'puppy',
     height: 40,
     weight: 6.5,
+    series: 1,
   },
   {
     id: 'cloud-crawler',
@@ -639,6 +697,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'spider',
     height: 25,
     weight: 0.8,
+    series: 1,
   },
   {
     id: 'zephyr-bunny',
@@ -650,6 +709,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'bunny',
     height: 30,
     weight: 2.2,
+    series: 1,
   },
   {
     id: 'nimbus-kitten',
@@ -661,6 +721,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'kitten',
     height: 28,
     weight: 3.5,
+    series: 1,
   },
   {
     id: 'glider-squirrel',
@@ -672,6 +733,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'flying-squirrel',
     height: 22,
     weight: 1.4,
+    series: 1,
   },
   {
     id: 'breeze-bird',
@@ -683,6 +745,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'songbird',
     height: 18,
     weight: 0.6,
+    series: 1,
   },
   {
     id: 'balloon-jellyfish',
@@ -694,6 +757,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'jellyfish',
     height: 55,
     weight: 2.8,
+    series: 1,
   },
   {
     id: 'kite-ray',
@@ -705,6 +769,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'ray',
     height: 85,
     weight: 12,
+    series: 1,
   },
   // Rare (4)
   {
@@ -717,6 +782,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'eagle',
     height: 95,
     weight: 8.5,
+    series: 1,
   },
   {
     id: 'aurora-serpent',
@@ -728,6 +794,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'serpent',
     height: 450,
     weight: 85,
+    series: 1,
   },
   {
     id: 'star-whale',
@@ -739,6 +806,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'whale',
     height: 1200,
     weight: 4500,
+    series: 1,
   },
   {
     id: 'wind-djinn',
@@ -750,6 +818,7 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'djinn',
     height: 185,
     weight: 35,
+    series: 1,
   },
   // Legendary (1)
   {
@@ -762,23 +831,1711 @@ export const ALL_CREATURES: Creature[] = [
     monsterType: 'cosmic-phoenix',
     height: 320,
     weight: 125,
-  },
-
-  // ==================== MYTHIC CREATURE ====================
-  // Ultimate (1) - Only appears after all other creatures are caught
-  {
-    id: 'binsters-claymars',
-    name: 'Binsters Claymars',
-    region: 'all',
-    rarity: 'mythic',
-    description: 'The legendary six-headed dragon of perfect dental hygiene! Each head represents a different brushing zone. Only reveals itself to true masters who have befriended every creature!',
-    robotParts: ['six-dragon-heads', 'clay-body', 'rainbow-belly', 'golden-horns', 'ultimate-core'],
-    monsterType: 'hydra-dragon',
-    height: 2500,
-    weight: 18000,
-    requiresAllCreatures: true,
+    series: 1,
   },
 ];
+
+// ============================================================================
+// SERIES 2 - Crystal Caverns & Slime Valley
+// New unique types: Crystal creatures and Slime variants
+// ============================================================================
+
+const SERIES_2_CREATURES: Creature[] = [
+  // ==================== GRASSLAND CREATURES ====================
+  // Common (8)
+  {
+    id: 's2-moss-mole',
+    name: 'Tunnelsprout',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'Digs through soil with drill-nose and plants seeds wherever it goes!',
+    robotParts: ['drill-snout', 'root-claws', 'seed-dispenser'],
+    monsterType: 'mole',
+    height: 28,
+    weight: 3.5,
+    series: 2,
+  },
+  {
+    id: 's2-crystal-caterpillar',
+    name: 'Prismapillar',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'Each segment is a different colored crystal that chimes when it moves!',
+    robotParts: ['crystal-segments', 'rainbow-sensors', 'gem-feet'],
+    monsterType: 'crystal-caterpillar',
+    height: 20,
+    weight: 1.8,
+    series: 2,
+  },
+  {
+    id: 's2-hedge-hog',
+    name: 'Thorntank',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'A tiny tank disguised as a hedgehog! Its spines are actually antennae!',
+    robotParts: ['antenna-spines', 'tread-feet', 'leaf-camo'],
+    monsterType: 'hedgehog',
+    height: 18,
+    weight: 2.2,
+    series: 2,
+  },
+  {
+    id: 's2-pollen-bot',
+    name: 'Sneezeling',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'Spreads joy and pollen! Everyone near it starts giggling!',
+    robotParts: ['pollen-jets', 'flower-head', 'giggle-generator'],
+    monsterType: 'pollen-sprite',
+    height: 15,
+    weight: 0.5,
+    series: 2,
+  },
+  {
+    id: 's2-grass-slime',
+    name: 'Meadowgoo',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'A jiggly slime that absorbs nutrients from the grass and glows green!',
+    robotParts: ['chlorophyll-core', 'sticky-membrane', 'photosynthesis-nodes'],
+    monsterType: 'grass-slime',
+    height: 25,
+    weight: 4.0,
+    series: 2,
+  },
+  {
+    id: 's2-acorn-knight',
+    name: 'Oakling',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'A tiny warrior born from an enchanted acorn! Very brave!',
+    robotParts: ['acorn-helmet', 'twig-sword', 'leaf-shield'],
+    monsterType: 'acorn-warrior',
+    height: 12,
+    weight: 0.8,
+    series: 2,
+  },
+  {
+    id: 's2-daisy-drone',
+    name: 'Petalcopter',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'Petals spin like helicopter blades! Smells amazing!',
+    robotParts: ['petal-rotors', 'stem-body', 'nectar-tank'],
+    monsterType: 'flower-drone',
+    height: 22,
+    weight: 0.9,
+    series: 2,
+  },
+  {
+    id: 's2-cricket-bot',
+    name: 'Chiptune',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'Chirps in 8-bit melodies! A favorite among retro fans!',
+    robotParts: ['speaker-legs', 'antenna-mixer', 'sound-chip'],
+    monsterType: 'cricket',
+    height: 8,
+    weight: 0.2,
+    series: 2,
+  },
+  // Rare (4)
+  {
+    id: 's2-emerald-elk',
+    name: 'Crystalope',
+    region: 'grassland',
+    rarity: 'rare',
+    description: 'Its antlers are pure emerald crystal that can heal other creatures!',
+    robotParts: ['emerald-antlers', 'healing-aura', 'forest-camo'],
+    monsterType: 'crystal-elk',
+    height: 210,
+    weight: 280,
+    series: 2,
+  },
+  {
+    id: 's2-mushroom-giant',
+    name: 'Sporegiant',
+    region: 'grassland',
+    rarity: 'rare',
+    description: 'A gentle giant made of interconnected mushrooms and circuits!',
+    robotParts: ['spore-network', 'mycelium-cables', 'cap-sensor'],
+    monsterType: 'mushroom-golem',
+    height: 400,
+    weight: 650,
+    series: 2,
+  },
+  {
+    id: 's2-willow-wisp',
+    name: 'Ghostweep',
+    region: 'grassland',
+    rarity: 'rare',
+    description: 'A spirit that lives in willow trees and guides lost travelers!',
+    robotParts: ['spectral-core', 'branch-tendrils', 'guide-light'],
+    monsterType: 'tree-spirit',
+    height: 150,
+    weight: 8,
+    series: 2,
+  },
+  {
+    id: 's2-mega-slime',
+    name: 'Blobzilla',
+    region: 'grassland',
+    rarity: 'rare',
+    description: 'The king of all grass slimes! Can split into smaller slimes!',
+    robotParts: ['nucleus-core', 'division-matrix', 'absorption-membrane'],
+    monsterType: 'mega-slime',
+    height: 200,
+    weight: 500,
+    series: 2,
+  },
+  // Legendary (2)
+  {
+    id: 's2-crystal-guardian',
+    name: 'Geodiatron',
+    region: 'grassland',
+    rarity: 'legendary',
+    description: 'Born from the heart of a crystal cave that grew into the meadow! Protects all gem-type creatures!',
+    robotParts: ['diamond-core', 'crystal-wings', 'geode-armor'],
+    monsterType: 'crystal-titan',
+    height: 500,
+    weight: 1800,
+    series: 2,
+  },
+  {
+    id: 's2-nature-computer',
+    name: 'Motherboard',
+    region: 'grassland',
+    rarity: 'legendary',
+    description: 'A sentient supercomputer that became one with nature! Processes photosynthesis data!',
+    robotParts: ['bio-processors', 'vine-cables', 'solar-RAM'],
+    monsterType: 'nature-AI',
+    height: 320,
+    weight: 890,
+    series: 2,
+  },
+
+  // ==================== COASTAL CREATURES ====================
+  // Common (8)
+  {
+    id: 's2-sand-dollar-bot',
+    name: 'Coinfish',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'Collects shiny things and stores them in its flat body!',
+    robotParts: ['coin-body', 'magnet-sensors', 'treasure-storage'],
+    monsterType: 'sand-dollar',
+    height: 15,
+    weight: 0.8,
+    series: 2,
+  },
+  {
+    id: 's2-crystal-urchin',
+    name: 'Sparkspine',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'Every spine is a different colored crystal that lights up!',
+    robotParts: ['crystal-spines', 'LED-core', 'water-sensors'],
+    monsterType: 'crystal-urchin',
+    height: 20,
+    weight: 2.5,
+    series: 2,
+  },
+  {
+    id: 's2-bubble-blob',
+    name: 'Foamgoo',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'A slime made entirely of ocean foam! Very bubbly personality!',
+    robotParts: ['bubble-matrix', 'foam-generator', 'salt-filter'],
+    monsterType: 'foam-slime',
+    height: 35,
+    weight: 1.2,
+    series: 2,
+  },
+  {
+    id: 's2-starfish-drone',
+    name: 'Pentabot',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'Can detach its arms to explore five places at once!',
+    robotParts: ['detach-arms', 'regrow-core', 'multi-eyes'],
+    monsterType: 'starfish',
+    height: 40,
+    weight: 3.0,
+    series: 2,
+  },
+  {
+    id: 's2-barnacle-cluster',
+    name: 'Clingtron',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'A friendly barnacle colony that hitchhikes on bigger creatures!',
+    robotParts: ['suction-bases', 'filter-feeders', 'colony-mind'],
+    monsterType: 'barnacle',
+    height: 12,
+    weight: 1.5,
+    series: 2,
+  },
+  {
+    id: 's2-kelp-dancer',
+    name: 'Swayling',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'Dances with the currents and creates beautiful underwater ballets!',
+    robotParts: ['ribbon-fronds', 'current-sensors', 'anchor-root'],
+    monsterType: 'kelp-creature',
+    height: 180,
+    weight: 12,
+    series: 2,
+  },
+  {
+    id: 's2-puffer-tank',
+    name: 'Spikeball',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'Inflates into a spiky ball when scared! Very round!',
+    robotParts: ['inflate-bladder', 'spike-array', 'pressure-gauge'],
+    monsterType: 'pufferfish',
+    height: 25,
+    weight: 2.8,
+    series: 2,
+  },
+  {
+    id: 's2-anemone-bot',
+    name: 'Tickletips',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'Its tentacles give gentle tickles instead of stings!',
+    robotParts: ['tickle-tentacles', 'root-anchor', 'happiness-sensors'],
+    monsterType: 'anemone',
+    height: 30,
+    weight: 4.5,
+    series: 2,
+  },
+  // Rare (4)
+  {
+    id: 's2-pearl-dragon',
+    name: 'Lusterwyrm',
+    region: 'coastal',
+    rarity: 'rare',
+    description: 'A serpentine dragon covered in iridescent pearl scales!',
+    robotParts: ['pearl-scales', 'rainbow-breath', 'tide-fins'],
+    monsterType: 'pearl-dragon',
+    height: 350,
+    weight: 200,
+    series: 2,
+  },
+  {
+    id: 's2-giant-clam',
+    name: 'Shellfortress',
+    region: 'coastal',
+    rarity: 'rare',
+    description: 'Houses an entire ecosystem inside its massive shell!',
+    robotParts: ['fortress-shell', 'ecosystem-core', 'pearl-generator'],
+    monsterType: 'mega-clam',
+    height: 280,
+    weight: 1200,
+    series: 2,
+  },
+  {
+    id: 's2-coral-golem',
+    name: 'Reefrock',
+    region: 'coastal',
+    rarity: 'rare',
+    description: 'A walking coral reef! Hundreds of tiny creatures live on it!',
+    robotParts: ['coral-armor', 'habitat-zones', 'calcium-core'],
+    monsterType: 'coral-golem',
+    height: 300,
+    weight: 950,
+    series: 2,
+  },
+  {
+    id: 's2-crystal-shark',
+    name: 'Diamondjaw',
+    region: 'coastal',
+    rarity: 'rare',
+    description: 'Teeth made of pure crystal! Hunts by refracting light!',
+    robotParts: ['crystal-teeth', 'prism-eyes', 'stealth-fins'],
+    monsterType: 'crystal-shark',
+    height: 280,
+    weight: 450,
+    series: 2,
+  },
+  // Legendary (1)
+  {
+    id: 's2-deep-crystal',
+    name: 'Abyssalith',
+    region: 'coastal',
+    rarity: 'legendary',
+    description: 'A massive crystal formation from the deepest trench! Glows with ancient power!',
+    robotParts: ['abyss-core', 'pressure-crystal', 'bioluminescence-array'],
+    monsterType: 'deep-crystal-titan',
+    height: 1200,
+    weight: 15000,
+    series: 2,
+  },
+
+  // ==================== LAVA CREATURES ====================
+  // Common (8)
+  {
+    id: 's2-ember-sprite',
+    name: 'Flickerling',
+    region: 'lava',
+    rarity: 'common',
+    description: 'A tiny fire spirit that loves to dance in flames!',
+    robotParts: ['flame-body', 'spark-wings', 'ember-heart'],
+    monsterType: 'fire-sprite',
+    height: 15,
+    weight: 0.3,
+    series: 2,
+  },
+  {
+    id: 's2-ruby-beetle',
+    name: 'Garnix',
+    region: 'lava',
+    rarity: 'common',
+    description: 'Shell made of heat-formed rubies! Very fashionable!',
+    robotParts: ['ruby-shell', 'gem-horns', 'heat-legs'],
+    monsterType: 'crystal-beetle',
+    height: 18,
+    weight: 3.2,
+    series: 2,
+  },
+  {
+    id: 's2-lava-slime',
+    name: 'Magmagoo',
+    region: 'lava',
+    rarity: 'common',
+    description: 'A slime made of liquid rock! Surprisingly cuddly if you have heat shields!',
+    robotParts: ['magma-body', 'heat-core', 'cooling-membrane'],
+    monsterType: 'lava-slime',
+    height: 40,
+    weight: 85,
+    series: 2,
+  },
+  {
+    id: 's2-smoke-puff',
+    name: 'Ashling',
+    region: 'lava',
+    rarity: 'common',
+    description: 'A creature made of volcanic ash that changes shape constantly!',
+    robotParts: ['ash-cloud-body', 'ember-eyes', 'smoke-trail'],
+    monsterType: 'ash-creature',
+    height: 50,
+    weight: 2.5,
+    series: 2,
+  },
+  {
+    id: 's2-fire-ant',
+    name: 'Inferant',
+    region: 'lava',
+    rarity: 'common',
+    description: 'Works in colonies to build amazing fire sculptures!',
+    robotParts: ['heat-mandibles', 'forge-abdomen', 'colony-link'],
+    monsterType: 'fire-ant',
+    height: 5,
+    weight: 0.05,
+    series: 2,
+  },
+  {
+    id: 's2-sulfur-frog',
+    name: 'Brimhop',
+    region: 'lava',
+    rarity: 'common',
+    description: 'Hops across lava pools! Its tongue catches fire flies!',
+    robotParts: ['heat-pads', 'flame-tongue', 'sulfur-skin'],
+    monsterType: 'volcanic-frog',
+    height: 22,
+    weight: 1.8,
+    series: 2,
+  },
+  {
+    id: 's2-obsidian-crab',
+    name: 'Glassback',
+    region: 'lava',
+    rarity: 'common',
+    description: 'Shell forms from cooled lava! Cracks and reforms constantly!',
+    robotParts: ['glass-shell', 'lava-claws', 'thermal-sensors'],
+    monsterType: 'obsidian-crab',
+    height: 28,
+    weight: 8.5,
+    series: 2,
+  },
+  {
+    id: 's2-spark-lizard',
+    name: 'Igniscale',
+    region: 'lava',
+    rarity: 'common',
+    description: 'Leaves trails of sparks wherever it runs!',
+    robotParts: ['spark-scales', 'ember-tail', 'heat-vision'],
+    monsterType: 'spark-lizard',
+    height: 35,
+    weight: 4.2,
+    series: 2,
+  },
+  // Rare (4)
+  {
+    id: 's2-ruby-serpent',
+    name: 'Crimsoncoil',
+    region: 'lava',
+    rarity: 'rare',
+    description: 'A snake made entirely of linked ruby crystals!',
+    robotParts: ['ruby-segments', 'gem-fangs', 'heat-rattle'],
+    monsterType: 'crystal-snake',
+    height: 400,
+    weight: 120,
+    series: 2,
+  },
+  {
+    id: 's2-forge-titan',
+    name: 'Anvillion',
+    region: 'lava',
+    rarity: 'rare',
+    description: 'A giant that forges weapons for legendary creatures!',
+    robotParts: ['anvil-arms', 'forge-heart', 'hammer-fists'],
+    monsterType: 'forge-giant',
+    height: 450,
+    weight: 2200,
+    series: 2,
+  },
+  {
+    id: 's2-fire-elemental',
+    name: 'Blazeborn',
+    region: 'lava',
+    rarity: 'rare',
+    description: 'Pure fire given consciousness and a playful personality!',
+    robotParts: ['plasma-core', 'flame-limbs', 'heat-aura'],
+    monsterType: 'fire-elemental',
+    height: 280,
+    weight: 45,
+    series: 2,
+  },
+  {
+    id: 's2-crystal-wyrm',
+    name: 'Carbuncle',
+    region: 'lava',
+    rarity: 'rare',
+    description: 'A dragon that breathes crystal shards instead of fire!',
+    robotParts: ['crystal-breath', 'gem-scales', 'mineral-wings'],
+    monsterType: 'crystal-dragon',
+    height: 320,
+    weight: 580,
+    series: 2,
+  },
+  // Legendary (1)
+  {
+    id: 's2-planet-core',
+    name: 'Geothermia',
+    region: 'lava',
+    rarity: 'legendary',
+    description: 'A sentient piece of the planets inner core! Contains the heat of a thousand volcanoes!',
+    robotParts: ['core-fragment', 'magma-veins', 'planetary-heart'],
+    monsterType: 'core-titan',
+    height: 680,
+    weight: 25000,
+    series: 2,
+  },
+
+  // ==================== CITY CREATURES ====================
+  // Common (8)
+  {
+    id: 's2-wifi-moth',
+    name: 'Signalfly',
+    region: 'city',
+    rarity: 'common',
+    description: 'Attracted to wifi signals instead of light!',
+    robotParts: ['antenna-wings', 'signal-sensors', 'data-dust'],
+    monsterType: 'wifi-moth',
+    height: 12,
+    weight: 0.2,
+    series: 2,
+  },
+  {
+    id: 's2-graffiti-goo',
+    name: 'Spraygoo',
+    region: 'city',
+    rarity: 'common',
+    description: 'A slime that leaves colorful art wherever it slides!',
+    robotParts: ['paint-body', 'nozzle-tips', 'art-AI'],
+    monsterType: 'paint-slime',
+    height: 30,
+    weight: 5.5,
+    series: 2,
+  },
+  {
+    id: 's2-traffic-cone',
+    name: 'Conebot',
+    region: 'city',
+    rarity: 'common',
+    description: 'Actually a creature! Directs traffic and loves the job!',
+    robotParts: ['reflective-shell', 'warning-lights', 'direction-sensors'],
+    monsterType: 'traffic-creature',
+    height: 75,
+    weight: 8,
+    series: 2,
+  },
+  {
+    id: 's2-parking-meter',
+    name: 'Ticketron',
+    region: 'city',
+    rarity: 'common',
+    description: 'A friendly meter that sometimes forgives expired time!',
+    robotParts: ['coin-slot', 'timer-brain', 'mercy-protocol'],
+    monsterType: 'meter-creature',
+    height: 120,
+    weight: 35,
+    series: 2,
+  },
+  {
+    id: 's2-crystal-mouse',
+    name: 'Diamice',
+    region: 'city',
+    rarity: 'common',
+    description: 'A mouse with crystal fur! Squeaks in musical tones!',
+    robotParts: ['crystal-fur', 'gem-eyes', 'treasure-sense'],
+    monsterType: 'crystal-mouse',
+    height: 10,
+    weight: 0.4,
+    series: 2,
+  },
+  {
+    id: 's2-manhole-mimic',
+    name: 'Coverling',
+    region: 'city',
+    rarity: 'common',
+    description: 'Looks like a manhole cover but pops up to say hi!',
+    robotParts: ['metal-shell', 'peek-eyes', 'underground-legs'],
+    monsterType: 'manhole-creature',
+    height: 15,
+    weight: 45,
+    series: 2,
+  },
+  {
+    id: 's2-street-lamp',
+    name: 'Luminos',
+    region: 'city',
+    rarity: 'common',
+    description: 'A street lamp that walks around lighting dark corners!',
+    robotParts: ['bulb-head', 'post-body', 'light-heart'],
+    monsterType: 'lamp-creature',
+    height: 350,
+    weight: 150,
+    series: 2,
+  },
+  {
+    id: 's2-bubble-bot',
+    name: 'Soapling',
+    region: 'city',
+    rarity: 'common',
+    description: 'Escaped from a car wash and now spreads cleanliness everywhere!',
+    robotParts: ['soap-dispenser', 'bubble-blower', 'scrub-arms'],
+    monsterType: 'soap-creature',
+    height: 45,
+    weight: 12,
+    series: 2,
+  },
+  // Rare (4)
+  {
+    id: 's2-arcade-boss',
+    name: 'Pixelord',
+    region: 'city',
+    rarity: 'rare',
+    description: 'Escaped from an arcade machine! Still thinks life is a game!',
+    robotParts: ['pixel-body', 'game-logic', 'power-up-core'],
+    monsterType: 'arcade-creature',
+    height: 200,
+    weight: 85,
+    series: 2,
+  },
+  {
+    id: 's2-skyscraper-golem',
+    name: 'Towerrock',
+    region: 'city',
+    rarity: 'rare',
+    description: 'A building that woke up! Very slow but very friendly!',
+    robotParts: ['concrete-body', 'window-eyes', 'elevator-heart'],
+    monsterType: 'building-golem',
+    height: 800,
+    weight: 50000,
+    series: 2,
+  },
+  {
+    id: 's2-crystal-spider',
+    name: 'Webgem',
+    region: 'city',
+    rarity: 'rare',
+    description: 'Spins webs made of crystal threads! Beautiful but strong!',
+    robotParts: ['crystal-spinnerets', 'gem-legs', 'prism-eyes'],
+    monsterType: 'crystal-spider',
+    height: 150,
+    weight: 45,
+    series: 2,
+  },
+  {
+    id: 's2-junk-dragon',
+    name: 'Scrapling',
+    region: 'city',
+    rarity: 'rare',
+    description: 'A dragon made entirely of recycled junk! Eco-friendly!',
+    robotParts: ['scrap-wings', 'junk-breath', 'recycle-heart'],
+    monsterType: 'junk-dragon',
+    height: 350,
+    weight: 420,
+    series: 2,
+  },
+  // Legendary (1)
+  {
+    id: 's2-internet-spirit',
+    name: 'Webweaver',
+    region: 'city',
+    rarity: 'legendary',
+    description: 'The collective spirit of the entire internet! Knows every meme ever made!',
+    robotParts: ['data-stream-body', 'meme-core', 'connection-web'],
+    monsterType: 'internet-spirit',
+    height: 400,
+    weight: 0.001,
+    series: 2,
+  },
+
+  // ==================== SKY CREATURES ====================
+  // Common (8)
+  {
+    id: 's2-paper-plane',
+    name: 'Foldwing',
+    region: 'sky',
+    rarity: 'common',
+    description: 'A living origami plane! Loves doing loop-de-loops!',
+    robotParts: ['paper-body', 'fold-wings', 'wind-rider'],
+    monsterType: 'paper-creature',
+    height: 25,
+    weight: 0.1,
+    series: 2,
+  },
+  {
+    id: 's2-cloud-slime',
+    name: 'Fluffgoo',
+    region: 'sky',
+    rarity: 'common',
+    description: 'A slime made of condensed cloud! Super soft and floaty!',
+    robotParts: ['vapor-body', 'rain-core', 'lightning-sparks'],
+    monsterType: 'cloud-slime',
+    height: 60,
+    weight: 0.5,
+    series: 2,
+  },
+  {
+    id: 's2-crystal-hummingbird',
+    name: 'Shimmerzip',
+    region: 'sky',
+    rarity: 'common',
+    description: 'Wings made of thin crystal sheets that sing when it flies!',
+    robotParts: ['crystal-wings', 'nectar-beak', 'hover-motors'],
+    monsterType: 'crystal-hummingbird',
+    height: 10,
+    weight: 0.15,
+    series: 2,
+  },
+  {
+    id: 's2-sky-fish',
+    name: 'Aerofin',
+    region: 'sky',
+    rarity: 'common',
+    description: 'A fish that swims through air! Confused but happy!',
+    robotParts: ['air-gills', 'sky-fins', 'altitude-bladder'],
+    monsterType: 'sky-fish',
+    height: 45,
+    weight: 3.5,
+    series: 2,
+  },
+  {
+    id: 's2-feather-sprite',
+    name: 'Plumeling',
+    region: 'sky',
+    rarity: 'common',
+    description: 'Made entirely of floating feathers held together by magic!',
+    robotParts: ['feather-body', 'wind-core', 'soft-aura'],
+    monsterType: 'feather-sprite',
+    height: 20,
+    weight: 0.2,
+    series: 2,
+  },
+  {
+    id: 's2-sunset-moth',
+    name: 'Duskwing',
+    region: 'sky',
+    rarity: 'common',
+    description: 'Only appears at sunset! Wings display the evening colors!',
+    robotParts: ['sunset-wings', 'twilight-sensors', 'dusk-dust'],
+    monsterType: 'sunset-moth',
+    height: 18,
+    weight: 0.25,
+    series: 2,
+  },
+  {
+    id: 's2-rainbow-blob',
+    name: 'Prismgoo',
+    region: 'sky',
+    rarity: 'common',
+    description: 'A slime that refracts sunlight into beautiful rainbows!',
+    robotParts: ['rainbow-body', 'light-absorption', 'color-shift'],
+    monsterType: 'rainbow-slime',
+    height: 35,
+    weight: 2.8,
+    series: 2,
+  },
+  {
+    id: 's2-wind-chime',
+    name: 'Tinkling',
+    region: 'sky',
+    rarity: 'common',
+    description: 'A creature made of floating crystals that chime in the wind!',
+    robotParts: ['chime-crystals', 'wind-sensors', 'melody-core'],
+    monsterType: 'wind-chime-creature',
+    height: 40,
+    weight: 1.5,
+    series: 2,
+  },
+  // Rare (4)
+  {
+    id: 's2-storm-giant',
+    name: 'Thundercoil',
+    region: 'sky',
+    rarity: 'rare',
+    description: 'A massive creature made of storm clouds and lightning!',
+    robotParts: ['storm-body', 'lightning-veins', 'thunder-heart'],
+    monsterType: 'storm-giant',
+    height: 600,
+    weight: 200,
+    series: 2,
+  },
+  {
+    id: 's2-crystal-griffin',
+    name: 'Gemtalon',
+    region: 'sky',
+    rarity: 'rare',
+    description: 'A majestic griffin with crystal feathers and gem-encrusted claws!',
+    robotParts: ['crystal-wings', 'gem-claws', 'diamond-beak'],
+    monsterType: 'crystal-griffin',
+    height: 280,
+    weight: 180,
+    series: 2,
+  },
+  {
+    id: 's2-aurora-whale',
+    name: 'Borealisk',
+    region: 'sky',
+    rarity: 'rare',
+    description: 'A massive sky whale that creates aurora borealis as it swims!',
+    robotParts: ['aurora-skin', 'polar-heart', 'light-spout'],
+    monsterType: 'aurora-whale',
+    height: 1500,
+    weight: 3500,
+    series: 2,
+  },
+  {
+    id: 's2-moon-moth',
+    name: 'Lunawing',
+    region: 'sky',
+    rarity: 'rare',
+    description: 'Only visible during full moons! Grants wishes to believers!',
+    robotParts: ['moonbeam-wings', 'lunar-dust', 'wish-antenna'],
+    monsterType: 'moon-moth',
+    height: 120,
+    weight: 8,
+    series: 2,
+  },
+  // Legendary (1)
+  {
+    id: 's2-sky-leviathan',
+    name: 'Aethermaw',
+    region: 'sky',
+    rarity: 'legendary',
+    description: 'The ancient guardian of the upper atmosphere! Swallows storms to protect the land below!',
+    robotParts: ['storm-stomach', 'cloud-fins', 'atmosphere-core'],
+    monsterType: 'sky-leviathan',
+    height: 2500,
+    weight: 8000,
+    series: 2,
+  },
+];
+
+// ============================================================================
+// SERIES 3 - Prehistoric Tech & Phantom Realm
+// New unique types: Mecha-dinosaurs and Phantom/Ghost creatures
+// ============================================================================
+
+const SERIES_3_CREATURES: Creature[] = [
+  // ==================== GRASSLAND CREATURES ====================
+  // Common (8)
+  {
+    id: 's3-phantom-rabbit',
+    name: 'Ghosthop',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'A spectral bunny that phases through solid objects!',
+    robotParts: ['ecto-ears', 'phase-legs', 'spirit-fluff'],
+    monsterType: 'phantom-rabbit',
+    height: 30,
+    weight: 0.1,
+    series: 3,
+  },
+  {
+    id: 's3-dino-beetle',
+    name: 'Trilobot',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'An ancient trilobite brought back with robot technology!',
+    robotParts: ['fossil-shell', 'ancient-sensors', 'primitive-legs'],
+    monsterType: 'mecha-trilobite',
+    height: 25,
+    weight: 4.5,
+    series: 3,
+  },
+  {
+    id: 's3-ghost-flower',
+    name: 'Spectrabloom',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'A flower spirit that only blooms in moonlight!',
+    robotParts: ['petal-ecto', 'ghost-pollen', 'spirit-stem'],
+    monsterType: 'phantom-flower',
+    height: 35,
+    weight: 0.05,
+    series: 3,
+  },
+  {
+    id: 's3-mini-raptor',
+    name: 'Velocibyte',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'A tiny raptor with incredible processing speed!',
+    robotParts: ['cyber-claws', 'speed-legs', 'hunt-AI'],
+    monsterType: 'mecha-raptor',
+    height: 60,
+    weight: 18,
+    series: 3,
+  },
+  {
+    id: 's3-wisp-bug',
+    name: 'Glimmergeist',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'A ghostly firefly that lights the way for lost souls!',
+    robotParts: ['spirit-glow', 'phase-wings', 'guide-light'],
+    monsterType: 'phantom-firefly',
+    height: 8,
+    weight: 0.01,
+    series: 3,
+  },
+  {
+    id: 's3-fossil-frog',
+    name: 'Cretacehopper',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'A prehistoric frog preserved in amber and reactivated!',
+    robotParts: ['amber-skin', 'ancient-tongue', 'fossil-hop'],
+    monsterType: 'ancient-frog',
+    height: 20,
+    weight: 1.5,
+    series: 3,
+  },
+  {
+    id: 's3-shade-snake',
+    name: 'Spectherp',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'A ghostly serpent that slithers between dimensions!',
+    robotParts: ['shadow-scales', 'phase-fangs', 'dimension-rattle'],
+    monsterType: 'phantom-snake',
+    height: 150,
+    weight: 0.5,
+    series: 3,
+  },
+  {
+    id: 's3-dino-chick',
+    name: 'Chickosaurus',
+    region: 'grassland',
+    rarity: 'common',
+    description: 'A baby dinosaur with fluffy proto-feathers and robot parts!',
+    robotParts: ['proto-feathers', 'tiny-claws', 'chirp-speaker'],
+    monsterType: 'baby-dinosaur',
+    height: 35,
+    weight: 5,
+    series: 3,
+  },
+  // Rare (4)
+  {
+    id: 's3-phantom-stag',
+    name: 'Spectralbuck',
+    region: 'grassland',
+    rarity: 'rare',
+    description: 'A majestic ghost deer! Its antlers glow with otherworldly light!',
+    robotParts: ['ecto-antlers', 'spirit-hooves', 'phantom-heart'],
+    monsterType: 'phantom-stag',
+    height: 200,
+    weight: 15,
+    series: 3,
+  },
+  {
+    id: 's3-tricerabot',
+    name: 'Tritanium',
+    region: 'grassland',
+    rarity: 'rare',
+    description: 'A full-sized triceratops with titanium horns!',
+    robotParts: ['titanium-horns', 'armor-frill', 'charge-legs'],
+    monsterType: 'mecha-triceratops',
+    height: 350,
+    weight: 6000,
+    series: 3,
+  },
+  {
+    id: 's3-ghost-treant',
+    name: 'Hollowoak',
+    region: 'grassland',
+    rarity: 'rare',
+    description: 'The spirit of an ancient tree! Still protects the forest!',
+    robotParts: ['spirit-bark', 'ghost-roots', 'phantom-leaves'],
+    monsterType: 'phantom-treant',
+    height: 500,
+    weight: 50,
+    series: 3,
+  },
+  {
+    id: 's3-stego-tank',
+    name: 'Stegotron',
+    region: 'grassland',
+    rarity: 'rare',
+    description: 'A stegosaurus with solar panel plates on its back!',
+    robotParts: ['solar-plates', 'spike-tail', 'armor-body'],
+    monsterType: 'mecha-stegosaurus',
+    height: 400,
+    weight: 4500,
+    series: 3,
+  },
+  // Legendary (2)
+  {
+    id: 's3-spirit-king',
+    name: 'Phantomarch',
+    region: 'grassland',
+    rarity: 'legendary',
+    description: 'The ruler of all grass-type phantoms! Guides spirits to peace!',
+    robotParts: ['crown-ecto', 'royal-aura', 'peace-scepter'],
+    monsterType: 'phantom-king',
+    height: 380,
+    weight: 5,
+    series: 3,
+  },
+  {
+    id: 's3-brachiobot',
+    name: 'Titaneck',
+    region: 'grassland',
+    rarity: 'legendary',
+    description: 'A towering brachiosaurus with a neck full of advanced tech!',
+    robotParts: ['tower-neck', 'radar-head', 'titan-legs'],
+    monsterType: 'mecha-brachiosaurus',
+    height: 1500,
+    weight: 35000,
+    series: 3,
+  },
+
+  // ==================== COASTAL CREATURES ====================
+  // Common (8)
+  {
+    id: 's3-ghost-fish',
+    name: 'Spectralfin',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'A transparent ghostly fish! You can see right through it!',
+    robotParts: ['ecto-scales', 'phase-fins', 'spirit-gills'],
+    monsterType: 'phantom-fish',
+    height: 30,
+    weight: 0.1,
+    series: 3,
+  },
+  {
+    id: 's3-ammonite-bot',
+    name: 'Spiralshell',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'An ancient ammonite brought back with propulsion jets!',
+    robotParts: ['spiral-shell', 'jet-siphon', 'ancient-eyes'],
+    monsterType: 'mecha-ammonite',
+    height: 80,
+    weight: 25,
+    series: 3,
+  },
+  {
+    id: 's3-phantom-crab',
+    name: 'Ghostpinch',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'A spectral crab! Its claws phase through matter!',
+    robotParts: ['ecto-claws', 'phantom-shell', 'spirit-legs'],
+    monsterType: 'phantom-crab',
+    height: 25,
+    weight: 0.2,
+    series: 3,
+  },
+  {
+    id: 's3-dunkle-pup',
+    name: 'Dunklebot',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'A baby Dunkleosteus with armored jaws!',
+    robotParts: ['armor-jaws', 'plate-head', 'ancient-fins'],
+    monsterType: 'mecha-placoderm',
+    height: 120,
+    weight: 85,
+    series: 3,
+  },
+  {
+    id: 's3-wraith-jellyfish',
+    name: 'Spooksting',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'A ghostly jellyfish with ethereal tentacles!',
+    robotParts: ['ecto-bell', 'phantom-tentacles', 'spirit-glow'],
+    monsterType: 'phantom-jellyfish',
+    height: 50,
+    weight: 0.05,
+    series: 3,
+  },
+  {
+    id: 's3-sea-scorpion',
+    name: 'Eurypteroid',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'An ancient sea scorpion with crushing pincers!',
+    robotParts: ['fossil-pincers', 'armor-tail', 'ancient-eyes'],
+    monsterType: 'mecha-eurypterid',
+    height: 180,
+    weight: 45,
+    series: 3,
+  },
+  {
+    id: 's3-ghost-eel',
+    name: 'Phanteel',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'A spectral eel that sparks with ghostly electricity!',
+    robotParts: ['ecto-coils', 'spirit-shock', 'phantom-slither'],
+    monsterType: 'phantom-eel',
+    height: 200,
+    weight: 0.3,
+    series: 3,
+  },
+  {
+    id: 's3-nautilus-bot',
+    name: 'Chambertron',
+    region: 'coastal',
+    rarity: 'common',
+    description: 'A living submarine based on ancient nautilus design!',
+    robotParts: ['chamber-shell', 'jet-propulsion', 'tentacle-arms'],
+    monsterType: 'mecha-nautilus',
+    height: 65,
+    weight: 20,
+    series: 3,
+  },
+  // Rare (4)
+  {
+    id: 's3-phantom-kraken',
+    name: 'Ghostentacle',
+    region: 'coastal',
+    rarity: 'rare',
+    description: 'A spectral kraken that haunts sunken ships!',
+    robotParts: ['ecto-tentacles', 'phantom-ink', 'spirit-beak'],
+    monsterType: 'phantom-kraken',
+    height: 400,
+    weight: 20,
+    series: 3,
+  },
+  {
+    id: 's3-mega-shark',
+    name: 'Megalobot',
+    region: 'coastal',
+    rarity: 'rare',
+    description: 'A massive megalodon with reinforced steel teeth!',
+    robotParts: ['mega-jaws', 'armor-skin', 'hunt-sensors'],
+    monsterType: 'mecha-megalodon',
+    height: 1800,
+    weight: 50000,
+    series: 3,
+  },
+  {
+    id: 's3-ship-ghost',
+    name: 'Galleongeist',
+    region: 'coastal',
+    rarity: 'rare',
+    description: 'The ghost of an entire pirate ship! Sails through water and air!',
+    robotParts: ['spectral-hull', 'ghost-sails', 'phantom-crew'],
+    monsterType: 'ghost-ship',
+    height: 800,
+    weight: 100,
+    series: 3,
+  },
+  {
+    id: 's3-plesio-sub',
+    name: 'Plesiotron',
+    region: 'coastal',
+    rarity: 'rare',
+    description: 'A plesiosaur converted into a living submarine!',
+    robotParts: ['sonar-neck', 'flipper-props', 'deep-armor'],
+    monsterType: 'mecha-plesiosaur',
+    height: 1200,
+    weight: 8000,
+    series: 3,
+  },
+  // Legendary (1)
+  {
+    id: 's3-sea-phantom',
+    name: 'Abyssalghast',
+    region: 'coastal',
+    rarity: 'legendary',
+    description: 'The ultimate phantom of the deep! Rules all ocean spirits!',
+    robotParts: ['abyss-ecto', 'depth-crown', 'spirit-trident'],
+    monsterType: 'sea-phantom-lord',
+    height: 2000,
+    weight: 50,
+    series: 3,
+  },
+
+  // ==================== LAVA CREATURES ====================
+  // Common (8)
+  {
+    id: 's3-flame-ghost',
+    name: 'Emberspook',
+    region: 'lava',
+    rarity: 'common',
+    description: 'A phantom made of ghostly flames! Warm but intangible!',
+    robotParts: ['flame-ecto', 'heat-spirit', 'ember-trail'],
+    monsterType: 'fire-phantom',
+    height: 60,
+    weight: 0.01,
+    series: 3,
+  },
+  {
+    id: 's3-dimetro-bot',
+    name: 'Sailback',
+    region: 'lava',
+    rarity: 'common',
+    description: 'A dimetrodon with a solar sail that powers its systems!',
+    robotParts: ['solar-sail', 'synapsid-body', 'heat-absorb'],
+    monsterType: 'mecha-dimetrodon',
+    height: 180,
+    weight: 250,
+    series: 3,
+  },
+  {
+    id: 's3-lava-phantom',
+    name: 'Magmageist',
+    region: 'lava',
+    rarity: 'common',
+    description: 'A ghost that lives in molten rock! Eerily beautiful!',
+    robotParts: ['lava-ecto', 'heat-spirit', 'magma-phase'],
+    monsterType: 'lava-phantom',
+    height: 80,
+    weight: 0.1,
+    series: 3,
+  },
+  {
+    id: 's3-ankylo-tank',
+    name: 'Ankylofort',
+    region: 'lava',
+    rarity: 'common',
+    description: 'An ankylosaur with heat-resistant armor plating!',
+    robotParts: ['heat-armor', 'club-tail', 'fortress-body'],
+    monsterType: 'mecha-ankylosaur',
+    height: 200,
+    weight: 4000,
+    series: 3,
+  },
+  {
+    id: 's3-ash-specter',
+    name: 'Cindershade',
+    region: 'lava',
+    rarity: 'common',
+    description: 'A phantom made of volcanic ash! Constantly shifting form!',
+    robotParts: ['ash-ecto', 'smoke-spirit', 'ember-eyes'],
+    monsterType: 'ash-phantom',
+    height: 100,
+    weight: 0.5,
+    series: 3,
+  },
+  {
+    id: 's3-spino-fire',
+    name: 'Spinoflare',
+    region: 'lava',
+    rarity: 'common',
+    description: 'A spinosaurus with a sail that shoots flames!',
+    robotParts: ['fire-sail', 'flame-claws', 'heat-snout'],
+    monsterType: 'mecha-spinosaurus',
+    height: 500,
+    weight: 7000,
+    series: 3,
+  },
+  {
+    id: 's3-smoke-wraith',
+    name: 'Fumespirit',
+    region: 'lava',
+    rarity: 'common',
+    description: 'A ghost that rises from volcanic vents! Smells like sulfur!',
+    robotParts: ['smoke-ecto', 'vent-spirit', 'sulfur-trail'],
+    monsterType: 'smoke-phantom',
+    height: 120,
+    weight: 0.2,
+    series: 3,
+  },
+  {
+    id: 's3-pachy-ram',
+    name: 'Pachyram',
+    region: 'lava',
+    rarity: 'common',
+    description: 'A pachycephalosaurus that headbutts with a reinforced dome!',
+    robotParts: ['steel-dome', 'charge-legs', 'impact-sensors'],
+    monsterType: 'mecha-pachycephalosaurus',
+    height: 160,
+    weight: 450,
+    series: 3,
+  },
+  // Rare (4)
+  {
+    id: 's3-volcano-phantom',
+    name: 'Eruptgeist',
+    region: 'lava',
+    rarity: 'rare',
+    description: 'The spirit of an ancient volcano! Erupts with ghostly fire!',
+    robotParts: ['volcano-ecto', 'eruption-spirit', 'lava-crown'],
+    monsterType: 'volcano-phantom',
+    height: 500,
+    weight: 10,
+    series: 3,
+  },
+  {
+    id: 's3-rex-supreme',
+    name: 'Tyrannotron',
+    region: 'lava',
+    rarity: 'rare',
+    description: 'The king of mecha-dinosaurs! A T-Rex with plasma breath!',
+    robotParts: ['plasma-jaws', 'titan-legs', 'roar-amplifier'],
+    monsterType: 'mecha-tyrannosaurus',
+    height: 600,
+    weight: 9000,
+    series: 3,
+  },
+  {
+    id: 's3-phoenix-ghost',
+    name: 'Spiritnix',
+    region: 'lava',
+    rarity: 'rare',
+    description: 'A phantom phoenix! Reborn from ghostly ashes!',
+    robotParts: ['ecto-flames', 'rebirth-spirit', 'ash-wings'],
+    monsterType: 'phantom-phoenix',
+    height: 200,
+    weight: 2,
+    series: 3,
+  },
+  {
+    id: 's3-allo-hunter',
+    name: 'Allorazer',
+    region: 'lava',
+    rarity: 'rare',
+    description: 'An allosaurus with razor-sharp metal claws!',
+    robotParts: ['razor-claws', 'heat-vision', 'pack-link'],
+    monsterType: 'mecha-allosaurus',
+    height: 450,
+    weight: 2500,
+    series: 3,
+  },
+  // Legendary (1)
+  {
+    id: 's3-inferno-lord',
+    name: 'Blazephantom',
+    region: 'lava',
+    rarity: 'legendary',
+    description: 'The supreme phantom of all flames! Commands fire itself!',
+    robotParts: ['inferno-ecto', 'flame-crown', 'fire-scepter'],
+    monsterType: 'fire-phantom-lord',
+    height: 800,
+    weight: 25,
+    series: 3,
+  },
+
+  // ==================== CITY CREATURES ====================
+  // Common (8)
+  {
+    id: 's3-office-ghost',
+    name: 'Cubiclegeist',
+    region: 'city',
+    rarity: 'common',
+    description: 'The spirit of someone who worked too much overtime!',
+    robotParts: ['tie-ecto', 'coffee-spirit', 'keyboard-hands'],
+    monsterType: 'office-phantom',
+    height: 170,
+    weight: 0.1,
+    series: 3,
+  },
+  {
+    id: 's3-ptero-drone',
+    name: 'Pterodrone',
+    region: 'city',
+    rarity: 'common',
+    description: 'A pteranodon adapted for city delivery services!',
+    robotParts: ['cargo-beak', 'wing-jets', 'GPS-crest'],
+    monsterType: 'mecha-pteranodon',
+    height: 200,
+    weight: 35,
+    series: 3,
+  },
+  {
+    id: 's3-static-phantom',
+    name: 'Signalgeist',
+    region: 'city',
+    rarity: 'common',
+    description: 'A ghost made of TV static! Appears on broken screens!',
+    robotParts: ['static-ecto', 'signal-spirit', 'channel-hop'],
+    monsterType: 'static-phantom',
+    height: 60,
+    weight: 0.01,
+    series: 3,
+  },
+  {
+    id: 's3-raptor-express',
+    name: 'Velocicourier',
+    region: 'city',
+    rarity: 'common',
+    description: 'The fastest delivery dino! Always on time!',
+    robotParts: ['speed-legs', 'package-arms', 'route-AI'],
+    monsterType: 'city-raptor',
+    height: 180,
+    weight: 80,
+    series: 3,
+  },
+  {
+    id: 's3-phone-ghost',
+    name: 'Callspook',
+    region: 'city',
+    rarity: 'common',
+    description: 'Makes ghostly phone calls from disconnected numbers!',
+    robotParts: ['phone-ecto', 'dial-spirit', 'ring-aura'],
+    monsterType: 'phone-phantom',
+    height: 30,
+    weight: 0.05,
+    series: 3,
+  },
+  {
+    id: 's3-compact-rex',
+    name: 'Minirex',
+    region: 'city',
+    rarity: 'common',
+    description: 'A T-Rex scaled down for urban living! Still thinks it is big!',
+    robotParts: ['compact-jaws', 'city-legs', 'mini-roar'],
+    monsterType: 'mini-tyrannosaurus',
+    height: 120,
+    weight: 150,
+    series: 3,
+  },
+  {
+    id: 's3-elevator-ghost',
+    name: 'Liftgeist',
+    region: 'city',
+    rarity: 'common',
+    description: 'Haunts elevators! Loves pressing all the buttons!',
+    robotParts: ['button-ecto', 'floor-spirit', 'ding-aura'],
+    monsterType: 'elevator-phantom',
+    height: 200,
+    weight: 0.1,
+    series: 3,
+  },
+  {
+    id: 's3-pachy-guard',
+    name: 'Domewatch',
+    region: 'city',
+    rarity: 'common',
+    description: 'A security guard pachycephalosaurus! Very protective!',
+    robotParts: ['guard-dome', 'patrol-legs', 'alarm-horn'],
+    monsterType: 'security-dinosaur',
+    height: 150,
+    weight: 300,
+    series: 3,
+  },
+  // Rare (4)
+  {
+    id: 's3-train-phantom',
+    name: 'Locomotgeist',
+    region: 'city',
+    rarity: 'rare',
+    description: 'The ghost of an old steam train! Still runs the midnight route!',
+    robotParts: ['train-ecto', 'steam-spirit', 'track-phase'],
+    monsterType: 'train-phantom',
+    height: 400,
+    weight: 50,
+    series: 3,
+  },
+  {
+    id: 's3-carno-cop',
+    name: 'Carnoforce',
+    region: 'city',
+    rarity: 'rare',
+    description: 'A carnotaurus that serves as the city dino-police!',
+    robotParts: ['siren-horns', 'pursuit-legs', 'justice-core'],
+    monsterType: 'mecha-carnotaurus',
+    height: 400,
+    weight: 2000,
+    series: 3,
+  },
+  {
+    id: 's3-theater-ghost',
+    name: 'Phantomask',
+    region: 'city',
+    rarity: 'rare',
+    description: 'The spirit of an old theater! Loves dramatic entrances!',
+    robotParts: ['mask-ecto', 'stage-spirit', 'spotlight-aura'],
+    monsterType: 'theater-phantom',
+    height: 250,
+    weight: 5,
+    series: 3,
+  },
+  {
+    id: 's3-urban-raptor',
+    name: 'Parkouraptor',
+    region: 'city',
+    rarity: 'rare',
+    description: 'Master of urban acrobatics! Runs on walls and rooftops!',
+    robotParts: ['grip-claws', 'jump-jets', 'wall-sensors'],
+    monsterType: 'parkour-raptor',
+    height: 200,
+    weight: 120,
+    series: 3,
+  },
+  // Legendary (1)
+  {
+    id: 's3-city-specter',
+    name: 'Metropolgeist',
+    region: 'city',
+    rarity: 'legendary',
+    description: 'The collective phantom of everyone who ever lived in the city! Knows all its secrets!',
+    robotParts: ['city-memory', 'crowd-ecto', 'history-core'],
+    monsterType: 'city-phantom-lord',
+    height: 600,
+    weight: 1,
+    series: 3,
+  },
+
+  // ==================== SKY CREATURES ====================
+  // Common (8)
+  {
+    id: 's3-cloud-phantom',
+    name: 'Mistgeist',
+    region: 'sky',
+    rarity: 'common',
+    description: 'A ghost made of morning mist! Evaporates in sunlight!',
+    robotParts: ['mist-ecto', 'dawn-spirit', 'dew-trail'],
+    monsterType: 'mist-phantom',
+    height: 80,
+    weight: 0.01,
+    series: 3,
+  },
+  {
+    id: 's3-micro-raptor',
+    name: 'Glidewing',
+    region: 'sky',
+    rarity: 'common',
+    description: 'A tiny four-winged microraptor! Master of aerial stunts!',
+    robotParts: ['quad-wings', 'glide-feathers', 'stunt-AI'],
+    monsterType: 'mecha-microraptor',
+    height: 70,
+    weight: 3,
+    series: 3,
+  },
+  {
+    id: 's3-star-phantom',
+    name: 'Stellargeist',
+    region: 'sky',
+    rarity: 'common',
+    description: 'A ghost made of starlight! Only visible at night!',
+    robotParts: ['star-ecto', 'cosmic-spirit', 'twinkle-aura'],
+    monsterType: 'star-phantom',
+    height: 40,
+    weight: 0.001,
+    series: 3,
+  },
+  {
+    id: 's3-archaeo-bird',
+    name: 'Archaeowing',
+    region: 'sky',
+    rarity: 'common',
+    description: 'The first bird ever! Upgraded with modern flight tech!',
+    robotParts: ['proto-wings', 'claw-tips', 'ancient-beak'],
+    monsterType: 'mecha-archaeopteryx',
+    height: 50,
+    weight: 2,
+    series: 3,
+  },
+  {
+    id: 's3-wind-specter',
+    name: 'Breezeghoul',
+    region: 'sky',
+    rarity: 'common',
+    description: 'A phantom that rides the wind! You can only hear its whisper!',
+    robotParts: ['wind-ecto', 'gust-spirit', 'whisper-voice'],
+    monsterType: 'wind-phantom',
+    height: 100,
+    weight: 0.02,
+    series: 3,
+  },
+  {
+    id: 's3-dimorpho-jet',
+    name: 'Dimorphojet',
+    region: 'sky',
+    rarity: 'common',
+    description: 'A dimorphodon with jet engines! Extremely fast!',
+    robotParts: ['jet-wings', 'speed-beak', 'sonic-crest'],
+    monsterType: 'mecha-dimorphodon',
+    height: 100,
+    weight: 15,
+    series: 3,
+  },
+  {
+    id: 's3-rainbow-phantom',
+    name: 'Prismageist',
+    region: 'sky',
+    rarity: 'common',
+    description: 'A ghost that appears in rainbows! Grants colorful wishes!',
+    robotParts: ['rainbow-ecto', 'color-spirit', 'wish-light'],
+    monsterType: 'rainbow-phantom',
+    height: 60,
+    weight: 0.01,
+    series: 3,
+  },
+  {
+    id: 's3-rhampho-sky',
+    name: 'Rhamphoracer',
+    region: 'sky',
+    rarity: 'common',
+    description: 'A rhamphorhynchus built for racing! Loves competition!',
+    robotParts: ['racing-wings', 'tail-rudder', 'speed-beak'],
+    monsterType: 'mecha-rhamphorhynchus',
+    height: 80,
+    weight: 8,
+    series: 3,
+  },
+  // Rare (4)
+  {
+    id: 's3-moon-phantom',
+    name: 'Lunageist',
+    region: 'sky',
+    rarity: 'rare',
+    description: 'A spirit from the moon itself! Grants dreams to sleepers!',
+    robotParts: ['lunar-ecto', 'dream-spirit', 'moon-glow'],
+    monsterType: 'lunar-phantom',
+    height: 300,
+    weight: 3,
+    series: 3,
+  },
+  {
+    id: 's3-quetz-carrier',
+    name: 'Quetzalcraft',
+    region: 'sky',
+    rarity: 'rare',
+    description: 'A quetzalcoatlus that serves as a flying aircraft carrier!',
+    robotParts: ['carrier-back', 'mega-wings', 'hangar-body'],
+    monsterType: 'mecha-quetzalcoatlus',
+    height: 1000,
+    weight: 25000,
+    series: 3,
+  },
+  {
+    id: 's3-comet-specter',
+    name: 'Cometwraith',
+    region: 'sky',
+    rarity: 'rare',
+    description: 'The ghost of a comet! Leaves a spectral tail across the sky!',
+    robotParts: ['comet-ecto', 'tail-spirit', 'cosmic-ice'],
+    monsterType: 'comet-phantom',
+    height: 500,
+    weight: 10,
+    series: 3,
+  },
+  {
+    id: 's3-ptero-titan',
+    name: 'Skywarden',
+    region: 'sky',
+    rarity: 'rare',
+    description: 'A massive pterosaur that guards the upper atmosphere!',
+    robotParts: ['guardian-wings', 'watch-eyes', 'patrol-beak'],
+    monsterType: 'titan-pterosaur',
+    height: 1200,
+    weight: 2000,
+    series: 3,
+  },
+  // Legendary (1)
+  {
+    id: 's3-sky-spirit',
+    name: 'Aethergeist',
+    region: 'sky',
+    rarity: 'legendary',
+    description: 'The supreme phantom of the sky! Commands all aerial spirits and dinosaurs!',
+    robotParts: ['sky-crown', 'cloud-scepter', 'wind-throne'],
+    monsterType: 'sky-phantom-lord',
+    height: 2000,
+    weight: 100,
+    series: 3,
+  },
+];
+
+// ============================================================================
+// MYTHIC CREATURE - Requires ALL series to be completed
+// ============================================================================
+
+const MYTHIC_CREATURE: Creature = {
+  id: 'binsters-claymars',
+  name: 'Binsters Claymars',
+  region: 'all',
+  rarity: 'mythic',
+  description: 'The legendary six-headed dragon of perfect dental hygiene! Each head represents a different brushing zone. Only reveals itself to true masters who have befriended every creature across all dimensions!',
+  robotParts: ['six-dragon-heads', 'clay-body', 'rainbow-belly', 'golden-horns', 'ultimate-core'],
+  monsterType: 'hydra-dragon',
+  height: 2500,
+  weight: 18000,
+  series: 1,
+  requiresAllCreatures: true,
+};
+
+// Combined list of all creatures
+export const ALL_CREATURES: Creature[] = [
+  ...SERIES_1_CREATURES,
+  ...SERIES_2_CREATURES,
+  ...SERIES_3_CREATURES,
+  MYTHIC_CREATURE,
+];
+
+// Helper functions
+export function getCreaturesBySeries(series: CreatureSeries): Creature[] {
+  return ALL_CREATURES.filter(c => c.series === series && c.rarity !== 'mythic');
+}
+
+export function getSeriesCreatureCount(series: CreatureSeries): number {
+  return getCreaturesBySeries(series).length;
+}
+
+export function isSeriesComplete(series: CreatureSeries, capturedIds: string[]): boolean {
+  const seriesCreatures = getCreaturesBySeries(series);
+  return seriesCreatures.every(c => capturedIds.includes(c.id));
+}
+
+export function getUnlockedSeries(capturedIds: string[]): CreatureSeries[] {
+  const unlockedSeries: CreatureSeries[] = [1];
+  
+  if (isSeriesComplete(1, capturedIds)) {
+    unlockedSeries.push(2);
+  }
+  
+  if (isSeriesComplete(2, capturedIds)) {
+    unlockedSeries.push(3);
+  }
+  
+  return unlockedSeries;
+}
 
 export function getCreaturesByRegion(region: Region): Creature[] {
   return ALL_CREATURES.filter(c => c.region === region);
@@ -797,63 +2554,61 @@ export function getRandomCreatureForScore(
   capturedIds: string[], 
   region?: Region
 ): Creature | null {
+  const unlockedSeries = getUnlockedSeries(capturedIds);
+  
   let pool: Creature[] = [];
   
   const filterByRegion = (creatures: Creature[]) => 
     region ? creatures.filter(c => c.region === region || c.region === 'all') : creatures;
   
-  // Get all non-mythic creatures
+  const filterBySeries = (creatures: Creature[]) =>
+    creatures.filter(c => unlockedSeries.includes(c.series));
+  
   const nonMythicCreatures = ALL_CREATURES.filter(c => c.rarity !== 'mythic');
   const mythicCreature = ALL_CREATURES.find(c => c.rarity === 'mythic');
   
-  // Check if all non-mythic creatures have been captured
-  const allNonMythicCaptured = nonMythicCreatures.every(c => capturedIds.includes(c.id));
+  const allSeriesComplete = isSeriesComplete(1, capturedIds) && 
+                            isSeriesComplete(2, capturedIds) && 
+                            isSeriesComplete(3, capturedIds);
   const mythicAlreadyCaptured = mythicCreature && capturedIds.includes(mythicCreature.id);
   
-  // Check if ALL creatures (including mythic) have been captured - allows duplicates
-  const allCreaturesCaptured = allNonMythicCaptured && mythicAlreadyCaptured;
-  
-  // If all non-mythic creatures are captured and mythic isn't, and score is perfect, offer the mythic!
-  if (allNonMythicCaptured && !mythicAlreadyCaptured && score >= 95 && mythicCreature) {
+  if (allSeriesComplete && !mythicAlreadyCaptured && score >= 95 && mythicCreature) {
     return mythicCreature;
   }
   
+  const availableCreatures = filterBySeries(filterByRegion(nonMythicCreatures));
+  
   if (score >= 90) {
     pool = [
-      ...filterByRegion(getCreaturesByRarity('legendary')),
-      ...filterByRegion(getCreaturesByRarity('rare')),
-      ...filterByRegion(getCreaturesByRarity('common')),
+      ...availableCreatures.filter(c => c.rarity === 'legendary'),
+      ...availableCreatures.filter(c => c.rarity === 'rare'),
+      ...availableCreatures.filter(c => c.rarity === 'common'),
     ];
   } else if (score >= 70) {
     pool = [
-      ...filterByRegion(getCreaturesByRarity('rare')),
-      ...filterByRegion(getCreaturesByRarity('common')),
+      ...availableCreatures.filter(c => c.rarity === 'rare'),
+      ...availableCreatures.filter(c => c.rarity === 'common'),
     ];
   } else {
-    pool = filterByRegion(getCreaturesByRarity('common'));
+    pool = availableCreatures.filter(c => c.rarity === 'common');
   }
   
-  // Filter out mythic creatures from normal pool (they're special!)
   pool = pool.filter(c => c.rarity !== 'mythic');
   
-  // If all creatures are captured, allow duplicates from the score-based pool
-  if (allCreaturesCaptured) {
+  const allAvailableCaptured = availableCreatures.every(c => capturedIds.includes(c.id));
+  if (allAvailableCaptured && allSeriesComplete && mythicAlreadyCaptured) {
     if (pool.length === 0) return null;
     return pool[Math.floor(Math.random() * pool.length)];
   }
   
-  // Otherwise, only pick from uncaptured creatures to ensure uniqueness
-  // First try the score-based pool
   let uncaptured = pool.filter(c => !capturedIds.includes(c.id));
   
-  // If no uncaptured in score-based pool, expand to ALL uncaptured non-mythic creatures in the region
   if (uncaptured.length === 0) {
-    uncaptured = filterByRegion(nonMythicCreatures).filter(c => !capturedIds.includes(c.id));
+    uncaptured = availableCreatures.filter(c => !capturedIds.includes(c.id));
   }
   
-  // If still no uncaptured in this region, try any uncaptured creature
   if (uncaptured.length === 0) {
-    uncaptured = nonMythicCreatures.filter(c => !capturedIds.includes(c.id));
+    uncaptured = filterBySeries(nonMythicCreatures).filter(c => !capturedIds.includes(c.id));
   }
   
   if (uncaptured.length === 0) return null;
@@ -862,7 +2617,6 @@ export function getRandomCreatureForScore(
 }
 
 export function getCaptureRate(score: number, rarity: 'common' | 'rare' | 'legendary' | 'mythic'): number {
-  // Mythic creatures require near-perfect brushing!
   if (rarity === 'mythic') {
     return score >= 98 ? 1.0 : score >= 95 ? 0.75 : 0.5;
   }

@@ -9,10 +9,12 @@ interface BuddySelectorProps {
 }
 
 export function BuddySelector({ userProgress, onSelect, onBack }: BuddySelectorProps) {
+  const capturedIds = userProgress.capturedCreatures.map(c => c.id);
   const unlockedBuddies = getUnlockedBuddies(
     userProgress.totalSessions,
     userProgress.currentStreak,
-    userProgress.capturedCreatures.length
+    userProgress.capturedCreatures.length,
+    capturedIds
   );
   
   const unlockedIds = new Set(unlockedBuddies.map(b => b.id));
@@ -88,6 +90,8 @@ function getUnlockHint(buddy: Buddy): string {
       return `${buddy.unlockThreshold} day streak`;
     case 'creature':
       return `${buddy.unlockThreshold} creatures`;
+    case 'series':
+      return `Complete Series ${buddy.unlockSeries}`;
     default:
       return 'Locked';
   }

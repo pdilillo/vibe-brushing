@@ -24,6 +24,7 @@ const SPRITESHEET_CREATURES: Record<string, SpritesheetConfig> = {
 };
 
 const AVAILABLE_CREATURES = [
+  // ==================== SERIES 1 ====================
   // Grassland - Common
   'gear-bunny',
   'mecha-moth',
@@ -110,7 +111,107 @@ const AVAILABLE_CREATURES = [
   // Sky - Legendary
   'celestial-phoenix',
   
-  // Mythic
+  // ==================== SERIES 2 - Grassland ====================
+  's2-moss-mole',
+  's2-crystal-caterpillar',
+  's2-hedge-hog',
+  's2-pollen-bot',
+  's2-grass-slime',
+  's2-acorn-knight',
+  's2-daisy-drone',
+  's2-cricket-bot',
+  
+  // ==================== SERIES 3 - Grassland ====================
+  's3-phantom-rabbit',
+  's3-dino-beetle',
+  's3-ghost-flower',
+  's3-mini-raptor',
+  's3-wisp-bug',
+  's3-fossil-frog',
+  's3-shade-snake',
+  's3-dino-chick',
+  
+  // ==================== SERIES 2 - Coastal ====================
+  's2-sand-dollar-bot',
+  's2-crystal-urchin',
+  's2-bubble-blob',
+  's2-starfish-drone',
+  's2-barnacle-cluster',
+  's2-kelp-dancer',
+  's2-puffer-tank',
+  's2-anemone-bot',
+  
+  // ==================== SERIES 3 - Coastal ====================
+  's3-ghost-fish',
+  's3-ammonite-bot',
+  's3-phantom-crab',
+  's3-dunkle-pup',
+  's3-wraith-jellyfish',
+  's3-sea-scorpion',
+  's3-ghost-eel',
+  's3-nautilus-bot',
+  
+  // ==================== SERIES 2 - Lava ====================
+  's2-ember-sprite',
+  's2-ruby-beetle',
+  's2-lava-slime',
+  's2-smoke-puff',
+  's2-fire-ant',
+  's2-sulfur-frog',
+  's2-obsidian-crab',
+  's2-spark-lizard',
+  
+  // ==================== SERIES 3 - Lava ====================
+  's3-phantom-rabbit',
+  's3-solar-wisp',
+  's3-basalt-golem',
+  's3-lava-slug',
+  's3-vent-worm',
+  's3-flame-moth',
+  's3-boiling-blob',
+  's3-glass-shard',
+  
+  // ==================== SERIES 2 - City ====================
+  's2-wifi-wisp',
+  's2-graffiti-blob',
+  's2-pipe-critter',
+  's2-alley-cat',
+  's2-meter-mite',
+  's2-cable-snake',
+  's2-vent-crawler',
+  's2-hydrant-hound',
+  
+  // ==================== SERIES 3 - City ====================
+  's3-arcade-ghost',
+  's3-concrete-fossil',
+  's3-neon-phantom',
+  's3-steam-bot',
+  's3-holo-owl',
+  's3-sonar-bat',
+  's3-power-grid',
+  's3-error-sprite',
+  
+  // ==================== SERIES 2 - Sky ====================
+  's2-breeze-sprite',
+  's2-cloud-puff',
+  's2-thunder-bird',
+  's2-balloon-bug',
+  's2-contrail-cat',
+  's2-mist-sprite',
+  's2-thermal-rider',
+  's2-snowflake-sprite',
+  
+  // ==================== SERIES 3 - Sky ====================
+  's3-aurora-wisp',
+  's3-moon-moth',
+  's3-strato-sphinx',
+  's3-jet-rider',
+  's3-cosmic-dust',
+  's3-rainbow-owl',
+  's3-hail-hopper',
+  's3-sky-whale',
+  
+  // ==================== MYTHIC ====================
   'binsters-claymars',
 ];
 
