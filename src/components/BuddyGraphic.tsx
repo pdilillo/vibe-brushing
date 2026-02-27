@@ -18,13 +18,13 @@ interface BuddyState {
   flipX: boolean;
 }
 
-const BASE_SPEED = 0.5;
-const MAX_SPEED_MULTIPLIER = 3;
-const BASE_ROTATION_SPEED = 0.5;
-const MAX_ROTATION_SPEED = 4;
-const BUDDY_SIZE_RATIO = 0.18; // 18% of container width
-const MAX_BUDDY_SIZE = 120;
-const MIN_BUDDY_SIZE = 60;
+const BASE_SPEED = 1.0;
+const MAX_SPEED_MULTIPLIER = 6;
+const BASE_ROTATION_SPEED = 1.0;
+const MAX_ROTATION_SPEED = 10;
+const BUDDY_SIZE_RATIO = 0.24; // 24% of container width - doubled from original 12%
+const MAX_BUDDY_SIZE = 160;
+const MIN_BUDDY_SIZE = 80;
 const PADDING = 10;
 
 export function BuddyGraphic({ 
