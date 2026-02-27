@@ -186,6 +186,7 @@ const AVAILABLE_CREATURES = [
   's3-sea-phantom',
   
   // ==================== SERIES 2 - Lava ====================
+  // Common
   's2-ember-sprite',
   's2-ruby-beetle',
   's2-lava-slime',
@@ -194,6 +195,13 @@ const AVAILABLE_CREATURES = [
   's2-sulfur-frog',
   's2-obsidian-crab',
   's2-spark-lizard',
+  // Rare
+  's2-ruby-serpent',
+  's2-forge-titan',
+  's2-fire-elemental',
+  's2-crystal-wyrm',
+  // Legendary
+  's2-planet-core',
   
   // ==================== SERIES 3 - Lava ====================
   // Common
@@ -213,6 +221,7 @@ const AVAILABLE_CREATURES = [
   's3-inferno-lord',
   
   // ==================== SERIES 2 - City ====================
+  // Common
   's2-wifi-wisp',
   's2-graffiti-blob',
   's2-pipe-critter',
@@ -221,6 +230,13 @@ const AVAILABLE_CREATURES = [
   's2-cable-snake',
   's2-vent-crawler',
   's2-hydrant-hound',
+  // Rare
+  's2-arcade-boss',
+  's2-skyscraper-golem',
+  's2-crystal-spider',
+  's2-junk-dragon',
+  // Legendary
+  's2-internet-spirit',
   
   // ==================== SERIES 3 - City ====================
   // Common
@@ -241,6 +257,7 @@ const AVAILABLE_CREATURES = [
   's3-city-specter',
   
   // ==================== SERIES 2 - Sky ====================
+  // Common
   's2-breeze-sprite',
   's2-cloud-puff',
   's2-thunder-bird',
@@ -249,6 +266,13 @@ const AVAILABLE_CREATURES = [
   's2-mist-sprite',
   's2-thermal-rider',
   's2-snowflake-sprite',
+  // Rare
+  's2-storm-giant',
+  's2-crystal-griffin',
+  's2-aurora-whale',
+  's2-moon-moth',
+  // Legendary
+  's2-sky-leviathan',
   
   // ==================== SERIES 3 - Sky ====================
   // Common

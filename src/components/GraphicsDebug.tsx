@@ -206,7 +206,7 @@ export function GraphicsDebug({ onBack }: GraphicsDebugProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+    <div className="h-screen overflow-y-auto bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
       <div className="sticky top-0 z-20 bg-slate-900/95 backdrop-blur border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 py-3">
@@ -394,7 +394,7 @@ export function GraphicsDebug({ onBack }: GraphicsDebugProps) {
           </div>
 
           {/* Creature Grid */}
-          <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="max-w-7xl mx-auto px-4 py-6 pb-32">
             <div className="text-slate-400 mb-4">
               Showing {filteredCreatures.length} of {ALL_CREATURES.length} creatures
             </div>
@@ -585,7 +585,7 @@ export function GraphicsDebug({ onBack }: GraphicsDebugProps) {
           </div>
 
           {/* Buddy Grid */}
-          <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="max-w-7xl mx-auto px-4 py-6 pb-20">
             <div className="text-slate-400 mb-4">
               Showing all {ALL_BUDDIES.length} buddies
             </div>
