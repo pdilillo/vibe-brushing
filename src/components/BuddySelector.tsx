@@ -58,7 +58,7 @@ export function BuddySelector({ userProgress, onSelect, onBack }: BuddySelectorP
               >
                 <div className={`flex-1 flex items-center justify-center w-full ${isUnlocked ? '' : 'grayscale'}`}>
                   {isUnlocked ? (
-                    <BuddyPreview buddyId={buddy.id} size={60} />
+                    <BuddyPreview buddyId={buddy.id} size={90} />
                   ) : (
                     <span className="text-4xl">🔒</span>
                   )}

@@ -22,9 +22,9 @@ const BASE_SPEED = 0.5;
 const MAX_SPEED_MULTIPLIER = 3;
 const BASE_ROTATION_SPEED = 0.5;
 const MAX_ROTATION_SPEED = 4;
-const BUDDY_SIZE_RATIO = 0.12; // 12% of container width - small to not obstruct face
-const MAX_BUDDY_SIZE = 80;
-const MIN_BUDDY_SIZE = 40;
+const BUDDY_SIZE_RATIO = 0.18; // 18% of container width
+const MAX_BUDDY_SIZE = 120;
+const MIN_BUDDY_SIZE = 60;
 const PADDING = 10;
 
 export function BuddyGraphic({ 
