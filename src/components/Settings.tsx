@@ -16,14 +16,14 @@ export function Settings({ onBack, onBuddyDebug, onGraphicsDebug, onPhotoDebug }
     saveSettings(settings);
   }, [settings]);
 
-  const handleDurationChange = (minutes: 1 | 2 | 3) => {
-    setSettings(prev => ({ ...prev, sessionDurationMinutes: minutes }));
+  const handleDurationChange = (seconds: 60 | 90 | 120) => {
+    setSettings(prev => ({ ...prev, sessionDurationSeconds: seconds }));
   };
 
-  const durationOptions: { value: 1 | 2 | 3; label: string; description: string }[] = [
-    { value: 1, label: '1 Minute', description: 'Quick brush' },
-    { value: 2, label: '2 Minutes', description: 'Recommended' },
-    { value: 3, label: '3 Minutes', description: 'Extra thorough' },
+  const durationOptions: { value: 60 | 90 | 120; label: string; description: string }[] = [
+    { value: 60, label: '1 Minute', description: 'Quick brush' },
+    { value: 90, label: '1:30', description: 'Standard brush' },
+    { value: 120, label: '2 Minutes', description: 'Recommended' },
   ];
 
   return (
@@ -52,25 +52,25 @@ export function Settings({ onBack, onBuddyDebug, onGraphicsDebug, onPhotoDebug }
                 key={option.value}
                 onClick={() => handleDurationChange(option.value)}
                 className={`w-full p-4 rounded-xl flex items-center justify-between transition-all ${
-                  settings.sessionDurationMinutes === option.value
+                  settings.sessionDurationSeconds === option.value
                     ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
                     : 'bg-purple-800/50 text-purple-200 hover:bg-purple-700/50'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                    settings.sessionDurationMinutes === option.value
+                    settings.sessionDurationSeconds === option.value
                       ? 'border-white bg-white'
                       : 'border-purple-400'
                   }`}>
-                    {settings.sessionDurationMinutes === option.value && (
+                    {settings.sessionDurationSeconds === option.value && (
                       <div className="w-3 h-3 rounded-full bg-purple-600" />
                     )}
                   </div>
                   <div className="text-left">
                     <div className="font-bold">{option.label}</div>
                     <div className={`text-xs ${
-                      settings.sessionDurationMinutes === option.value
+                      settings.sessionDurationSeconds === option.value
                         ? 'text-white/80'
                         : 'text-purple-400'
                     }`}>
@@ -78,7 +78,7 @@ export function Settings({ onBack, onBuddyDebug, onGraphicsDebug, onPhotoDebug }
                     </div>
                   </div>
                 </div>
-                {option.value === 2 && (
+                {option.value === 120 && (
                   <span className="text-xs bg-yellow-500 text-yellow-900 px-2 py-1 rounded-full font-bold">
                     ⭐ Best
                   </span>

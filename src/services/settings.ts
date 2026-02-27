@@ -1,11 +1,11 @@
 const SETTINGS_KEY = 'sparkle-app-settings';
 
 export interface AppSettings {
-  sessionDurationMinutes: 1 | 2 | 3;
+  sessionDurationSeconds: 60 | 90 | 120;
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
-  sessionDurationMinutes: 2,
+  sessionDurationSeconds: 120,
 };
 
 export function getSettings(): AppSettings {
@@ -30,5 +30,5 @@ export function saveSettings(settings: AppSettings): void {
 
 export function getSessionDurationSeconds(): number {
   const settings = getSettings();
-  return settings.sessionDurationMinutes * 60;
+  return settings.sessionDurationSeconds;
 }

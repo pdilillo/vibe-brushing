@@ -422,18 +422,6 @@ export function CaptureGame({
               )}
             </div>
             
-            {phase === 'ready' && (
-              <div 
-                className="absolute transition-all duration-100 animate-bounce-gentle"
-                style={{ 
-                  left: `${ballPosition.x}%`, 
-                  top: `${ballPosition.y}%`,
-                  transform: `translate(-50%, -50%) scale(${ballPosition.scale}) rotate(${ballPosition.rotation}deg)`
-                }}
-              >
-                <BallGraphic type={ballType} size="medium" showSparkle />
-              </div>
-            )}
             
             {phase === 'throwing' && (
               <div 
@@ -449,15 +437,19 @@ export function CaptureGame({
             )}
 
             {phase === 'ready' && (
-              <div className="absolute bottom-24 text-center">
+              <div className="absolute bottom-20 text-center">
                 <div className="text-lg text-white mb-2 drop-shadow-lg">
                   Capture chance: <span className="text-yellow-400 font-bold">{Math.round(captureRate * 100)}%</span>
                 </div>
+                <div className="text-3xl font-bold text-white mb-3 drop-shadow-lg animate-pulse">
+                  THROW!
+                </div>
                 <button
                   onClick={handleThrow}
-                  className="px-8 py-4 text-2xl font-bold text-white bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl shadow-lg active:scale-95 transition-transform animate-button-glow"
+                  className="active:scale-90 transition-transform hover:scale-110"
+                  aria-label="Throw ball"
                 >
-                  Throw Sparkle Ball! ✨
+                  <BallGraphic type={ballType} size="large" showSparkle className="animate-bounce-gentle" />
                 </button>
               </div>
             )}
