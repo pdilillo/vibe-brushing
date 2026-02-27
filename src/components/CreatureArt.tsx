@@ -112,6 +112,7 @@ const AVAILABLE_CREATURES = [
   'celestial-phoenix',
   
   // ==================== SERIES 2 - Grassland ====================
+  // Common
   's2-moss-mole',
   's2-crystal-caterpillar',
   's2-hedge-hog',
@@ -120,8 +121,17 @@ const AVAILABLE_CREATURES = [
   's2-acorn-knight',
   's2-daisy-drone',
   's2-cricket-bot',
+  // Rare
+  's2-emerald-elk',
+  's2-mushroom-giant',
+  's2-willow-wisp',
+  's2-mega-slime',
+  // Legendary
+  's2-crystal-guardian',
+  's2-nature-computer',
   
   // ==================== SERIES 3 - Grassland ====================
+  // Common
   's3-phantom-rabbit',
   's3-dino-beetle',
   's3-ghost-flower',
@@ -130,8 +140,17 @@ const AVAILABLE_CREATURES = [
   's3-fossil-frog',
   's3-shade-snake',
   's3-dino-chick',
+  // Rare
+  's3-phantom-stag',
+  's3-tricerabot',
+  's3-ghost-treant',
+  's3-stego-tank',
+  // Legendary
+  's3-spirit-king',
+  's3-brachiobot',
   
   // ==================== SERIES 2 - Coastal ====================
+  // Common
   's2-sand-dollar-bot',
   's2-crystal-urchin',
   's2-bubble-blob',
@@ -140,8 +159,16 @@ const AVAILABLE_CREATURES = [
   's2-kelp-dancer',
   's2-puffer-tank',
   's2-anemone-bot',
+  // Rare
+  's2-pearl-dragon',
+  's2-giant-clam',
+  's2-coral-golem',
+  's2-crystal-shark',
+  // Legendary
+  's2-deep-crystal',
   
   // ==================== SERIES 3 - Coastal ====================
+  // Common
   's3-ghost-fish',
   's3-ammonite-bot',
   's3-phantom-crab',
@@ -150,6 +177,13 @@ const AVAILABLE_CREATURES = [
   's3-sea-scorpion',
   's3-ghost-eel',
   's3-nautilus-bot',
+  // Rare
+  's3-phantom-kraken',
+  's3-mega-shark',
+  's3-ship-ghost',
+  's3-plesio-sub',
+  // Legendary
+  's3-sea-phantom',
   
   // ==================== SERIES 2 - Lava ====================
   's2-ember-sprite',
@@ -162,7 +196,7 @@ const AVAILABLE_CREATURES = [
   's2-spark-lizard',
   
   // ==================== SERIES 3 - Lava ====================
-  's3-phantom-rabbit',
+  // Common
   's3-solar-wisp',
   's3-basalt-golem',
   's3-lava-slug',
@@ -170,6 +204,13 @@ const AVAILABLE_CREATURES = [
   's3-flame-moth',
   's3-boiling-blob',
   's3-glass-shard',
+  // Rare
+  's3-volcano-phantom',
+  's3-rex-supreme',
+  's3-phoenix-ghost',
+  's3-allo-hunter',
+  // Legendary
+  's3-inferno-lord',
   
   // ==================== SERIES 2 - City ====================
   's2-wifi-wisp',
@@ -182,6 +223,7 @@ const AVAILABLE_CREATURES = [
   's2-hydrant-hound',
   
   // ==================== SERIES 3 - City ====================
+  // Common
   's3-arcade-ghost',
   's3-concrete-fossil',
   's3-neon-phantom',
@@ -190,6 +232,13 @@ const AVAILABLE_CREATURES = [
   's3-sonar-bat',
   's3-power-grid',
   's3-error-sprite',
+  // Rare
+  's3-train-phantom',
+  's3-carno-cop',
+  's3-theater-ghost',
+  's3-urban-raptor',
+  // Legendary
+  's3-city-specter',
   
   // ==================== SERIES 2 - Sky ====================
   's2-breeze-sprite',
@@ -202,6 +251,7 @@ const AVAILABLE_CREATURES = [
   's2-snowflake-sprite',
   
   // ==================== SERIES 3 - Sky ====================
+  // Common
   's3-aurora-wisp',
   's3-moon-moth',
   's3-strato-sphinx',
@@ -210,6 +260,13 @@ const AVAILABLE_CREATURES = [
   's3-rainbow-owl',
   's3-hail-hopper',
   's3-sky-whale',
+  // Rare
+  's3-moon-phantom',
+  's3-quetz-carrier',
+  's3-comet-specter',
+  's3-ptero-titan',
+  // Legendary
+  's3-sky-spirit',
   
   // ==================== MYTHIC ====================
   'binsters-claymars',
