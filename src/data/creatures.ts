@@ -177,18 +177,6 @@ const SERIES_1_CREATURES: Creature[] = [
     weight: 1200,
     series: 1,
   },
-  {
-    id: 'leaf-kong',
-    name: 'Foliape',
-    region: 'grassland',
-    rarity: 'legendary',
-    description: 'The mightiest grass-type warrior! His autumn leaf crown channels the power of all seasons, and his leaf armor is impenetrable!',
-    robotParts: ['autumn-crown', 'leaf-armor', 'vine-muscles', 'photosynthesis-core'],
-    monsterType: 'gorilla',
-    height: 280,
-    weight: 450,
-    series: 1,
-  },
 
   // ==================== COASTAL CREATURES ====================
   // Common (8)
@@ -2484,10 +2472,10 @@ const SERIES_3_CREATURES: Creature[] = [
 ];
 
 // ============================================================================
-// MYTHIC CREATURE - Requires ALL series to be completed
+// MYTHIC CREATURES - Requires ALL series to be completed
 // ============================================================================
 
-const MYTHIC_CREATURE: Creature = {
+const MYTHIC_BINSTERS: Creature = {
   id: 'binsters-claymars',
   name: 'Binsters Claymars',
   region: 'all',
@@ -2501,12 +2489,28 @@ const MYTHIC_CREATURE: Creature = {
   requiresAllCreatures: true,
 };
 
+const MYTHIC_FOLIAPE: Creature = {
+  id: 'leaf-kong',
+  name: 'Foliape',
+  region: 'all',
+  rarity: 'mythic',
+  description: 'The ultimate nature guardian! This colossal forest ape commands the power of all seasons. His autumn leaf crown channels ancient forest magic, and his living leaf armor regenerates endlessly. Only appears to those who have proven themselves as true protectors of all creatures!',
+  robotParts: ['autumn-crown', 'leaf-armor', 'vine-muscles', 'photosynthesis-core', 'forest-heart'],
+  monsterType: 'nature-titan-gorilla',
+  height: 800,
+  weight: 2500,
+  series: 1,
+  requiresAllCreatures: true,
+};
+
+const MYTHIC_CREATURES: Creature[] = [MYTHIC_BINSTERS, MYTHIC_FOLIAPE];
+
 // Combined list of all creatures
 export const ALL_CREATURES: Creature[] = [
   ...SERIES_1_CREATURES,
   ...SERIES_2_CREATURES,
   ...SERIES_3_CREATURES,
-  MYTHIC_CREATURE,
+  ...MYTHIC_CREATURES,
 ];
 
 // Helper functions

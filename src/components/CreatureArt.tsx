@@ -41,7 +41,6 @@ const AVAILABLE_CREATURES = [
   'echo-owl',
   // Grassland - Legendary
   'natura-prime',
-  'leaf-kong',
   
   // Coastal - Common
   'turbo-turtle',
@@ -294,6 +293,7 @@ const AVAILABLE_CREATURES = [
   
   // ==================== MYTHIC ====================
   'binsters-claymars',
+  'leaf-kong',
 ];
 
 const POSSESSED_VARIANTS = [
