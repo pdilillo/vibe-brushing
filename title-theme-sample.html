@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Title Theme Sample – Sparkle Brush</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 420px;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      background: #1e1b4b;
+      color: #e9d5ff;
+      text-align: center;
+      border-radius: 1rem;
+    }
+    h1 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+    p { opacity: 0.9; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    button {
+      font-size: 1.1rem;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(to right, #7c3aed, #db2777);
+      color: white;
+      border: none;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover { opacity: 0.95; }
+    button:active { transform: scale(0.98); }
+  </style>
+</head>
+<body>
+  <h1>✨ Title Theme Sample</h1>
+  <p>Click to play ~16 seconds of the Sparkle Brush title theme — retro arcade style (2 loops).</p>
+  <button id="play">Play sample</button>
+
+  <script>
+    const NOTE = {
+      G2: 98.00, B2: 123.47, D3: 146.83, B3: 246.94,
+      D4: 293.66, E4: 329.63, 'F#4': 369.99, G4: 392.00, A4: 440.00, B4: 493.88,
+      D5: 587.33, G5: 783.99
+    };
+    const TEMPO = 132;
+    const SEC_PER_BEAT = 60 / TEMPO;
+    const MELODY = [
+      [NOTE.G4, NOTE.B4, NOTE.D5, NOTE.G5, NOTE.B4, NOTE.D5, NOTE.E4, NOTE.D4],
+      [NOTE.E4, NOTE['F#4'], NOTE.G4, NOTE.B4, NOTE.D5, NOTE.B4, NOTE.G4, NOTE.G4],
+      [NOTE.D4, NOTE.E4, NOTE['F#4'], NOTE.A4, NOTE.B4, NOTE.G4, NOTE.E4, NOTE.D4],
+      [NOTE.B3, NOTE.D4, NOTE.G4, NOTE.D4, NOTE.B3, NOTE.D4, NOTE.G4, NOTE.G4]
+    ];
+    const BASS = [
+      [NOTE.G2, 0, NOTE.D3, 0, NOTE.G2, 0, NOTE.B2, 0],
+      [NOTE.G2, 0, NOTE.D3, 0, NOTE.G2, 0, NOTE.G2, 0]
+    ];
+    const ARP = [0, 4, 7, 12, 16, 12, 7, 4];
+    const ARP_ROOT = NOTE.G4;
+
+    function playNote(ctx, freq, start, dur, vol) {
+      const o1 = ctx.createOscillator();
+      const o2 = ctx.createOscillator();
+      const g = ctx.createGain();
+      const f = ctx.createBiquadFilter();
+      o1.type = o2.type = 'sawtooth';
+      o1.frequency.setValueAtTime(freq, start);
+      o2.frequency.setValueAtTime(freq * 1.003, start);
+      f.type = 'lowpass';
+      f.frequency.value = 4200;
+      o1.connect(g); o2.connect(g); g.connect(f); f.connect(ctx.destination);
+      g.gain.setValueAtTime(0, start);
+      g.gain.linearRampToValueAtTime(vol, start + 0.008);
+      g.gain.linearRampToValueAtTime(0, start + dur);
+      o1.start(start); o2.start(start);
+      o1.stop(start + dur + 0.05); o2.stop(start + dur + 0.05);
+    }
+
+    function playBass(ctx, freq, start, dur, vol) {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(freq * 1.5, start);
+      o.frequency.exponentialRampToValueAtTime(freq, start + 0.03);
+      o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0, start);
+      g.gain.linearRampToValueAtTime(vol, start + 0.008);
+      g.gain.linearRampToValueAtTime(0, start + dur);
+      o.start(start); o.stop(start + dur);
+    }
+
+    function kick(ctx, start) {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'square';
+      o.frequency.setValueAtTime(150, start);
+      o.frequency.exponentialRampToValueAtTime(40, start + 0.08);
+      g.gain.setValueAtTime(0, start);
+      g.gain.linearRampToValueAtTime(0.35, start + 0.002);
+      g.gain.exponentialRampToValueAtTime(0.01, start + 0.12);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(start); o.stop(start + 0.12);
+    }
+
+    function snare(ctx, start) {
+      const o = ctx.createOscillator();
+      const go = ctx.createGain();
+      o.type = 'square';
+      o.frequency.setValueAtTime(180, start);
+      o.frequency.exponentialRampToValueAtTime(100, start + 0.04);
+      go.gain.setValueAtTime(0, start);
+      go.gain.linearRampToValueAtTime(0.18, start + 0.001);
+      go.gain.exponentialRampToValueAtTime(0.01, start + 0.06);
+      o.connect(go); go.connect(ctx.destination);
+      o.start(start); o.stop(start + 0.06);
+      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.08, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      let v = 0;
+      for (let i = 0; i < d.length; i++) {
+        if (i % 4 === 0) v = Math.random() > 0.5 ? 1 : -1;
+        d[i] = v;
+      }
+      const n = ctx.createBufferSource();
+      n.buffer = buf;
+      const gn = ctx.createGain();
+      const hp = ctx.createBiquadFilter();
+      hp.type = 'highpass'; hp.frequency.value = 3500;
+      n.connect(hp); hp.connect(gn); gn.connect(ctx.destination);
+      gn.gain.setValueAtTime(0, start);
+      gn.gain.linearRampToValueAtTime(0.12, start + 0.001);
+      gn.gain.exponentialRampToValueAtTime(0.01, start + 0.08);
+      n.start(start); n.stop(start + 0.08);
+    }
+
+    function hihat(ctx, start) {
+      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.025, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      let v = 0;
+      for (let i = 0; i < d.length; i++) {
+        if (i % 2 === 0) v = Math.random() > 0.5 ? 1 : -1;
+        d[i] = v;
+      }
+      const n = ctx.createBufferSource();
+      n.buffer = buf;
+      const hp = ctx.createBiquadFilter();
+      hp.type = 'highpass'; hp.frequency.value = 8000;
+      const g = ctx.createGain();
+      n.connect(hp); hp.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0, start);
+      g.gain.linearRampToValueAtTime(0.07, start + 0.001);
+      g.gain.exponentialRampToValueAtTime(0.01, start + 0.025);
+      n.start(start); n.stop(start + 0.025);
+    }
+
+    function arp(ctx, start, dur) {
+      const base = ARP_ROOT;
+      const step = dur / ARP.length;
+      ARP.forEach((s, i) => {
+        const f = base * Math.pow(2, s / 12);
+        const t = start + i * step;
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(f, t);
+        o.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.035, t + 0.002);
+        g.gain.linearRampToValueAtTime(0, t + step * 0.9);
+        o.start(t); o.stop(t + step);
+      });
+    }
+
+    document.getElementById('play').onclick = function () {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const t0 = ctx.currentTime;
+      const bars = 16;
+      for (let bar = 0; bar < bars; bar++) {
+        const barStart = t0 + bar * 8 * SEC_PER_BEAT;
+        const pat = bar % 4;
+        const bassPat = bar % 2;
+        const mel = MELODY[pat];
+        const bass = BASS[bassPat];
+        for (let b = 0; b < 8; b++) {
+          const t = barStart + b * SEC_PER_BEAT;
+          if (b === 0) kick(ctx, t);
+          if (b === 4) snare(ctx, t);
+          hihat(ctx, t + SEC_PER_BEAT / 2);
+          if (mel[b] > 0) playNote(ctx, mel[b], t, SEC_PER_BEAT * 0.8, 0.065);
+          if (bass[b] > 0) playBass(ctx, bass[b], t, SEC_PER_BEAT * 0.9, 0.085);
+          if (b % 4 === 0) arp(ctx, t, SEC_PER_BEAT * 2);
+        }
+      }
+      this.textContent = 'Playing…';
+      this.disabled = true;
+      setTimeout(() => {
+        this.textContent = 'Play sample';
+        this.disabled = false;
+      }, bars * 8 * SEC_PER_BEAT * 1000 + 500);
+    };
+  </script>
+</body>
+</html>
