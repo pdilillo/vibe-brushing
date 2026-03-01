@@ -17,6 +17,12 @@ export const ALL_BUDDIES: Buddy[] = [
     imageUrl: `${base}creatures/hat-party.png`,
     unlockCondition: 'starter'
   },
+  {
+    id: 'kitty-okie',
+    name: 'Kitty Okie',
+    imageUrl: `${base}creatures/kitty-okie.png`,
+    unlockCondition: 'starter'
+  },
   
   // ==================== SESSION MILESTONE BUDDIES ====================
   {
@@ -169,6 +175,14 @@ export const ALL_BUDDIES: Buddy[] = [
     unlockCondition: 'series',
     unlockSeries: 3
   },
+
+  // ==================== SECRET BUDDIES ====================
+  {
+    id: 'tooth-buddy',
+    name: 'Toothy',
+    imageUrl: `${base}creatures/hat-tooth-buddy.png`,
+    unlockCondition: 'secret'
+  },
 ];
 
 export function getStarterBuddies(): Buddy[] {
@@ -194,6 +208,8 @@ export function getUnlockedBuddies(
       case 'series':
         if (!buddy.unlockSeries) return false;
         return isSeriesComplete(buddy.unlockSeries, capturedCreatureIds);
+      case 'secret':
+        return false;
       default:
         return false;
     }

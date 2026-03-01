@@ -1,4 +1,9 @@
-import type { UserProgress, UserProfile } from '../types';
+import { useEffect, useState, useCallback } from 'react';
+import { useTitleTheme, playSoundEffect } from '../hooks/useAudio';
+import { ALL_BUDDIES } from '../data/buddies';
+import type { UserProgress, UserProfile, UnlockedBuddy } from '../types';
+
+const TOOTH_CLICKS_TO_FLY = 7;
 
 interface HomeProps {
   userProgress: UserProgress;
@@ -7,9 +12,50 @@ interface HomeProps {
   onViewCollection: () => void;
   onViewSettings: () => void;
   onSwitchProfile: () => void;
+  onUnlockSecretBuddy?: (buddy: UnlockedBuddy) => Promise<void>;
 }
 
-export function Home({ userProgress, currentProfile, onStartBrushing, onViewCollection, onViewSettings, onSwitchProfile }: HomeProps) {
+export function Home({ userProgress, currentProfile, onStartBrushing, onViewCollection, onViewSettings, onSwitchProfile, onUnlockSecretBuddy }: HomeProps) {
+  const titleTheme = useTitleTheme();
+  const [toothClicks, setToothClicks] = useState(0);
+  const [toothOffset, setToothOffset] = useState({ x: 0, y: 0 });
+  const [toothFlying, setToothFlying] = useState(false);
+  const [toothFlown, setToothFlown] = useState(false);
+
+  useEffect(() => {
+    titleTheme.start();
+    return () => titleTheme.stop();
+  }, []);
+
+  const hasToothBuddy = userProgress.unlockedBuddies.some(b => b.id === 'tooth-buddy');
+  const toothBuddy = ALL_BUDDIES.find(b => b.id === 'tooth-buddy');
+
+  const handleToothClick = useCallback(() => {
+    if (toothFlying || toothFlown) return;
+    const next = toothClicks + 1;
+    setToothClicks(next);
+    playSoundEffect('tooth-bounce');
+    setToothOffset({
+      x: (Math.random() - 0.5) * 60,
+      y: (Math.random() - 0.5) * 40
+    });
+    if (next >= TOOTH_CLICKS_TO_FLY) {
+      setToothFlying(true);
+      playSoundEffect('tooth-fly');
+      const angle = Math.random() * Math.PI * 0.6 + Math.PI * 0.2;
+      const tx = Math.cos(angle) * 400 * (Math.random() > 0.5 ? 1 : -1);
+      const ty = -Math.abs(Math.sin(angle) * 400) - 100;
+      setToothOffset({ x: tx, y: ty });
+      window.setTimeout(() => {
+        setToothFlown(true);
+        if (toothBuddy && !hasToothBuddy && onUnlockSecretBuddy) {
+          const unlocked: UnlockedBuddy = { ...toothBuddy, unlockedAt: new Date() };
+          onUnlockSecretBuddy(unlocked).catch(() => {});
+        }
+      }, 400);
+    }
+  }, [toothClicks, toothFlying, toothFlown, toothBuddy, hasToothBuddy, onUnlockSecretBuddy]);
+
   return (
     <div className="flex flex-col items-center justify-between h-full p-6 text-center">
       <div className="w-full flex justify-between items-center">
@@ -38,8 +84,23 @@ export function Home({ userProgress, currentProfile, onStartBrushing, onViewColl
       </div>
       
       <div className="flex-1 flex flex-col items-center justify-center gap-6">
-        <div className="animate-bounce-gentle">
-          <div className="text-8xl mb-4">✨🦷✨</div>
+        <div className="relative mb-4 flex items-center justify-center min-h-[6rem]">
+          <div className="text-6xl">✨</div>
+          {!toothFlown && (
+            <button
+              type="button"
+              onClick={handleToothClick}
+              className="absolute text-8xl cursor-pointer select-none touch-manipulation active:scale-95 transition-transform duration-75 hover:scale-110 focus:outline-none focus:ring-0"
+              style={{
+                transform: `translate(${toothOffset.x}px, ${toothOffset.y}px)`,
+                transition: toothFlying ? 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'transform 0.2s ease-out'
+              }}
+              aria-label="Tap the tooth"
+            >
+              🦷
+            </button>
+          )}
+          <div className="text-6xl">✨</div>
         </div>
         
         <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-yellow-500 bg-clip-text text-transparent">

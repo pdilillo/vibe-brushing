@@ -52,7 +52,7 @@ export interface Buddy {
   id: string;
   name: string;
   imageUrl: string;
-  unlockCondition: 'starter' | 'sessions' | 'streak' | 'creature' | 'series';
+  unlockCondition: 'starter' | 'sessions' | 'streak' | 'creature' | 'series' | 'secret';
   unlockThreshold?: number;
   unlockSeries?: CreatureSeries;
 }

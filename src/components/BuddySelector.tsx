@@ -16,8 +16,15 @@ export function BuddySelector({ userProgress, onSelect, onBack }: BuddySelectorP
     userProgress.capturedCreatures.length,
     capturedIds
   );
-  
-  const unlockedIds = new Set(unlockedBuddies.map(b => b.id));
+  const unlockedIds = new Set([
+    ...unlockedBuddies.map(b => b.id),
+    ...userProgress.unlockedBuddies.map(b => b.id)
+  ]);
+  const sortedBuddies = [...ALL_BUDDIES].sort((a, b) => {
+    const aUnlocked = unlockedIds.has(a.id) ? 1 : 0;
+    const bUnlocked = unlockedIds.has(b.id) ? 1 : 0;
+    return bUnlocked - aUnlocked;
+  });
 
   return (
     <div className="flex flex-col h-full p-6">
@@ -42,7 +49,7 @@ export function BuddySelector({ userProgress, onSelect, onBack }: BuddySelectorP
             <div className="text-xs text-purple-300">No Buddy</div>
           </button>
           
-          {ALL_BUDDIES.map(buddy => {
+          {sortedBuddies.map(buddy => {
             const isUnlocked = unlockedIds.has(buddy.id);
             
             return (
@@ -92,6 +99,8 @@ function getUnlockHint(buddy: Buddy): string {
       return `${buddy.unlockThreshold} creatures`;
     case 'series':
       return `Complete Series ${buddy.unlockSeries}`;
+    case 'secret':
+      return '???';
     default:
       return 'Locked';
   }

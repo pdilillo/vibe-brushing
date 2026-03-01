@@ -13,9 +13,9 @@ import { ProfileSelect } from './components/ProfileSelect';
 import { BuddyDebug } from './components/BuddyDebug';
 import { GraphicsDebug } from './components/GraphicsDebug';
 import { PhotoDebug } from './components/PhotoDebug';
-import { getUserProgress, getCurrentProfileId, getProfile, addSession } from './services/database';
+import { getUserProgress, getCurrentProfileId, getProfile, addSession, unlockBuddy } from './services/database';
 import { getSessionDurationSeconds } from './services/settings';
-import type { GamePhase, UserProgress, ZoneProgress, Creature, Buddy, Region, UserProfile, BrushingSession as BrushingSessionType } from './types';
+import type { GamePhase, UserProgress, ZoneProgress, Creature, Buddy, Region, UserProfile, BrushingSession as BrushingSessionType, UnlockedBuddy } from './types';
 
 function App() {
   const [phase, setPhase] = useState<GamePhase>('profile-select');
@@ -70,6 +70,11 @@ function App() {
       console.error('Failed to load user progress:', err);
       setPhase('profile-select');
     }
+  }
+
+  async function handleUnlockSecretBuddy(buddy: UnlockedBuddy) {
+    await unlockBuddy(buddy);
+    await loadUserProgress();
   }
 
   function handleStartBrushing() {
@@ -186,6 +191,7 @@ function App() {
           onViewCollection={handleViewCollection}
           onViewSettings={handleViewSettings}
           onSwitchProfile={handleSwitchProfile}
+          onUnlockSecretBuddy={handleUnlockSecretBuddy}
         />
       )}
       
