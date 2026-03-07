@@ -819,6 +819,7 @@ export function useRegionMusic(region: Region, rarity: CreatureRarity = 'common'
   const regionRef = useRef(region);
   const rarityRef = useRef(rarity);
   const musicConfigRef = useRef<RegionMusicConfig>(getMusicConfig(region, rarity));
+  const wasPlayingBeforeHideRef = useRef(false);
 
   useEffect(() => {
     regionRef.current = region;
@@ -1173,6 +1174,24 @@ export function useRegionMusic(region: Region, rarity: CreatureRarity = 'common'
     isPlayingRef.current = false;
   }, []);
 
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        if (isPlayingRef.current) {
+          wasPlayingBeforeHideRef.current = true;
+          stop();
+        }
+      } else if (document.visibilityState === 'visible') {
+        if (wasPlayingBeforeHideRef.current) {
+          wasPlayingBeforeHideRef.current = false;
+          start();
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [start, stop]);
+
   const setIntensity = useCallback((level: 'calm' | 'excited') => {
     if (intensityRef.current !== level) {
       intensityRef.current = level;
@@ -1206,6 +1225,7 @@ export function useTitleTheme(): TitleThemeController {
   const currentBeatRef = useRef(0);
   const currentPatternRef = useRef(0);
   const barCountRef = useRef(0);
+  const wasPlayingBeforeHideRef = useRef(false);
   const config = TITLE_THEME_CONFIG;
 
   const getAudioContext = useCallback(() => {
@@ -1450,6 +1470,24 @@ export function useTitleTheme(): TitleThemeController {
     }
     isPlayingRef.current = false;
   }, []);
+
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        if (isPlayingRef.current) {
+          wasPlayingBeforeHideRef.current = true;
+          stop();
+        }
+      } else if (document.visibilityState === 'visible') {
+        if (wasPlayingBeforeHideRef.current) {
+          wasPlayingBeforeHideRef.current = false;
+          start();
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [start, stop]);
 
   useEffect(() => {
     return () => {
