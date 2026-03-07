@@ -265,12 +265,18 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
       loadedStickers.forEach(({ sticker, img: stickerImg }) => {
         const x = (sticker.x / 100) * canvas.width;
         const y = (sticker.y / 100) * canvas.height;
-        const size = stickerSize * sticker.scale;
-        
+        const maxSize = stickerSize * sticker.scale;
+        // Preserve sticker aspect ratio (match editor's object-fit: contain behavior)
+        const natW = stickerImg.naturalWidth || 1;
+        const natH = stickerImg.naturalHeight || 1;
+        const scale = maxSize / Math.max(natW, natH);
+        const drawWidth = natW * scale;
+        const drawHeight = natH * scale;
+
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate((sticker.rotation * Math.PI) / 180);
-        ctx.drawImage(stickerImg, -size / 2, -size / 2, size, size);
+        ctx.drawImage(stickerImg, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
         ctx.restore();
       });
       
