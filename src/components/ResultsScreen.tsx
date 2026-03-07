@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { playSoundEffect } from '../hooks/useAudio';
 import type { ZoneProgress } from '../types';
 
 interface ResultsScreenProps {
@@ -9,7 +11,11 @@ interface ResultsScreenProps {
 export function ResultsScreen({ cleaningPercentage, onContinue }: ResultsScreenProps) {
   const rating = getRating(cleaningPercentage);
   const isComplete = cleaningPercentage >= 100;
-  
+
+  useEffect(() => {
+    playSoundEffect('results-fanfare');
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center">
       <div className="text-6xl mb-4 animate-bounce-gentle">

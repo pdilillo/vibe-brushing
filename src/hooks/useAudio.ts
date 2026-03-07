@@ -1586,7 +1586,7 @@ export function useAudio(options: UseAudioOptions = {}) {
   };
 }
 
-export function playSoundEffect(name: 'success' | 'fail' | 'brush' | 'sparkle' | 'capture' | 'legendary-intro' | 'wobble' | 'click' | 'tooth-bounce' | 'tooth-fly') {
+export function playSoundEffect(name: 'success' | 'fail' | 'brush' | 'sparkle' | 'capture' | 'legendary-intro' | 'wobble' | 'click' | 'tooth-bounce' | 'tooth-fly' | 'results-fanfare') {
   const sounds: Record<string, () => void> = {
     success: () => {
       const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
@@ -1827,6 +1827,41 @@ export function playSoundEffect(name: 'success' | 'fail' | 'brush' | 'sparkle' |
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.06 + 0.1);
         osc.start(ctx.currentTime + i * 0.06);
         osc.stop(ctx.currentTime + i * 0.06 + 0.1);
+      });
+    },
+    'results-fanfare': () => {
+      const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      if (ctx.state === 'suspended') ctx.resume();
+      const t = ctx.currentTime;
+      // Short ascending congratulatory phrase: C5 -> E5 -> G5 -> C6
+      const melody = [NOTE_FREQS.C5, NOTE_FREQS.E5, NOTE_FREQS.G5, NOTE_FREQS.C6];
+      melody.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, t + i * 0.12);
+        gain.gain.setValueAtTime(0, t + i * 0.12);
+        gain.gain.linearRampToValueAtTime(0.2, t + i * 0.12 + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + i * 0.12 + 0.2);
+        osc.start(t + i * 0.12);
+        osc.stop(t + i * 0.12 + 0.2);
+      });
+      // Resolving chord at the end (C major)
+      const chord = [NOTE_FREQS.C5, NOTE_FREQS.E5, NOTE_FREQS.G5];
+      chord.forEach((freq) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, t + 0.52);
+        gain.gain.setValueAtTime(0, t + 0.52);
+        gain.gain.linearRampToValueAtTime(0.15, t + 0.53);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.9);
+        osc.start(t + 0.52);
+        osc.stop(t + 0.9);
       });
     }
   };
