@@ -24,6 +24,9 @@ export function CameraView({ selectedBuddy, onVideoReady, onContainerSize, activ
 
   const setVideoRef = useCallback((el: HTMLVideoElement | null) => {
     console.log('[CameraView] Video ref callback:', { hasElement: !!el });
+    if (localVideoRef.current !== el) {
+      hasCalledOnReady.current = false; // New video element (e.g. new session) — allow onVideoReady again
+    }
     localVideoRef.current = el;
     if (el) {
       registerVideoElement(el);

@@ -79,11 +79,12 @@ export function CameraProvider({ children }: { children: React.ReactNode }) {
       video.oncanplay = handleCanPlay;
       video.onloadeddata = handleCanPlay;
       
-      if (video.readyState >= 3) {
+      // For MediaStream srcObject, do NOT call video.load() - it can reset the element
+      // and prevent the stream from playing (e.g. when re-attaching to a new video on a second session).
+      if (video.readyState >= 2) {
         handleCanPlay();
-      } else {
-        video.load();
       }
+      // Otherwise rely on canplay/loadeddata firing when the stream delivers frames
       
       video.onerror = () => {
         console.error('[CameraContext] Video element error');
