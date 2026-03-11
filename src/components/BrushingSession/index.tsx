@@ -51,7 +51,7 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
   const lastMotionTime = useRef<number>(Date.now());
   const pauseCheckInterval = useRef<number | null>(null);
   
-  const { startCamera, captureFrameWithBuddy, stopCamera, registerVideoElement } = useSharedCamera();
+  const { startCamera, captureFrameWithBuddy, stopCamera, registerVideoElement, videoRef, isReady: cameraIsReady } = useSharedCamera();
   const buddyStateRef = useRef<{ x: number; y: number; rotation: number; flipX: boolean } | null>(null);
   const pauseVideoRef = useRef<HTMLVideoElement | null>(null);
   const containerSizeRef = useRef({ width: 0, height: 0 });
@@ -74,6 +74,7 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
     overallProgress, 
     startDetection, 
     stopDetection,
+    isMotionReady,
     setFaceRegion,
     setDebugMode,
     getDebugInfo
@@ -186,21 +187,47 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
     });
   }, [setDebugMode]);
 
+  // Countdown only runs after motion detection has primed (video playing + at least one frame processed).
   useEffect(() => {
     if (phase !== 'countdown') return;
-    
+    if (!isMotionReady) return;
+
     if (countdown <= 0) {
       setPhase('brushing');
       lastMotionTime.current = Date.now();
       return;
     }
-    
+
     const timer = setTimeout(() => {
       setCountdown(c => c - 1);
     }, 1000);
-    
+
     return () => clearTimeout(timer);
-  }, [countdown, phase]);
+  }, [countdown, phase, isMotionReady]);
+
+  // Ensure detection starts even if onVideoReady fired before hooks were ready (multi-session).
+  useEffect(() => {
+    if (phase !== 'countdown' || isMotionReady) return;
+    const video = videoRef.current;
+    if (!video || !cameraIsReady) return;
+    if (video.readyState >= 2 && video.videoWidth > 0) {
+      startDetection(video);
+      startTracking(video);
+    }
+  }, [phase, isMotionReady, cameraIsReady, videoRef, startDetection, startTracking]);
+
+  // Retry starting detection until primed (covers late stream attach on second session).
+  useEffect(() => {
+    if (phase !== 'countdown' || isMotionReady) return;
+    const id = window.setInterval(() => {
+      const video = videoRef.current;
+      if (video && video.readyState >= 2 && video.videoWidth > 0) {
+        startDetection(video);
+        startTracking(video);
+      }
+    }, 300);
+    return () => clearInterval(id);
+  }, [phase, isMotionReady, videoRef, startDetection, startTracking]);
 
   useEffect(() => {
     if (phase !== 'brushing') return;
@@ -303,43 +330,6 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
     .filter(r => r.hasMotion)
     .map(r => r.zoneId);
 
-  if (phase === 'countdown') {
-    return (
-      <div className="relative flex flex-col items-center justify-center h-full overflow-hidden">
-        <div className="absolute inset-0">
-          <RegionBackground region={region} />
-        </div>
-        
-        <div className="relative z-10 text-center">
-          <div className="text-6xl font-bold text-white animate-bounce-gentle drop-shadow-lg">
-            {countdown > 0 ? countdown : 'GO!'}
-          </div>
-          <div className="text-xl text-white/80 mt-4 drop-shadow">Get ready to brush!</div>
-          
-          {creature && (
-            <div className="mt-6 text-center">
-              <div className="text-lg text-white/70">Today's creature:</div>
-              <div className={`text-2xl font-bold ${
-                creature.rarity === 'mythic' ? 'text-orange-400 animate-pulse' :
-                creature.rarity === 'legendary' ? 'text-yellow-400 animate-pulse' :
-                creature.rarity === 'rare' ? 'text-purple-400' : 'text-white'
-              }`}>
-                {creature.name}
-              </div>
-            </div>
-          )}
-          
-          <button
-            onClick={handleCancel}
-            className="mt-8 px-6 py-2 text-white/80 bg-black/30 rounded-xl backdrop-blur-sm"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   if (phase === 'paused') {
     return (
       <div className="relative flex flex-col items-center justify-center h-full p-6 overflow-hidden">
@@ -402,6 +392,46 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
             debugMode={debugMode}
             getDebugInfo={getDebugInfo}
           />
+
+          {/* Countdown overlay: camera mounts underneath so motion can prime before GO */}
+          {phase === 'countdown' && (
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
+              <div className="text-center px-4">
+                {!isMotionReady ? (
+                  <>
+                    <div className="text-4xl mb-4 animate-pulse">📷</div>
+                    <div className="text-xl font-semibold text-white drop-shadow">Preparing motion detection…</div>
+                    <div className="text-sm text-white/70 mt-2">Keep the camera visible</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-6xl font-bold text-white animate-bounce-gentle drop-shadow-lg">
+                      {countdown > 0 ? countdown : 'GO!'}
+                    </div>
+                    <div className="text-xl text-white/80 mt-4 drop-shadow">Get ready to brush!</div>
+                    {creature && (
+                      <div className="mt-6">
+                        <div className="text-lg text-white/70">Today&apos;s creature:</div>
+                        <div className={`text-2xl font-bold ${
+                          creature.rarity === 'mythic' ? 'text-orange-400 animate-pulse' :
+                          creature.rarity === 'legendary' ? 'text-yellow-400 animate-pulse' :
+                          creature.rarity === 'rare' ? 'text-purple-400' : 'text-white'
+                        }`}>
+                          {creature.name}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+              <button
+                onClick={handleCancel}
+                className="mt-8 px-6 py-2 text-white/80 bg-black/40 rounded-xl backdrop-blur-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
           
           <div className="absolute top-2 left-2 right-2 flex justify-between items-start pointer-events-auto z-20">
             <button
@@ -410,7 +440,10 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
             >
               ✕
             </button>
+            {phase === 'brushing' && (
             <Timer timeRemaining={timeRemaining} totalTime={sessionDuration} />
+            )}
+            {phase === 'brushing' && (
             <div className="flex gap-1">
               <button
                 onClick={toggleDebugMode}
@@ -427,10 +460,11 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
                 📸
               </button>
             </div>
+            )}
           </div>
         </div>
         
-        <div className="h-1/3 overflow-auto">
+        <div className={`h-1/3 overflow-auto ${phase === 'countdown' ? 'opacity-50 pointer-events-none' : ''}`}>
           {creature ? (
             <CreatureCleaning
               creature={creature}

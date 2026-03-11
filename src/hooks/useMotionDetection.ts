@@ -14,6 +14,10 @@ interface UseMotionDetectionReturn {
   motionResults: MotionResult[];
   overallProgress: number;
   isComplete: boolean;
+  /** True while the detection interval is active (after startDetection, before stopDetection). */
+  isDetectionRunning: boolean;
+  /** True after at least one frame was successfully processed (video playing + detector ran). Safe to start gameplay. */
+  isMotionReady: boolean;
   startDetection: (video: HTMLVideoElement) => void;
   stopDetection: () => void;
   reset: () => void;
@@ -49,6 +53,10 @@ export function useMotionDetection(options: UseMotionDetectionOptions = {}): Use
       hasMotion: false
     }))
   );
+
+  const [isDetectionRunning, setIsDetectionRunning] = useState(false);
+  const [isPrimed, setIsPrimed] = useState(false);
+  const primedRef = useRef(false);
 
   const setFaceRegion = useCallback((region: FaceRegion | null) => {
     faceRegionRef.current = region;
@@ -93,8 +101,13 @@ export function useMotionDetection(options: UseMotionDetectionOptions = {}): Use
     if (video.readyState < 2 || video.videoWidth === 0) {
       return;
     }
-    
+
     const results = detectorRef.current.detectMotion(video, faceRegionRef.current);
+    // First successful frame processed — motion pipeline is live; safe to start the game.
+    if (!primedRef.current) {
+      primedRef.current = true;
+      setIsPrimed(true);
+    }
     setMotionResults(results);
     
     // Single zone logic - no spillover needed
@@ -130,6 +143,10 @@ export function useMotionDetection(options: UseMotionDetectionOptions = {}): Use
       srcObject: !!video.srcObject,
       paused: video.paused,
     });
+
+    // New session / new video — require a fresh prime before gameplay.
+    primedRef.current = false;
+    setIsPrimed(false);
     
     if (video.paused) {
       console.log('[MotionDetection] Video is paused, attempting to play...');
@@ -152,6 +169,11 @@ export function useMotionDetection(options: UseMotionDetectionOptions = {}): Use
     }
     
     intervalRef.current = window.setInterval(detect, detectionInterval);
+    setIsDetectionRunning(true);
+    // Run once soon so we prime as fast as possible once the video has dimensions.
+    requestAnimationFrame(() => {
+      detect();
+    });
     console.log('[MotionDetection] Detection interval started');
   }, [detect, detectionInterval]);
 
@@ -160,6 +182,9 @@ export function useMotionDetection(options: UseMotionDetectionOptions = {}): Use
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+    setIsDetectionRunning(false);
+    primedRef.current = false;
+    setIsPrimed(false);
   }, []);
 
   const reset = useCallback(() => {
@@ -189,11 +214,15 @@ export function useMotionDetection(options: UseMotionDetectionOptions = {}): Use
   const overallProgress = zoneProgress.reduce((sum, z) => sum + z.cleaningProgress, 0) / zoneProgress.length;
   const isComplete = zoneProgress.every(z => z.isComplete);
 
+  const isMotionReady = isDetectionRunning && isPrimed;
+
   return {
     zoneProgress,
     motionResults,
     overallProgress,
     isComplete,
+    isDetectionRunning,
+    isMotionReady,
     startDetection,
     stopDetection,
     reset,
