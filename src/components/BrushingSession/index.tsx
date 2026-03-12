@@ -74,6 +74,7 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
     overallProgress, 
     startDetection, 
     stopDetection,
+    reset: resetMotionProgress,
     isMotionReady,
     setFaceRegion,
     setDebugMode,
@@ -84,6 +85,9 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
   const completedZonesRef = useRef<Set<string>>(new Set());
   const hasStartedCameraRef = useRef(false);
   const musicStartedRef = useRef(false);
+  // Snapshot of progress at completion so final score reflects current (possibly decayed) value, not a stale closure.
+  const progressSnapshotRef = useRef<{ overallProgress: number; zoneProgress: ZoneProgressType[] }>({ overallProgress: 0, zoneProgress: [] });
+  progressSnapshotRef.current = { overallProgress, zoneProgress };
 
   useEffect(() => {
     if (facePosition) {
@@ -193,6 +197,7 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
     if (!isMotionReady) return;
 
     if (countdown <= 0) {
+      resetMotionProgress(); // Zero progress so score doesn't include countdown phase
       setPhase('brushing');
       lastMotionTime.current = Date.now();
       return;
@@ -203,7 +208,7 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [countdown, phase, isMotionReady]);
+  }, [countdown, phase, isMotionReady, resetMotionProgress]);
 
   // Ensure detection starts even if onVideoReady fired before hooks were ready (multi-session).
   useEffect(() => {
@@ -291,21 +296,23 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
     music.stop();
     stopDetection();
     stopTracking();
-    
+    // Use snapshot so final score reflects current progress (including any decay after 100%), not a stale closure.
+    const { overallProgress: finalProgress, zoneProgress: finalZoneProgress } = progressSnapshotRef.current;
+
     const finalFrame = await capturePhotoWithBuddy();
     const allPhotos = finalFrame ? [...photos, finalFrame] : photos;
-    
+
     setTimeout(() => {
       stopCamera();
       onComplete({
-        cleaningPercentage: overallProgress,
-        zoneProgress,
+        cleaningPercentage: finalProgress,
+        zoneProgress: finalZoneProgress,
         photos: allPhotos,
         region,
         creature,
       });
     }, 500);
-  }, [stopDetection, stopTracking, capturePhotoWithBuddy, photos, overallProgress, zoneProgress, onComplete, stopCamera, music, region, creature]);
+  }, [stopDetection, stopTracking, capturePhotoWithBuddy, photos, onComplete, stopCamera, music, region, creature]);
 
   const handleResume = useCallback(() => {
     lastMotionTime.current = Date.now();
