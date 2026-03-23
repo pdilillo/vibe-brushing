@@ -2587,14 +2587,14 @@ export function getRandomCreatureForScore(
   
   pool = pool.filter(c => c.rarity !== 'mythic');
   
-  // No duplicates until the player has caught at least one of every monster across all unlocked series
-  const allAvailableCaptured = availableCreatures.every(c => capturedIds.includes(c.id));
-  if (allAvailableCaptured) {
+  // Duplicates only after every unlocked series is finished (global completion per series — not per region).
+  const allUnlockedSeriesComplete = unlockedSeries.every(s => isSeriesComplete(s, capturedIds));
+  if (allUnlockedSeriesComplete) {
     if (pool.length === 0) return null;
     return pool[Math.floor(Math.random() * pool.length)];
   }
   
-  // Until then, only pick from creatures not yet caught (no duplicates)
+  // Until then, prefer creatures not yet caught (no duplicates within incomplete series progression)
   let uncaptured = pool.filter(c => !capturedIds.includes(c.id));
   
   if (uncaptured.length === 0) {
