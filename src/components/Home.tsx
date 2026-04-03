@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useTitleTheme, playSoundEffect } from '../hooks/useAudio';
 import { ALL_BUDDIES } from '../data/buddies';
+import { hasBrushedToday } from '../utils/date';
 import type { UserProgress, UserProfile, UnlockedBuddy } from '../types';
 
 const TOOTH_CLICKS_TO_FLY = 7;
@@ -29,6 +30,7 @@ export function Home({ userProgress, currentProfile, onStartBrushing, onViewColl
 
   const hasToothBuddy = userProgress.unlockedBuddies.some(b => b.id === 'tooth-buddy');
   const toothBuddy = ALL_BUDDIES.find(b => b.id === 'tooth-buddy');
+  const streakDoneToday = hasBrushedToday(userProgress.lastSessionDate);
 
   const handleToothClick = useCallback(() => {
     if (toothFlying || toothFlown) return;
@@ -110,11 +112,26 @@ export function Home({ userProgress, currentProfile, onStartBrushing, onViewColl
         <p className="text-xl text-purple-200 max-w-xs">
           Make your teeth sparkle and catch amazing creatures!
         </p>
+
+        {streakDoneToday && (
+          <p className="text-sm text-emerald-300/95 font-medium max-w-sm -mt-2">
+            You already brushed today — your streak is counted for this day.
+          </p>
+        )}
         
         <div className="flex gap-4 mt-4 text-lg">
-          <div className="bg-purple-800/50 rounded-xl px-4 py-2">
+          <div
+            className={`rounded-xl px-4 py-2 transition-shadow ${
+              streakDoneToday
+                ? 'bg-emerald-950/40 ring-2 ring-emerald-400/50 shadow-[0_0_20px_rgba(52,211,153,0.15)]'
+                : 'bg-purple-800/50'
+            }`}
+          >
             <div className="text-2xl font-bold text-yellow-400">{userProgress.currentStreak}</div>
             <div className="text-sm text-purple-300">Day Streak</div>
+            {streakDoneToday && (
+              <div className="text-xs font-semibold text-emerald-300 mt-1">Done today ✓</div>
+            )}
           </div>
           <div className="bg-purple-800/50 rounded-xl px-4 py-2">
             <div className="text-2xl font-bold text-green-400">{userProgress.capturedCreatures.length}</div>

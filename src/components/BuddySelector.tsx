@@ -99,6 +99,8 @@ function getUnlockHint(buddy: Buddy): string {
       return `${buddy.unlockThreshold} creatures`;
     case 'series':
       return `Complete Series ${buddy.unlockSeries}`;
+    case 'perfect-session':
+      return '100% brush session';
     case 'secret':
       return '???';
     default:

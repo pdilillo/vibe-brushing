@@ -176,6 +176,14 @@ export const ALL_BUDDIES: Buddy[] = [
     unlockSeries: 3
   },
 
+  // ==================== PERFECT SESSION BUDDIES ====================
+  {
+    id: 'fire-frog',
+    name: 'Fire Frog',
+    imageUrl: `${base}creatures/buddy-fire-frog.png`,
+    unlockCondition: 'perfect-session'
+  },
+
   // ==================== SECRET BUDDIES ====================
   {
     id: 'tooth-buddy',
@@ -208,6 +216,8 @@ export function getUnlockedBuddies(
       case 'series':
         if (!buddy.unlockSeries) return false;
         return isSeriesComplete(buddy.unlockSeries, capturedCreatureIds);
+      case 'perfect-session':
+        return false;
       case 'secret':
         return false;
       default:

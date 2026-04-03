@@ -8,6 +8,7 @@ import {
   getUserProgress,
   migrateDefaultUser
 } from '../services/database';
+import { hasBrushedToday } from '../utils/date';
 
 interface ProfileSelectProps {
   onProfileSelected: (profile: UserProfile) => void;
@@ -139,9 +140,12 @@ export function ProfileSelect({ onProfileSelected }: ProfileSelectProps) {
                     <div className="flex-1 text-left">
                       <div className="text-white font-bold text-lg">{profile.name}</div>
                       {profile.progress && (
-                        <div className="text-purple-200 text-sm flex gap-3">
+                        <div className="text-purple-200 text-sm flex flex-wrap gap-x-3 gap-y-1 items-center">
                           <span>🔥 {profile.progress.currentStreak} streak</span>
                           <span>🐾 {profile.progress.capturedCreatures.length} creatures</span>
+                          {hasBrushedToday(profile.progress.lastSessionDate) && (
+                            <span className="text-emerald-300 font-medium">✓ Brushed today</span>
+                          )}
                         </div>
                       )}
                     </div>

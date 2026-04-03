@@ -1,5 +1,8 @@
 import Dexie, { type Table } from 'dexie';
+import { ALL_BUDDIES } from '../data/buddies';
 import type { BrushingSession, UserProgress, DecoratedPhoto, CapturedCreature, UnlockedBuddy, UserProfile } from '../types';
+
+const FIRE_FROG_BUDDY_ID = 'fire-frog';
 
 const CURRENT_PROFILE_KEY = 'sparkle-brush-current-profile';
 
@@ -199,6 +202,14 @@ export async function addSession(session: BrushingSession): Promise<void> {
     longestStreak: Math.max(progress.longestStreak, newStreak),
     lastSessionDate: new Date()
   }, profileId);
+
+  const isPerfectBrush = Math.round(session.cleaningPercentage) >= 100;
+  if (isPerfectBrush) {
+    const fireFrog = ALL_BUDDIES.find(b => b.id === FIRE_FROG_BUDDY_ID);
+    if (fireFrog) {
+      await unlockBuddy({ ...fireFrog, unlockedAt: new Date() });
+    }
+  }
 }
 
 export async function addCapturedCreature(creature: CapturedCreature): Promise<void> {
