@@ -6,6 +6,8 @@ interface BuddyGraphicProps {
   containerWidth: number;
   containerHeight: number;
   activityScore: number; // 0-100, based on brushing activity
+  /** True while every zone stays at 100% — extra motion, glow, and ring */
+  fullCleanCelebration?: boolean;
 }
 
 interface BuddyState {
@@ -27,11 +29,15 @@ const MAX_BUDDY_SIZE = 160;
 const MIN_BUDDY_SIZE = 80;
 const PADDING = 10;
 
+const CELEBRATION_SPEED_BOOST = 1.55;
+const CELEBRATION_ROTATION_BOOST = 1.45;
+
 export function BuddyGraphic({ 
   buddy, 
   containerWidth, 
   containerHeight,
-  activityScore = 0
+  activityScore = 0,
+  fullCleanCelebration = false,
 }: BuddyGraphicProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const animationRef = useRef<number | null>(null);
@@ -71,8 +77,10 @@ export function BuddyGraphic({
   useEffect(() => {
     if (containerWidth === 0 || containerHeight === 0 || !stateRef.current) return;
 
-    const speedMultiplier = 1 + (activityScore / 100) * (MAX_SPEED_MULTIPLIER - 1);
-    const rotationMultiplier = 1 + (activityScore / 100) * (MAX_ROTATION_SPEED / BASE_ROTATION_SPEED - 1);
+    const celebrationBoost = fullCleanCelebration ? CELEBRATION_SPEED_BOOST : 1;
+    const rotationCelebrationBoost = fullCleanCelebration ? CELEBRATION_ROTATION_BOOST : 1;
+    const speedMultiplier = (1 + (activityScore / 100) * (MAX_SPEED_MULTIPLIER - 1)) * celebrationBoost;
+    const rotationMultiplier = (1 + (activityScore / 100) * (MAX_ROTATION_SPEED / BASE_ROTATION_SPEED - 1)) * rotationCelebrationBoost;
 
     const animate = (time: number) => {
       if (!stateRef.current) return;
@@ -113,8 +121,11 @@ export function BuddyGraphic({
 
       const newRotation = state.rotation + state.rotationSpeed * BASE_ROTATION_SPEED * rotationMultiplier * deltaTime;
 
-      if (activityScore > 50 && Math.random() < 0.005 * deltaTime) {
-        state.rotationSpeed = (Math.random() - 0.5) * 4;
+      const wiggleChance = fullCleanCelebration ? 0.018 : 0.005;
+      const wiggleThreshold = fullCleanCelebration ? 20 : 50;
+      if (activityScore > wiggleThreshold && Math.random() < wiggleChance * deltaTime) {
+        const spin = fullCleanCelebration ? 8 : 4;
+        state.rotationSpeed = (Math.random() - 0.5) * spin;
       }
 
       stateRef.current = {
@@ -138,14 +149,29 @@ export function BuddyGraphic({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [containerWidth, containerHeight, activityScore, buddySize]);
+  }, [containerWidth, containerHeight, activityScore, buddySize, fullCleanCelebration]);
 
   if (!renderState || containerWidth === 0 || containerHeight === 0) {
     return null;
   }
 
-  const pulseScale = 1 + (activityScore / 100) * 0.1 * Math.sin(Date.now() / 200);
-  const glowIntensity = activityScore / 100;
+  const t = Date.now();
+  const pulsePeriod = fullCleanCelebration ? 110 : 200;
+  const pulseAmp = fullCleanCelebration ? 0.14 : 0.1;
+  const pulseScale = 1 + (activityScore / 100) * pulseAmp * Math.sin(t / pulsePeriod);
+  const glowIntensity = fullCleanCelebration ? Math.min(1, activityScore / 100 + 0.35) : activityScore / 100;
+
+  const ringSize = buddySize * 1.42;
+  const sparkles = fullCleanCelebration
+    ? [
+        { angle: 0, radius: 0.52, phase: 0 },
+        { angle: 60, radius: 0.58, phase: 0.4 },
+        { angle: 120, radius: 0.5, phase: 0.2 },
+        { angle: 180, radius: 0.55, phase: 0.7 },
+        { angle: 240, radius: 0.53, phase: 0.1 },
+        { angle: 300, radius: 0.56, phase: 0.55 },
+      ]
+    : [];
 
   return (
     <div 
@@ -161,7 +187,7 @@ export function BuddyGraphic({
         `,
         filter: `drop-shadow(0 4px 8px rgba(0,0,0,0.3)) ${
           glowIntensity > 0.3 
-            ? `drop-shadow(0 0 ${8 * glowIntensity}px rgba(255, 200, 100, ${glowIntensity * 0.6}))`
+            ? `drop-shadow(0 0 ${10 * glowIntensity}px rgba(255, 220, 120, ${0.55 + (fullCleanCelebration ? 0.25 : 0)})) drop-shadow(0 0 ${6 * glowIntensity}px rgba(168, 85, 247, ${fullCleanCelebration ? 0.45 : 0.2}))`
             : ''
         }`,
         opacity: imageLoaded ? 1 : 0,
@@ -169,25 +195,70 @@ export function BuddyGraphic({
         willChange: 'transform',
       }}
     >
-      <img
-        src={buddy.imageUrl}
-        alt={buddy.name}
-        style={{
-          width: buddySize,
-          height: buddySize,
-          objectFit: 'contain',
-        }}
-      />
-      
-      {activityScore > 70 && (
+      {fullCleanCelebration && (
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2 rounded-full animate-spin pointer-events-none"
           style={{
-            background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4) 0%, transparent 50%)',
-            animation: 'pulse 0.5s ease-in-out infinite',
+            width: ringSize,
+            height: ringSize,
+            background: 'conic-gradient(from 0deg, #fbbf24, #f472b6, #818cf8, #22d3ee, #4ade80, #fbbf24)',
+            animationDuration: '2.8s',
+            WebkitMask: `radial-gradient(circle, transparent ${buddySize * 0.42}px, #000 ${buddySize * 0.42 + 4}px)`,
+            mask: `radial-gradient(circle, transparent ${buddySize * 0.42}px, #000 ${buddySize * 0.42 + 4}px)`,
           }}
+          aria-hidden
         />
       )}
+
+      <div className="relative z-[5]" style={{ width: buddySize, height: buddySize }}>
+        <img
+          src={buddy.imageUrl}
+          alt={buddy.name}
+          className="relative z-[1]"
+          style={{
+            width: buddySize,
+            height: buddySize,
+            objectFit: 'contain',
+          }}
+        />
+
+        {fullCleanCelebration &&
+          sparkles.map((s, i) => {
+            const rad = (s.angle * Math.PI) / 180;
+            const wobble = Math.sin(t / 400 + s.phase * Math.PI * 2) * 4;
+            const x = Math.cos(rad) * (buddySize * s.radius) + buddySize / 2;
+            const y = Math.sin(rad) * (buddySize * s.radius) + buddySize / 2 + wobble;
+            const op = 0.45 + Math.sin(t / 280 + i) * 0.45;
+            return (
+              <span
+                key={i}
+                className="absolute z-[2] text-lg leading-none pointer-events-none"
+                style={{
+                  left: x,
+                  top: y,
+                  transform: 'translate(-50%, -50%)',
+                  opacity: op,
+                  textShadow: '0 0 6px rgba(255,255,255,0.9)',
+                }}
+                aria-hidden
+              >
+                ✨
+              </span>
+            );
+          })}
+
+        {activityScore > 70 && (
+          <div
+            className="absolute inset-0 z-[1] pointer-events-none rounded-full"
+            style={{
+              background: fullCleanCelebration
+                ? 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.55) 0%, rgba(255,200,150,0.2) 40%, transparent 55%)'
+                : 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4) 0%, transparent 50%)',
+              animation: fullCleanCelebration ? 'pulse 0.35s ease-in-out infinite' : 'pulse 0.5s ease-in-out infinite',
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 }

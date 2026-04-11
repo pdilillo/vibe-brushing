@@ -1586,7 +1586,7 @@ export function useAudio(options: UseAudioOptions = {}) {
   };
 }
 
-export function playSoundEffect(name: 'success' | 'fail' | 'brush' | 'sparkle' | 'capture' | 'legendary-intro' | 'wobble' | 'click' | 'tooth-bounce' | 'tooth-fly' | 'results-fanfare') {
+export function playSoundEffect(name: 'success' | 'fail' | 'brush' | 'sparkle' | 'capture' | 'legendary-intro' | 'wobble' | 'click' | 'tooth-bounce' | 'tooth-fly' | 'results-fanfare' | 'full-clean-cheer') {
   const sounds: Record<string, () => void> = {
     success: () => {
       const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
@@ -1827,6 +1827,25 @@ export function playSoundEffect(name: 'success' | 'fail' | 'brush' | 'sparkle' |
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.06 + 0.1);
         osc.start(ctx.currentTime + i * 0.06);
         osc.stop(ctx.currentTime + i * 0.06 + 0.1);
+      });
+    },
+    'full-clean-cheer': () => {
+      const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      if (ctx.state === 'suspended') ctx.resume();
+      const t = ctx.currentTime;
+      const notes = [NOTE_FREQS.G5, NOTE_FREQS.B5, NOTE_FREQS.D6, NOTE_FREQS.G6];
+      notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t + i * 0.07);
+        gain.gain.setValueAtTime(0, t + i * 0.07);
+        gain.gain.linearRampToValueAtTime(0.14, t + i * 0.07 + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + i * 0.07 + 0.18);
+        osc.start(t + i * 0.07);
+        osc.stop(t + i * 0.07 + 0.2);
       });
     },
     'results-fanfare': () => {

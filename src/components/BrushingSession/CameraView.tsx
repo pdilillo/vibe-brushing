@@ -10,11 +10,13 @@ interface CameraViewProps {
   onVideoReady?: (video: HTMLVideoElement) => void;
   onContainerSize?: (width: number, height: number) => void;
   activityScore?: number;
+  /** All mouth zones at 100% — buddy shows extra celebration while this holds */
+  fullCleanCelebration?: boolean;
   debugMode?: boolean;
   getDebugInfo?: () => DebugInfo | null;
 }
 
-export function CameraView({ selectedBuddy, onVideoReady, onContainerSize, activityScore = 0, debugMode = false, getDebugInfo }: CameraViewProps) {
+export function CameraView({ selectedBuddy, onVideoReady, onContainerSize, activityScore = 0, fullCleanCelebration = false, debugMode = false, getDebugInfo }: CameraViewProps) {
   const { isReady, error, registerVideoElement } = useSharedCamera();
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -128,6 +130,7 @@ export function CameraView({ selectedBuddy, onVideoReady, onContainerSize, activ
           containerWidth={containerSize.width}
           containerHeight={containerSize.height}
           activityScore={activityScore}
+          fullCleanCelebration={fullCleanCelebration}
         />
       )}
       

@@ -79,6 +79,8 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
   const { facePosition, startTracking, stopTracking } = useFaceTracking();
   
   const completedZonesRef = useRef<Set<string>>(new Set());
+  /** Latch: after fanfare plays, stays true until any zone drops below 100% (so pause/resume does not retrigger). */
+  const fullCleanFanfarePlayedRef = useRef(false);
   const hasStartedCameraRef = useRef(false);
   const musicStartedRef = useRef(false);
   // Snapshot of progress at completion so final score reflects current (possibly decayed) value, not a stale closure.
@@ -121,6 +123,11 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
     };
   }, [startCamera, stopDetection, stopTracking]);
 
+  const fullCleanCelebration =
+    phase === 'brushing' &&
+    zoneProgress.length > 0 &&
+    zoneProgress.every(z => z.isComplete);
+
   useEffect(() => {
     zoneProgress.forEach(zone => {
       if (zone.isComplete && !completedZonesRef.current.has(zone.zoneId)) {
@@ -129,6 +136,22 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
       }
     });
   }, [zoneProgress]);
+
+  useEffect(() => {
+    if (phase === 'countdown') {
+      fullCleanFanfarePlayedRef.current = false;
+      return;
+    }
+    const allComplete = zoneProgress.length > 0 && zoneProgress.every(z => z.isComplete);
+    if (!allComplete) {
+      fullCleanFanfarePlayedRef.current = false;
+      return;
+    }
+    if (phase === 'brushing' && !fullCleanFanfarePlayedRef.current) {
+      playSoundEffect('full-clean-cheer');
+      fullCleanFanfarePlayedRef.current = true;
+    }
+  }, [phase, zoneProgress]);
 
   useEffect(() => {
     const hasMotion = motionResults.some(r => r.hasMotion);
@@ -377,6 +400,7 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
             onVideoReady={handleVideoReady}
             onContainerSize={handleContainerSize}
             activityScore={motionResults.reduce((sum, r) => sum + r.motionLevel, 0) / Math.max(motionResults.length, 1)}
+            fullCleanCelebration={fullCleanCelebration}
           />
 
           {/* Countdown overlay: camera mounts underneath so motion can prime before GO */}
@@ -431,19 +455,21 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
           )}
           
           <div
-            className={`absolute top-2 left-2 right-2 flex justify-between items-start pointer-events-auto ${
+            className={`absolute top-2 left-2 right-2 pointer-events-none ${
               phase === 'countdown' ? 'z-40' : 'z-20'
             }`}
           >
             <button
               onClick={handleCancel}
-              className="px-3 py-1.5 text-sm text-white/80 bg-black/50 rounded-xl backdrop-blur-sm pointer-events-auto"
+              className="absolute left-0 top-0 z-10 px-3 py-1.5 text-sm text-white/80 bg-black/50 rounded-xl backdrop-blur-sm pointer-events-auto"
               type="button"
             >
               ✕
             </button>
             {phase === 'brushing' && (
-              <Timer timeRemaining={timeRemaining} totalTime={sessionDuration} />
+              <div className="flex justify-center w-full pointer-events-auto">
+                <Timer timeRemaining={timeRemaining} totalTime={sessionDuration} />
+              </div>
             )}
           </div>
         </div>
