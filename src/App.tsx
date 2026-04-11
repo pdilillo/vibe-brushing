@@ -13,6 +13,7 @@ import { ProfileSelect } from './components/ProfileSelect';
 import { BuddyDebug } from './components/BuddyDebug';
 import { GraphicsDebug } from './components/GraphicsDebug';
 import { PhotoDebug } from './components/PhotoDebug';
+import { StreakPrizeModal } from './components/StreakPrizeModal';
 import { getUserProgress, getCurrentProfileId, getProfile, addSession, unlockBuddy } from './services/database';
 import { getSessionDurationSeconds } from './services/settings';
 import type { GamePhase, UserProgress, ZoneProgress, Creature, Buddy, Region, UserProfile, BrushingSession as BrushingSessionType, UnlockedBuddy } from './types';
@@ -165,6 +166,14 @@ function App() {
     setPhase('photo-debug');
   }
 
+  function handleStreakPrizeDebug() {
+    setPhase('streak-prize-debug');
+  }
+
+  function handleSparkleTalesDebug() {
+    setPhase('sparkle-tales-debug');
+  }
+
   if (phase === 'profile-select') {
     return (
       <div className="h-full w-full overflow-hidden">
@@ -192,11 +201,19 @@ function App() {
           onViewSettings={handleViewSettings}
           onSwitchProfile={handleSwitchProfile}
           onUnlockSecretBuddy={handleUnlockSecretBuddy}
+          onStreakPrizeClaimed={loadUserProgress}
         />
       )}
       
       {phase === 'settings' && (
-        <Settings onBack={handleGoHome} onBuddyDebug={handleBuddyDebug} onGraphicsDebug={handleGraphicsDebug} onPhotoDebug={handlePhotoDebug} />
+        <Settings
+          onBack={handleGoHome}
+          onPrizeOpeningDemo={handleStreakPrizeDebug}
+          onSparkleTalesView={handleSparkleTalesDebug}
+          onBuddyDebug={handleBuddyDebug}
+          onGraphicsDebug={handleGraphicsDebug}
+          onPhotoDebug={handlePhotoDebug}
+        />
       )}
       
       {phase === 'camera-check' && (
@@ -258,6 +275,7 @@ function App() {
               ? [{ ...capturedCreature, capturedAt: new Date() }, ...userProgress.capturedCreatures]
               : userProgress.capturedCreatures
           }
+          unlockedStickerIds={userProgress.unlockedStickerIds ?? []}
           onDone={handleEditorDone}
           onBack={() => setPhase('photos')}
         />
@@ -267,6 +285,14 @@ function App() {
         <Collection
           userProgress={userProgress}
           onBack={handleGoHome}
+        />
+      )}
+
+      {phase === 'sparkle-tales-debug' && (
+        <Collection
+          userProgress={userProgress}
+          onBack={() => setPhase('settings')}
+          sparkleTalesAllUnlockedPreview
         />
       )}
       
@@ -280,6 +306,16 @@ function App() {
       
       {phase === 'photo-debug' && (
         <PhotoDebug onBack={handleGoHome} />
+      )}
+
+      {phase === 'streak-prize-debug' && (
+        <StreakPrizeModal
+          debugPreview
+          unlockedStickerIds={userProgress.unlockedStickerIds ?? []}
+          unlockedCreatureStoryIds={userProgress.unlockedCreatureStoryIds ?? []}
+          onClose={() => setPhase('settings')}
+          onClaimed={loadUserProgress}
+        />
       )}
     </div>
   );

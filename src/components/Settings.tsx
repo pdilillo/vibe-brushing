@@ -1,20 +1,54 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { getSettings, saveSettings, type AppSettings } from '../services/settings';
 import { version } from '../../package.json';
 
+/** Password required to reveal Developer Tools (demos, graphics, buddy, photo debug). */
+const DEVELOPER_TOOLS_PASSWORD = 'sparkle4242';
+
 interface SettingsProps {
   onBack: () => void;
+  /** Prize opening animation demo (no progress saved). */
+  onPrizeOpeningDemo?: () => void;
+  /** View all Sparkle tales in Collection preview (no progress saved). */
+  onSparkleTalesView?: () => void;
   onBuddyDebug?: () => void;
   onGraphicsDebug?: () => void;
   onPhotoDebug?: () => void;
 }
 
-export function Settings({ onBack, onBuddyDebug, onGraphicsDebug, onPhotoDebug }: SettingsProps) {
+export function Settings({
+  onBack,
+  onPrizeOpeningDemo,
+  onSparkleTalesView,
+  onBuddyDebug,
+  onGraphicsDebug,
+  onPhotoDebug
+}: SettingsProps) {
   const [settings, setSettings] = useState<AppSettings>(getSettings);
+  /** Always starts locked; no persistence — enter password each time you open Settings. */
+  const [devToolsUnlocked, setDevToolsUnlocked] = useState(false);
+  const [devToolsPassword, setDevToolsPassword] = useState('');
+  const [devToolsPasswordError, setDevToolsPasswordError] = useState(false);
+
+  const hasDemoHandlers = Boolean(onPrizeOpeningDemo || onSparkleTalesView);
+  const hasDebugMenuHandlers = Boolean(onBuddyDebug || onGraphicsDebug || onPhotoDebug);
+  const hasDeveloperToolsSection = hasDemoHandlers || hasDebugMenuHandlers;
 
   useEffect(() => {
     saveSettings(settings);
   }, [settings]);
+
+  const handleDeveloperToolsUnlock = (e: FormEvent) => {
+    e.preventDefault();
+    const ok = devToolsPassword.trim() === DEVELOPER_TOOLS_PASSWORD;
+    if (ok) {
+      setDevToolsUnlocked(true);
+      setDevToolsPassword('');
+      setDevToolsPasswordError(false);
+    } else {
+      setDevToolsPasswordError(true);
+    }
+  };
 
   const handleDurationChange = (seconds: 60 | 90 | 120) => {
     setSettings(prev => ({ ...prev, sessionDurationSeconds: seconds }));
@@ -58,22 +92,26 @@ export function Settings({ onBack, onBuddyDebug, onGraphicsDebug, onPhotoDebug }
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                    settings.sessionDurationSeconds === option.value
-                      ? 'border-white bg-white'
-                      : 'border-purple-400'
-                  }`}>
+                  <div
+                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                      settings.sessionDurationSeconds === option.value
+                        ? 'border-white bg-white'
+                        : 'border-purple-400'
+                    }`}
+                  >
                     {settings.sessionDurationSeconds === option.value && (
                       <div className="w-3 h-3 rounded-full bg-purple-600" />
                     )}
                   </div>
                   <div className="text-left">
                     <div className="font-bold">{option.label}</div>
-                    <div className={`text-xs ${
-                      settings.sessionDurationSeconds === option.value
-                        ? 'text-white/80'
-                        : 'text-purple-400'
-                    }`}>
+                    <div
+                      className={`text-xs ${
+                        settings.sessionDurationSeconds === option.value
+                          ? 'text-white/80'
+                          : 'text-purple-400'
+                      }`}
+                    >
                       {option.description}
                     </div>
                   </div>
@@ -99,44 +137,146 @@ export function Settings({ onBack, onBuddyDebug, onGraphicsDebug, onPhotoDebug }
           </div>
         </div>
 
-        {(onBuddyDebug || onGraphicsDebug || onPhotoDebug) && (
-          <div className="bg-gray-900/50 rounded-2xl p-4 border border-gray-700">
-            <h2 className="text-lg font-bold mb-2 text-gray-300">Developer Tools</h2>
-            <div className="space-y-2">
-              {onGraphicsDebug && (
-                <button
-                  onClick={onGraphicsDebug}
-                  className="w-full p-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-left transition-colors"
-                >
-                  <div className="font-bold text-purple-400">Graphics Debug Menu</div>
-                  <div className="text-xs text-gray-400 mt-1">
-                    Preview all creatures and buddy graphics in a gallery view
+        {hasDeveloperToolsSection && (
+          <div className="bg-gray-900/50 rounded-2xl p-4 border border-gray-700 mb-4">
+            <h2 className="text-lg font-bold mb-1 text-gray-300">Developer tools</h2>
+            <p className="text-xs text-gray-500 mb-3">
+              Demos and internal testing menus. Enter the password to unlock.
+            </p>
+
+            {!devToolsUnlocked && (
+              <form onSubmit={handleDeveloperToolsUnlock} className="space-y-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <label htmlFor="dev-tools-password" className="sr-only">
+                    Developer tools password
+                  </label>
+                  <input
+                    id="dev-tools-password"
+                    type="password"
+                    autoComplete="off"
+                    value={devToolsPassword}
+                    onChange={e => {
+                      setDevToolsPassword(e.target.value);
+                      if (devToolsPasswordError) setDevToolsPasswordError(false);
+                    }}
+                    placeholder="Password"
+                    className="flex-1 px-3 py-2 rounded-xl bg-gray-950/80 border border-gray-600 text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-xl bg-gray-700 text-white font-medium hover:bg-gray-600 transition-colors"
+                  >
+                    Unlock
+                  </button>
+                </div>
+                {devToolsPasswordError && (
+                  <p className="text-xs text-red-400" role="alert">
+                    Incorrect password.
+                  </p>
+                )}
+              </form>
+            )}
+
+            {devToolsUnlocked && (
+              <>
+                <div className="flex justify-end mb-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDevToolsUnlocked(false);
+                      setDevToolsPassword('');
+                      setDevToolsPasswordError(false);
+                    }}
+                    className="text-xs text-gray-500 hover:text-gray-300"
+                  >
+                    Lock developer tools
+                  </button>
+                </div>
+
+                {hasDemoHandlers && (
+                  <div className="mb-4">
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                      Demos
+                    </h3>
+                    <p className="text-xs text-gray-500 mb-2">
+                      Does not change saved progress.
+                    </p>
+                    <div className="space-y-2">
+                      {onPrizeOpeningDemo && (
+                        <button
+                          type="button"
+                          onClick={onPrizeOpeningDemo}
+                          className="w-full p-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-left transition-colors border border-gray-600/50"
+                        >
+                          <div className="font-bold text-amber-300">Prize opening</div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            Tap the gift, hear the buildup, and see a sample sticker and story reveal
+                          </div>
+                        </button>
+                      )}
+                      {onSparkleTalesView && (
+                        <button
+                          type="button"
+                          onClick={onSparkleTalesView}
+                          className="w-full p-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-left transition-colors border border-gray-600/50"
+                        >
+                          <div className="font-bold text-teal-400">Sparkle tales</div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            Open your collection with every tale unlocked so you can read them all
+                          </div>
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </button>
-              )}
-              {onBuddyDebug && (
-                <button
-                  onClick={onBuddyDebug}
-                  className="w-full p-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-left transition-colors"
-                >
-                  <div className="font-bold text-green-400">Buddy Debug Mode</div>
-                  <div className="text-xs text-gray-400 mt-1">
-                    Test buddy animation with activity level simulation
+                )}
+
+                {hasDebugMenuHandlers && (
+                  <div>
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                      Debug
+                    </h3>
+                    <div className="space-y-2">
+                      {onGraphicsDebug && (
+                        <button
+                          type="button"
+                          onClick={onGraphicsDebug}
+                          className="w-full p-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-left transition-colors"
+                        >
+                          <div className="font-bold text-purple-400">Graphics debug</div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            Preview all creatures and buddy graphics in a gallery view
+                          </div>
+                        </button>
+                      )}
+                      {onBuddyDebug && (
+                        <button
+                          type="button"
+                          onClick={onBuddyDebug}
+                          className="w-full p-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-left transition-colors"
+                        >
+                          <div className="font-bold text-green-400">Buddy debug</div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            Test buddy animation with activity level simulation
+                          </div>
+                        </button>
+                      )}
+                      {onPhotoDebug && (
+                        <button
+                          type="button"
+                          onClick={onPhotoDebug}
+                          className="w-full p-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-left transition-colors"
+                        >
+                          <div className="font-bold text-pink-400">Photo editor debug</div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            Test photo editing with all stickers unlocked and no limits
+                          </div>
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </button>
-              )}
-              {onPhotoDebug && (
-                <button
-                  onClick={onPhotoDebug}
-                  className="w-full p-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-left transition-colors"
-                >
-                  <div className="font-bold text-pink-400">Photo Editor Debug</div>
-                  <div className="text-xs text-gray-400 mt-1">
-                    Test photo editing with all stickers unlocked and no limits
-                  </div>
-                </button>
-              )}
-            </div>
+                )}
+              </>
+            )}
           </div>
         )}
       </div>

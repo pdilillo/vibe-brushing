@@ -94,6 +94,16 @@ export interface UserProgress {
   capturedCreatures: CapturedCreature[];
   unlockedBuddies: UnlockedBuddy[];
   selectedBuddyId?: string;
+  /** 0–6 stamps earned toward the 7-day prize; 7th day sets streakPrizePending */
+  streakPrizeStampCount?: number;
+  /** True when 7 consecutive days are complete — claim opens the prize */
+  streakPrizePending?: boolean;
+  /** Local YYYY-MM-DD when a streak stamp was last counted (one per day max) */
+  lastStreakStampLocalDate?: string;
+  /** Sticker ids unlocked for the photo editor (includes streak prizes) */
+  unlockedStickerIds?: string[];
+  /** Creature ids whose streak tale has been unlocked (random order; pool in streakCreatureStories) */
+  unlockedCreatureStoryIds?: string[];
 }
 
 export interface DecoratedPhoto {
@@ -110,7 +120,9 @@ export interface Sticker {
   id: string;
   name: string;
   imageUrl: string;
-  category: 'creatures' | 'stars' | 'dental' | 'fun';
+  category: 'creatures' | 'stars' | 'dental' | 'fun' | 'streak';
+  /** If true, only available after unlocking via 7-day streak prize */
+  streakReward?: boolean;
 }
 
 export interface PlacedSticker {
@@ -142,4 +154,6 @@ export type GamePhase =
   | 'collection'
   | 'buddy-debug'
   | 'graphics-debug'
-  | 'photo-debug';
+  | 'photo-debug'
+  | 'streak-prize-debug'
+  | 'sparkle-tales-debug';

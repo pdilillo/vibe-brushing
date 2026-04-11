@@ -1,4 +1,9 @@
 import { useState } from 'react';
+import {
+  getStoryForCreatureId,
+  getStreakStorySlotsSorted,
+  STREAK_STORY_POOL
+} from '../../data/streakCreatureStories';
 import { ALL_CREATURES, getElementType, getCreaturesBySeries, isSeriesComplete, getUnlockedSeries } from '../../data/creatures';
 import { CreatureArt } from '../CreatureArt';
 import type { UserProgress, Creature, CapturedCreature, CreatureSeries } from '../../types';
@@ -6,6 +11,8 @@ import type { UserProgress, Creature, CapturedCreature, CreatureSeries } from '.
 interface CollectionProps {
   userProgress: UserProgress;
   onBack: () => void;
+  /** When true, Sparkle tales shows every story as unlocked for QA (does not persist). */
+  sparkleTalesAllUnlockedPreview?: boolean;
 }
 
 const SERIES_INFO: Record<CreatureSeries, { name: string; subtitle: string; icon: string; color: string }> = {
@@ -14,11 +21,22 @@ const SERIES_INFO: Record<CreatureSeries, { name: string; subtitle: string; icon
   3: { name: 'Series 3', subtitle: 'Prehistoric Tech', icon: '🦖', color: 'from-orange-500 to-red-500' },
 };
 
-export function Collection({ userProgress, onBack }: CollectionProps) {
+export function Collection({
+  userProgress,
+  onBack,
+  sparkleTalesAllUnlockedPreview = false
+}: CollectionProps) {
   const [selectedCreature, setSelectedCreature] = useState<Creature | null>(null);
   const [activeSeries, setActiveSeries] = useState<CreatureSeries>(1);
-  
+  const [readingStoryCreatureId, setReadingStoryCreatureId] = useState<string | null>(null);
+
   const capturedIds = new Set(userProgress.capturedCreatures.map(c => c.id));
+  const effectiveUnlockedStoryIds = sparkleTalesAllUnlockedPreview
+    ? [...STREAK_STORY_POOL]
+    : (userProgress.unlockedCreatureStoryIds ?? []);
+  const unlockedStoryIds = new Set(effectiveUnlockedStoryIds);
+  const storySlots = getStreakStorySlotsSorted();
+  const talesUnlocked = unlockedStoryIds.size;
   const unlockedSeries = getUnlockedSeries(Array.from(capturedIds));
   
   const seriesCreatures = getCreaturesBySeries(activeSeries);
@@ -43,8 +61,23 @@ export function Collection({ userProgress, onBack }: CollectionProps) {
 
   const isSeriesLocked = (series: CreatureSeries) => !unlockedSeries.includes(series);
 
+  const readingCreature =
+    readingStoryCreatureId != null
+      ? ALL_CREATURES.find(x => x.id === readingStoryCreatureId)
+      : undefined;
+  const readingTale =
+    readingStoryCreatureId != null ? getStoryForCreatureId(readingStoryCreatureId) : undefined;
+
   return (
     <div className="flex flex-col h-full">
+      {sparkleTalesAllUnlockedPreview && (
+        <div
+          className="shrink-0 px-4 py-2.5 bg-amber-950/80 border-b border-amber-500/35 text-center text-xs font-medium text-amber-100"
+          role="status"
+        >
+          Preview — all Sparkle tales unlocked (not saved)
+        </div>
+      )}
       <div className="flex items-center justify-between p-4 bg-purple-900/50">
         <button
           onClick={onBack}
@@ -109,6 +142,60 @@ export function Collection({ userProgress, onBack }: CollectionProps) {
       </div>
       
       <div className="flex-1 overflow-y-auto p-4">
+        <div className="mb-6 rounded-2xl border border-amber-500/35 bg-gradient-to-br from-amber-950/40 to-purple-950/50 p-4">
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl" aria-hidden>📜</span>
+              <div>
+                <h2 className="font-bold text-white text-lg leading-tight">Sparkle tales</h2>
+                <p className="text-xs text-purple-300">Stories earned from 7-day streaks</p>
+              </div>
+            </div>
+            <span className="text-sm font-semibold text-amber-200 shrink-0">
+              {talesUnlocked}/{STREAK_STORY_POOL.length}
+            </span>
+          </div>
+          <ul className="space-y-2">
+            {storySlots.map(({ creatureId }) => {
+              const creature = ALL_CREATURES.find(c => c.id === creatureId);
+              const unlocked = unlockedStoryIds.has(creatureId);
+              const story = getStoryForCreatureId(creatureId);
+              if (!creature || !story) return null;
+              return (
+                <li key={creatureId}>
+                  {unlocked ? (
+                    <button
+                      type="button"
+                      onClick={() => setReadingStoryCreatureId(creatureId)}
+                      className="w-full flex items-center gap-3 rounded-xl bg-purple-800/50 hover:bg-purple-700/50 border border-purple-500/30 px-3 py-3 text-left transition-colors"
+                    >
+                      <span className="text-2xl shrink-0" aria-hidden>📜</span>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold text-white truncate">{creature.name}</div>
+                        <div className="text-xs text-purple-300">Tap to read</div>
+                      </div>
+                      <span className="text-purple-300 text-sm shrink-0">Read</span>
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-3 rounded-xl bg-purple-950/60 border border-purple-700/30 px-3 py-3 opacity-80">
+                      <span className="text-2xl shrink-0 relative" aria-hidden>
+                        📜
+                        <span className="absolute -bottom-0.5 -right-0.5 text-sm" aria-hidden>
+                          🔒
+                        </span>
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold text-purple-400 truncate">{creature.name}</div>
+                        <div className="text-xs text-purple-500">Unlock from a 7-day streak prize</div>
+                      </div>
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
         {activeSeries === 1 && groupedCreatures.mythic.length > 0 && (
           <CreatureSection
             title="🐉 Mythic"
@@ -168,6 +255,55 @@ export function Collection({ userProgress, onBack }: CollectionProps) {
           onClose={() => setSelectedCreature(null)}
         />
       )}
+
+      {readingCreature && readingTale && (
+        <StoryReaderModal
+          creature={readingCreature}
+          body={readingTale.body}
+          onClose={() => setReadingStoryCreatureId(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+function StoryReaderModal({
+  creature,
+  body,
+  onClose
+}: {
+  creature: Creature;
+  body: string;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="story-reader-title"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-md max-h-[85vh] rounded-2xl bg-purple-900/95 border border-purple-500/40 shadow-2xl overflow-hidden flex flex-col"
+        onClick={e => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-purple-800/90 flex items-center justify-center text-purple-200 hover:bg-purple-700 z-10"
+          aria-label="Close"
+        >
+          ✕
+        </button>
+        <div className="p-6 pt-14 overflow-y-auto">
+          <h2 id="story-reader-title" className="text-xl font-bold text-amber-200 mb-1">
+            {creature.name}
+          </h2>
+          <p className="text-xs text-purple-400 mb-4">Sparkle tale</p>
+          <p className="text-sm text-purple-100 leading-relaxed whitespace-pre-wrap">{body}</p>
+        </div>
+      </div>
     </div>
   );
 }

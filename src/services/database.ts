@@ -1,5 +1,9 @@
 import Dexie, { type Table } from 'dexie';
 import { ALL_BUDDIES } from '../data/buddies';
+import { pickRandomUnlockedStoryId } from '../data/streakCreatureStories';
+import { getNextStreakPrizeStickerId } from '../data/stickers';
+import { formatLocalDateString } from '../utils/date';
+import { computeStreakPrizeAfterSession } from './streakPrize';
 import type { BrushingSession, UserProgress, DecoratedPhoto, CapturedCreature, UnlockedBuddy, UserProfile } from '../types';
 
 const FIRE_FROG_BUDDY_ID = 'fire-frog';
@@ -41,6 +45,34 @@ class SparkleBrushDatabase extends Dexie {
         if (!progress.unlockedBuddies) {
           progress.unlockedBuddies = [];
         }
+      });
+    });
+
+    this.version(4).stores({
+      sessions: 'id, date, profileId',
+      userProgress: 'id, profileId',
+      photos: 'id, sessionId, createdAt',
+      profiles: 'id, name, createdAt'
+    }).upgrade(tx => {
+      return tx.table('userProgress').toCollection().modify(progress => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const p = progress as any;
+        if (p.streakPrizeStampCount === undefined) p.streakPrizeStampCount = 0;
+        if (p.streakPrizePending === undefined) p.streakPrizePending = false;
+        if (!p.unlockedStickerIds) p.unlockedStickerIds = [];
+      });
+    });
+
+    this.version(5).stores({
+      sessions: 'id, date, profileId',
+      userProgress: 'id, profileId',
+      photos: 'id, sessionId, createdAt',
+      profiles: 'id, name, createdAt'
+    }).upgrade(tx => {
+      return tx.table('userProgress').toCollection().modify(progress => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const p = progress as any;
+        if (!p.unlockedCreatureStoryIds) p.unlockedCreatureStoryIds = [];
       });
     });
   }
@@ -100,7 +132,11 @@ export async function createProfile(name: string): Promise<UserProfile> {
     currentStreak: 0,
     longestStreak: 0,
     capturedCreatures: [],
-    unlockedBuddies: []
+    unlockedBuddies: [],
+    streakPrizeStampCount: 0,
+    streakPrizePending: false,
+    unlockedStickerIds: [],
+    unlockedCreatureStoryIds: []
   };
   await db.userProgress.add(progress);
   
@@ -138,7 +174,11 @@ export async function getUserProgress(profileId?: string): Promise<UserProgress>
       currentStreak: 0,
       longestStreak: 0,
       capturedCreatures: [],
-      unlockedBuddies: []
+      unlockedBuddies: [],
+      streakPrizeStampCount: 0,
+      streakPrizePending: false,
+      unlockedStickerIds: [],
+      unlockedCreatureStoryIds: []
     };
     await db.userProgress.add(progress);
   } else {
@@ -153,6 +193,10 @@ export async function getUserProgress(profileId?: string): Promise<UserProgress>
     if (!progress.unlockedBuddies) {
       progress.unlockedBuddies = [];
     }
+    if (progress.streakPrizeStampCount === undefined) progress.streakPrizeStampCount = 0;
+    if (progress.streakPrizePending === undefined) progress.streakPrizePending = false;
+    if (!progress.unlockedStickerIds) progress.unlockedStickerIds = [];
+    if (!progress.unlockedCreatureStoryIds) progress.unlockedCreatureStoryIds = [];
   }
   
   return progress;
@@ -196,11 +240,16 @@ export async function addSession(session: BrushingSession): Promise<void> {
     newStreak = 1;
   }
   
+  const now = new Date();
+  const streakPrizeUpdate = computeStreakPrizeAfterSession(progress, now);
+
   await updateUserProgress({
     totalSessions: progress.totalSessions + 1,
     currentStreak: newStreak,
     longestStreak: Math.max(progress.longestStreak, newStreak),
-    lastSessionDate: new Date()
+    lastSessionDate: now,
+    ...streakPrizeUpdate,
+    unlockedStickerIds: progress.unlockedStickerIds ?? []
   }, profileId);
 
   const isPerfectBrush = Math.round(session.cleaningPercentage) >= 100;
@@ -240,6 +289,54 @@ export async function unlockBuddy(buddy: UnlockedBuddy): Promise<void> {
       unlockedBuddies: [...progress.unlockedBuddies, buddy]
     }, profileId);
   }
+}
+
+/** Claim the pending 7-day streak prize: next streak sticker (ordered) and one random unclaimed creature tale. */
+export async function claimStreakPrize(): Promise<{
+  stickerId?: string;
+  creatureStoryId?: string;
+} | null> {
+  const profileId = getCurrentProfileId();
+  if (!profileId) {
+    throw new Error('No profile selected');
+  }
+  const progress = await getUserProgress(profileId);
+  if (!progress.streakPrizePending) {
+    return null;
+  }
+  const unlocked = progress.unlockedStickerIds ?? [];
+  const storyUnlocked = progress.unlockedCreatureStoryIds ?? [];
+  const nextStickerId = getNextStreakPrizeStickerId(unlocked);
+  const nextStoryId = pickRandomUnlockedStoryId(storyUnlocked);
+  const todayStr = formatLocalDateString(new Date());
+  const baseUpdate = {
+    streakPrizePending: false,
+    streakPrizeStampCount: 0,
+    lastStreakStampLocalDate: todayStr
+  };
+
+  if (nextStickerId) {
+    const updates: Partial<UserProgress> = {
+      ...baseUpdate,
+      unlockedStickerIds: [...unlocked, nextStickerId]
+    };
+    if (nextStoryId) {
+      updates.unlockedCreatureStoryIds = [...storyUnlocked, nextStoryId];
+    }
+    await updateUserProgress(updates, profileId);
+    return { stickerId: nextStickerId, creatureStoryId: nextStoryId ?? undefined };
+  }
+
+  if (nextStoryId) {
+    await updateUserProgress({
+      ...baseUpdate,
+      unlockedCreatureStoryIds: [...storyUnlocked, nextStoryId]
+    }, profileId);
+    return { creatureStoryId: nextStoryId };
+  }
+
+  await updateUserProgress(baseUpdate, profileId);
+  return null;
 }
 
 export async function setSelectedBuddy(buddyId: string | undefined): Promise<void> {
@@ -283,7 +380,12 @@ export async function migrateDefaultUser(): Promise<void> {
       lastSessionDate: oldProgress.lastSessionDate,
       capturedCreatures: oldProgress.capturedCreatures,
       unlockedBuddies: oldProgress.unlockedBuddies,
-      selectedBuddyId: oldProgress.selectedBuddyId
+      selectedBuddyId: oldProgress.selectedBuddyId,
+      streakPrizeStampCount: oldProgress.streakPrizeStampCount ?? 0,
+      streakPrizePending: oldProgress.streakPrizePending ?? false,
+      lastStreakStampLocalDate: oldProgress.lastStreakStampLocalDate,
+      unlockedStickerIds: oldProgress.unlockedStickerIds ?? [],
+      unlockedCreatureStoryIds: oldProgress.unlockedCreatureStoryIds ?? []
     }, profile.id);
     
     setCurrentProfileId(profile.id);

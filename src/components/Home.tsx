@@ -2,6 +2,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { useTitleTheme, playSoundEffect } from '../hooks/useAudio';
 import { ALL_BUDDIES } from '../data/buddies';
 import { hasBrushedToday } from '../utils/date';
+import { StreakStampCard } from './StreakStampCard';
+import { StreakPrizeModal } from './StreakPrizeModal';
 import type { UserProgress, UserProfile, UnlockedBuddy } from '../types';
 
 const TOOTH_CLICKS_TO_FLY = 7;
@@ -14,10 +16,12 @@ interface HomeProps {
   onViewSettings: () => void;
   onSwitchProfile: () => void;
   onUnlockSecretBuddy?: (buddy: UnlockedBuddy) => Promise<void>;
+  onStreakPrizeClaimed?: () => void | Promise<void>;
 }
 
-export function Home({ userProgress, currentProfile, onStartBrushing, onViewCollection, onViewSettings, onSwitchProfile, onUnlockSecretBuddy }: HomeProps) {
+export function Home({ userProgress, currentProfile, onStartBrushing, onViewCollection, onViewSettings, onSwitchProfile, onUnlockSecretBuddy, onStreakPrizeClaimed }: HomeProps) {
   const titleTheme = useTitleTheme();
+  const [prizeModalOpen, setPrizeModalOpen] = useState(false);
   const [toothClicks, setToothClicks] = useState(0);
   const [toothOffset, setToothOffset] = useState({ x: 0, y: 0 });
   const [toothFlying, setToothFlying] = useState(false);
@@ -59,6 +63,17 @@ export function Home({ userProgress, currentProfile, onStartBrushing, onViewColl
   }, [toothClicks, toothFlying, toothFlown, toothBuddy, hasToothBuddy, onUnlockSecretBuddy]);
 
   return (
+    <>
+      {prizeModalOpen && (
+        <StreakPrizeModal
+          unlockedStickerIds={userProgress.unlockedStickerIds ?? []}
+          unlockedCreatureStoryIds={userProgress.unlockedCreatureStoryIds ?? []}
+          onClose={() => setPrizeModalOpen(false)}
+          onClaimed={async () => {
+            await onStreakPrizeClaimed?.();
+          }}
+        />
+      )}
     <div className="flex flex-col items-center justify-between h-full p-6 text-center">
       <div className="w-full flex justify-between items-center">
         <button
@@ -118,6 +133,11 @@ export function Home({ userProgress, currentProfile, onStartBrushing, onViewColl
             You already brushed today — your streak is counted for this day.
           </p>
         )}
+
+        <StreakStampCard
+          userProgress={userProgress}
+          onOpenPrize={() => setPrizeModalOpen(true)}
+        />
         
         <div className="flex gap-4 mt-4 text-lg">
           <div
@@ -160,5 +180,6 @@ export function Home({ userProgress, currentProfile, onStartBrushing, onViewColl
         </button>
       </div>
     </div>
+    </>
   );
 }

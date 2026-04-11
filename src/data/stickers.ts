@@ -66,7 +66,43 @@ export const ALL_STICKERS: Sticker[] = [
   { id: 's3-moon', name: 'Moon', imageUrl: '🌙', category: 'creatures' },
   { id: 's3-comet', name: 'Comet', imageUrl: '✨', category: 'creatures' },
   { id: 's3-train', name: 'Ghost Train', imageUrl: '🚂', category: 'creatures' },
+
+  // 7-day streak prizes (unlock one per completed streak cycle, in order)
+  { id: 'streak-1', name: 'Sparkle Seal', imageUrl: '🏅', category: 'streak', streakReward: true },
+  { id: 'streak-2', name: 'Rainbow Ribbon', imageUrl: '🎀', category: 'streak', streakReward: true },
+  { id: 'streak-3', name: 'Lucky Clover', imageUrl: '🍀', category: 'streak', streakReward: true },
+  { id: 'streak-4', name: 'Diamond Sparkle', imageUrl: '💠', category: 'streak', streakReward: true },
+  { id: 'streak-5', name: 'Star Medal', imageUrl: '🥇', category: 'streak', streakReward: true },
+  { id: 'streak-6', name: 'Trophy Tooth', imageUrl: '🏆', category: 'streak', streakReward: true },
+  { id: 'streak-7', name: 'Shooting Sparkle', imageUrl: '🌠', category: 'streak', streakReward: true },
 ];
+
+/** Order in which streak prizes are granted (repeat after all unlocked — then random remaining). */
+export const STREAK_PRIZE_STICKER_IDS: string[] = [
+  'streak-1',
+  'streak-2',
+  'streak-3',
+  'streak-4',
+  'streak-5',
+  'streak-6',
+  'streak-7',
+];
+
+export function isStickerUnlockedForEditor(sticker: Sticker, unlockedStickerIds: string[]): boolean {
+  if (!sticker.streakReward) return true;
+  return unlockedStickerIds.includes(sticker.id);
+}
+
+export function getStickersForPhotoEditor(unlockedStickerIds: string[]): Sticker[] {
+  return ALL_STICKERS.filter(s => isStickerUnlockedForEditor(s, unlockedStickerIds));
+}
+
+export function getNextStreakPrizeStickerId(unlockedStickerIds: string[]): string | null {
+  for (const id of STREAK_PRIZE_STICKER_IDS) {
+    if (!unlockedStickerIds.includes(id)) return id;
+  }
+  return null;
+}
 
 export const ALL_BACKGROUNDS: Background[] = [
   { id: 'none', name: 'Squeaky Clean', imageUrl: '' },

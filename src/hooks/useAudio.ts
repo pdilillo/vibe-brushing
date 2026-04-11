@@ -1891,3 +1891,93 @@ export function playSoundEffect(name: 'success' | 'fail' | 'brush' | 'sparkle' |
     console.warn('Sound playback failed:', e);
   }
 }
+
+/** Time from start of buildup to start of opening burst (matches playStreakPrizeBuildup pacing). */
+export const STREAK_PRIZE_BUILDUP_MS = 2650;
+
+/**
+ * Escalating pitch + faster rhythm (chip arpeggio) before the gift opens.
+ */
+export function playStreakPrizeBuildup(): void {
+  try {
+    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    if (ctx.state === 'suspended') void ctx.resume();
+
+    const freqs = [
+      NOTE_FREQS.C4, NOTE_FREQS.D4, NOTE_FREQS.E4, NOTE_FREQS.F4, NOTE_FREQS.G4,
+      NOTE_FREQS.A4, NOTE_FREQS.B4, NOTE_FREQS.C5, NOTE_FREQS.D5, NOTE_FREQS.E5,
+      NOTE_FREQS.F5, NOTE_FREQS.G5, NOTE_FREQS.A5, NOTE_FREQS.B5, NOTE_FREQS.C6,
+      NOTE_FREQS.D6, NOTE_FREQS.E6, NOTE_FREQS.F6
+    ];
+    let t = ctx.currentTime;
+    let gap = 0.28;
+    freqs.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+      const vol = Math.min(0.2, 0.07 + i * 0.008);
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(vol, t + 0.014);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+      osc.start(t);
+      osc.stop(t + 0.12);
+      gap = Math.max(0.042, gap * 0.87);
+      t += gap;
+    });
+  } catch (e) {
+    console.warn('Streak prize buildup sound failed:', e);
+  }
+}
+
+/**
+ * Short burst when the present “pops” open (after buildup).
+ */
+export function playStreakPrizeOpenBurst(): void {
+  try {
+    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    if (ctx.state === 'suspended') void ctx.resume();
+    const t0 = ctx.currentTime;
+    const arp = [NOTE_FREQS.G5, NOTE_FREQS.B5, NOTE_FREQS.D6, NOTE_FREQS.G6];
+    arp.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(freq, t0 + i * 0.035);
+      gain.gain.setValueAtTime(0, t0 + i * 0.035);
+      gain.gain.linearRampToValueAtTime(0.14, t0 + i * 0.035 + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.001, t0 + i * 0.035 + 0.12);
+      osc.start(t0 + i * 0.035);
+      osc.stop(t0 + i * 0.035 + 0.13);
+    });
+    const noiseLen = 0.07;
+    const bufferSize = Math.floor(ctx.sampleRate * noiseLen);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      if (i % 3 === 0) last = Math.random() > 0.5 ? 1 : -1;
+      data[i] = last * 0.4;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const ng = ctx.createGain();
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 2000;
+    noise.connect(hp);
+    hp.connect(ng);
+    ng.connect(ctx.destination);
+    ng.gain.setValueAtTime(0, t0 + 0.12);
+    ng.gain.linearRampToValueAtTime(0.08, t0 + 0.125);
+    ng.gain.exponentialRampToValueAtTime(0.001, t0 + 0.22);
+    noise.start(t0 + 0.12);
+    noise.stop(t0 + 0.22);
+  } catch (e) {
+    console.warn('Streak prize open burst failed:', e);
+  }
+}

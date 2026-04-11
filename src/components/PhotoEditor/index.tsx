@@ -1,11 +1,13 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
-import { ALL_BACKGROUNDS } from '../../data/stickers';
-import type { PlacedSticker, Background, CapturedCreature } from '../../types';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { ALL_BACKGROUNDS, getStickersForPhotoEditor } from '../../data/stickers';
+import type { PlacedSticker, Background, CapturedCreature, Sticker } from '../../types';
 import { v4 as uuidv4 } from 'uuid';
 
 interface PhotoEditorProps {
   photo: string;
   capturedCreatures: CapturedCreature[];
+  /** Sticker ids unlocked via streak prizes etc. */
+  unlockedStickerIds?: string[];
   onDone: () => void;
   onBack: () => void;
   debugMode?: boolean;
@@ -15,6 +17,8 @@ interface DraggableSticker extends PlacedSticker {
   id: string;
   imageUrl: string;
   creatureId: string;
+  /** Emoji sticker from sticker picker (not a creature PNG) */
+  isEmoji?: boolean;
 }
 
 const SIZE_PRESETS = [
@@ -30,12 +34,20 @@ const MAX_STICKERS = 30;
 const STICKER_OFFSET = 5;
 const STICKERS_PER_PAGE = 9;
 
-export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMode = false }: PhotoEditorProps) {
+export function PhotoEditor({
+  photo,
+  capturedCreatures,
+  unlockedStickerIds = [],
+  onDone,
+  onBack,
+  debugMode = false
+}: PhotoEditorProps) {
   const [placedStickers, setPlacedStickers] = useState<DraggableSticker[]>([]);
   const [selectedBackground, setSelectedBackground] = useState<Background>(ALL_BACKGROUNDS[0]);
   const [draggedSticker, setDraggedSticker] = useState<string | null>(null);
   const [selectedStickerId, setSelectedStickerId] = useState<string | null>(null);
   const [showStickerMenu, setShowStickerMenu] = useState(false);
+  const [stickerMenuTab, setStickerMenuTab] = useState<'creatures' | 'emoji'>('creatures');
   const [stickerPickerPage, setStickerPickerPage] = useState(0);
   const [lastAddedCreatureId, setLastAddedCreatureId] = useState<string | null>(null);
   const [bombProgress, setBombProgress] = useState(0);
@@ -51,6 +63,11 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
   const toastTimerRef = useRef<number | null>(null);
   
   const maxStickers = debugMode ? 999 : MAX_STICKERS;
+
+  const emojiStickersAvailable = useMemo(
+    () => getStickersForPhotoEditor(unlockedStickerIds),
+    [unlockedStickerIds]
+  );
 
   const handleAddCreatureSticker = useCallback((creature: CapturedCreature) => {
     if (placedStickers.length >= maxStickers) {
@@ -77,7 +94,31 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
     setLastAddedCreatureId(creature.id);
     setShowStickerMenu(false);
     setSelectedStickerId(newSticker.id);
-  }, [placedStickers.length]);
+  }, [placedStickers.length, maxStickers]);
+
+  const handleAddEmojiSticker = useCallback((sticker: Sticker) => {
+    if (placedStickers.length >= maxStickers) return;
+    const offsetIndex = placedStickers.length % 10;
+    const baseX = 50 + offsetIndex * STICKER_OFFSET - (5 * STICKER_OFFSET) / 2;
+    const baseY = 50 + offsetIndex * STICKER_OFFSET - (5 * STICKER_OFFSET) / 2;
+    const x = Math.max(10, Math.min(90, baseX));
+    const y = Math.max(10, Math.min(90, baseY));
+    const newSticker: DraggableSticker = {
+      id: uuidv4(),
+      stickerId: sticker.id,
+      creatureId: '',
+      imageUrl: sticker.imageUrl,
+      isEmoji: true,
+      x,
+      y,
+      scale: 1,
+      rotation: 0
+    };
+    setPlacedStickers(prev => [...prev, newSticker]);
+    setLastAddedCreatureId(null);
+    setShowStickerMenu(false);
+    setSelectedStickerId(newSticker.id);
+  }, [placedStickers.length, maxStickers]);
 
   const handleDragStart = useCallback((stickerId: string, e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
@@ -251,24 +292,33 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
       ctx.drawImage(img, 0, 0);
       
       const stickerSize = Math.min(canvas.width, canvas.height) / 4;
-      
-      const loadStickerImages = placedStickers.map(sticker => {
-        return new Promise<{ sticker: DraggableSticker; img: HTMLImageElement }>((resolve, reject) => {
-          const stickerImg = new Image();
-          stickerImg.crossOrigin = 'anonymous';
-          stickerImg.onload = () => resolve({ sticker, img: stickerImg });
-          stickerImg.onerror = reject;
-          stickerImg.src = sticker.imageUrl;
-        });
-      });
-      
-      const loadedStickers = await Promise.all(loadStickerImages);
-      
-      loadedStickers.forEach(({ sticker, img: stickerImg }) => {
+
+      for (const sticker of placedStickers) {
         const x = (sticker.x / 100) * canvas.width;
         const y = (sticker.y / 100) * canvas.height;
         const maxSize = stickerSize * sticker.scale;
-        // Preserve sticker aspect ratio (match editor's object-fit: contain behavior)
+
+        if (sticker.isEmoji) {
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate((sticker.rotation * Math.PI) / 180);
+          const fontSize = maxSize * 0.85;
+          ctx.font = `${fontSize}px serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(sticker.imageUrl, 0, 0);
+          ctx.restore();
+          continue;
+        }
+
+        const stickerImg = await new Promise<HTMLImageElement>((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = sticker.imageUrl;
+        });
+
         const natW = stickerImg.naturalWidth || 1;
         const natH = stickerImg.naturalHeight || 1;
         const scale = maxSize / Math.max(natW, natH);
@@ -280,7 +330,7 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
         ctx.rotate((sticker.rotation * Math.PI) / 180);
         ctx.drawImage(stickerImg, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
         ctx.restore();
-      });
+      }
       
       const dataUrl = canvas.toDataURL('image/png');
       
@@ -321,10 +371,10 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
     };
   }, [endBombHold]);
 
-  const stickerPickerTotalPages = Math.max(
-    1,
-    Math.ceil(capturedCreatures.length / STICKERS_PER_PAGE)
-  );
+  const stickerPickerListLength =
+    stickerMenuTab === 'creatures' ? capturedCreatures.length : emojiStickersAvailable.length;
+
+  const stickerPickerTotalPages = Math.max(1, Math.ceil(stickerPickerListLength / STICKERS_PER_PAGE));
 
   useEffect(() => {
     if (!showStickerMenu) return;
@@ -332,18 +382,26 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
     setStickerPickerPage(prev => (prev <= maxIdx ? prev : maxIdx));
   }, [showStickerMenu, stickerPickerTotalPages]);
 
+  useEffect(() => {
+    setStickerPickerPage(0);
+  }, [stickerMenuTab]);
+
   const stepStickerPickerPage = useCallback(
     (delta: number) => {
-      const total = Math.max(1, Math.ceil(capturedCreatures.length / STICKERS_PER_PAGE));
+      const total = Math.max(1, Math.ceil(stickerPickerListLength / STICKERS_PER_PAGE));
       setStickerPickerPage(prev => (prev + delta + total) % total);
     },
-    [capturedCreatures.length]
+    [stickerPickerListLength]
   );
 
   const lastAddedCreature = capturedCreatures.find(c => c.id === lastAddedCreatureId);
 
   const stickerPickerSliceStart = stickerPickerPage * STICKERS_PER_PAGE;
   const paginatedCreatures = capturedCreatures.slice(
+    stickerPickerSliceStart,
+    stickerPickerSliceStart + STICKERS_PER_PAGE
+  );
+  const paginatedEmojiStickers = emojiStickersAvailable.slice(
     stickerPickerSliceStart,
     stickerPickerSliceStart + STICKERS_PER_PAGE
   );
@@ -421,13 +479,28 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
                     transition: isDragging ? 'none' : 'transform 0.15s'
                   }}
                 >
-                  <img
-                    src={sticker.imageUrl}
-                    alt="Sticker"
-                    className="pointer-events-none"
-                    style={{ width: STICKER_BASE_SIZE, height: STICKER_BASE_SIZE, objectFit: 'contain' }}
-                    draggable={false}
-                  />
+                  {sticker.isEmoji ? (
+                    <span
+                      className="pointer-events-none flex items-center justify-center leading-none"
+                      style={{
+                        width: STICKER_BASE_SIZE,
+                        height: STICKER_BASE_SIZE,
+                        fontSize: STICKER_BASE_SIZE * 0.85
+                      }}
+                      role="img"
+                      aria-hidden
+                    >
+                      {sticker.imageUrl}
+                    </span>
+                  ) : (
+                    <img
+                      src={sticker.imageUrl}
+                      alt="Sticker"
+                      className="pointer-events-none"
+                      style={{ width: STICKER_BASE_SIZE, height: STICKER_BASE_SIZE, objectFit: 'contain' }}
+                      draggable={false}
+                    />
+                  )}
                 </div>
                 {isSelected && (
                   <button
@@ -454,7 +527,7 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
         {placedStickers.length === 0 && !showStickerMenu && !isExploding && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="bg-black/50 rounded-xl px-4 py-2 text-sm text-white text-center">
-              Tap the + button to add creature stickers!
+              Tap + to add creature or sparkle stickers!
             </div>
           </div>
         )}
@@ -686,8 +759,8 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
             className="bg-purple-900 rounded-2xl p-4 m-4 max-w-md max-h-[80vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xl font-bold">Add Creature Sticker</h2>
+            <div className="flex items-center justify-between mb-3 gap-2">
+              <h2 className="text-xl font-bold">Add sticker</h2>
               <button
                 onClick={() => setShowStickerMenu(false)}
                 className="w-8 h-8 bg-purple-800 rounded-full flex items-center justify-center text-purple-300 hover:bg-purple-700"
@@ -695,11 +768,41 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
                 ✕
               </button>
             </div>
-            
-            {capturedCreatures.length === 0 ? (
+
+            <div className="flex gap-2 mb-3">
+              <button
+                type="button"
+                onClick={() => setStickerMenuTab('creatures')}
+                className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                  stickerMenuTab === 'creatures'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-purple-800/50 text-purple-300'
+                }`}
+              >
+                Creatures
+              </button>
+              <button
+                type="button"
+                onClick={() => setStickerMenuTab('emoji')}
+                className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                  stickerMenuTab === 'emoji'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-purple-800/50 text-purple-300'
+                }`}
+              >
+                Sparkle stickers
+              </button>
+            </div>
+
+            {stickerMenuTab === 'creatures' && capturedCreatures.length === 0 ? (
               <div className="text-center py-8 text-purple-300">
                 <p>No creatures captured yet!</p>
                 <p className="text-sm mt-2">Complete brushing sessions to catch creatures.</p>
+              </div>
+            ) : stickerMenuTab === 'emoji' && emojiStickersAvailable.length === 0 ? (
+              <div className="text-center py-8 text-purple-300">
+                <p>No sparkle stickers yet.</p>
+                <p className="text-sm mt-2">Complete a 7-day streak to earn some!</p>
               </div>
             ) : (
               <>
@@ -727,22 +830,38 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
                   </button>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
-                  {paginatedCreatures.map(creature => (
-                    <button
-                      key={creature.id}
-                      onClick={() => handleAddCreatureSticker(creature)}
-                      className="aspect-square bg-purple-800/50 rounded-xl p-2 flex flex-col items-center justify-center gap-1 hover:bg-purple-700/50 active:scale-95 transition-all"
-                    >
-                      <img
-                        src={`${import.meta.env.BASE_URL}creatures/${creature.id}.png`}
-                        alt={creature.name}
-                        className="w-16 h-16 object-contain"
-                      />
-                      <span className="text-xs text-purple-200 truncate w-full text-center">
-                        {creature.name}
-                      </span>
-                    </button>
-                  ))}
+                  {stickerMenuTab === 'creatures'
+                    ? paginatedCreatures.map(creature => (
+                        <button
+                          key={creature.id}
+                          onClick={() => handleAddCreatureSticker(creature)}
+                          className="aspect-square bg-purple-800/50 rounded-xl p-2 flex flex-col items-center justify-center gap-1 hover:bg-purple-700/50 active:scale-95 transition-all"
+                        >
+                          <img
+                            src={`${import.meta.env.BASE_URL}creatures/${creature.id}.png`}
+                            alt={creature.name}
+                            className="w-16 h-16 object-contain"
+                          />
+                          <span className="text-xs text-purple-200 truncate w-full text-center">
+                            {creature.name}
+                          </span>
+                        </button>
+                      ))
+                    : paginatedEmojiStickers.map(sticker => (
+                        <button
+                          key={sticker.id}
+                          type="button"
+                          onClick={() => handleAddEmojiSticker(sticker)}
+                          className="aspect-square bg-purple-800/50 rounded-xl p-2 flex flex-col items-center justify-center gap-1 hover:bg-purple-700/50 active:scale-95 transition-all"
+                        >
+                          <span className="text-4xl leading-none" aria-hidden>
+                            {sticker.imageUrl}
+                          </span>
+                          <span className="text-xs text-purple-200 truncate w-full text-center">
+                            {sticker.name}
+                          </span>
+                        </button>
+                      ))}
                 </div>
               </>
             )}
