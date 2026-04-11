@@ -28,6 +28,7 @@ const STICKER_BASE_SIZE = 80;
 const BOMB_HOLD_DURATION = 2000;
 const MAX_STICKERS = 30;
 const STICKER_OFFSET = 5;
+const STICKERS_PER_PAGE = 9;
 
 export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMode = false }: PhotoEditorProps) {
   const [placedStickers, setPlacedStickers] = useState<DraggableSticker[]>([]);
@@ -35,6 +36,7 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
   const [draggedSticker, setDraggedSticker] = useState<string | null>(null);
   const [selectedStickerId, setSelectedStickerId] = useState<string | null>(null);
   const [showStickerMenu, setShowStickerMenu] = useState(false);
+  const [stickerPickerPage, setStickerPickerPage] = useState(0);
   const [lastAddedCreatureId, setLastAddedCreatureId] = useState<string | null>(null);
   const [bombProgress, setBombProgress] = useState(0);
   const [isBombHolding, setIsBombHolding] = useState(false);
@@ -319,7 +321,32 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
     };
   }, [endBombHold]);
 
+  const stickerPickerTotalPages = Math.max(
+    1,
+    Math.ceil(capturedCreatures.length / STICKERS_PER_PAGE)
+  );
+
+  useEffect(() => {
+    if (!showStickerMenu) return;
+    const maxIdx = stickerPickerTotalPages - 1;
+    setStickerPickerPage(prev => (prev <= maxIdx ? prev : maxIdx));
+  }, [showStickerMenu, stickerPickerTotalPages]);
+
+  const stepStickerPickerPage = useCallback(
+    (delta: number) => {
+      const total = Math.max(1, Math.ceil(capturedCreatures.length / STICKERS_PER_PAGE));
+      setStickerPickerPage(prev => (prev + delta + total) % total);
+    },
+    [capturedCreatures.length]
+  );
+
   const lastAddedCreature = capturedCreatures.find(c => c.id === lastAddedCreatureId);
+
+  const stickerPickerSliceStart = stickerPickerPage * STICKERS_PER_PAGE;
+  const paginatedCreatures = capturedCreatures.slice(
+    stickerPickerSliceStart,
+    stickerPickerSliceStart + STICKERS_PER_PAGE
+  );
 
   return (
     <div className="flex flex-col h-full">
@@ -656,10 +683,10 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
           onClick={() => setShowStickerMenu(false)}
         >
           <div 
-            className="bg-purple-900 rounded-2xl p-4 m-4 max-w-md max-h-[80vh] overflow-auto"
+            className="bg-purple-900 rounded-2xl p-4 m-4 max-w-md max-h-[80vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3">
               <h2 className="text-xl font-bold">Add Creature Sticker</h2>
               <button
                 onClick={() => setShowStickerMenu(false)}
@@ -675,24 +702,49 @@ export function PhotoEditor({ photo, capturedCreatures, onDone, onBack, debugMod
                 <p className="text-sm mt-2">Complete brushing sessions to catch creatures.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-3 gap-3">
-                {capturedCreatures.map(creature => (
+              <>
+                <div className="flex items-center justify-center gap-2 mb-3">
                   <button
-                    key={creature.id}
-                    onClick={() => handleAddCreatureSticker(creature)}
-                    className="aspect-square bg-purple-800/50 rounded-xl p-2 flex flex-col items-center justify-center gap-1 hover:bg-purple-700/50 active:scale-95 transition-all"
+                    type="button"
+                    onClick={() => stepStickerPickerPage(-1)}
+                    disabled={stickerPickerTotalPages <= 1}
+                    className="min-w-[2.5rem] py-2 px-3 rounded-xl font-semibold text-purple-100 bg-purple-800 hover:bg-purple-700 active:scale-95 transition-all disabled:opacity-40 disabled:pointer-events-none"
+                    aria-label="Previous sticker page"
                   >
-                    <img
-                      src={`${import.meta.env.BASE_URL}creatures/${creature.id}.png`}
-                      alt={creature.name}
-                      className="w-16 h-16 object-contain"
-                    />
-                    <span className="text-xs text-purple-200 truncate w-full text-center">
-                      {creature.name}
-                    </span>
+                    ←
                   </button>
-                ))}
-              </div>
+                  <span className="text-sm text-purple-200 tabular-nums min-w-[5.5rem] text-center">
+                    {stickerPickerPage + 1} / {stickerPickerTotalPages}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => stepStickerPickerPage(1)}
+                    disabled={stickerPickerTotalPages <= 1}
+                    className="min-w-[2.5rem] py-2 px-3 rounded-xl font-semibold text-purple-100 bg-purple-800 hover:bg-purple-700 active:scale-95 transition-all disabled:opacity-40 disabled:pointer-events-none"
+                    aria-label="Next sticker page"
+                  >
+                    →
+                  </button>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  {paginatedCreatures.map(creature => (
+                    <button
+                      key={creature.id}
+                      onClick={() => handleAddCreatureSticker(creature)}
+                      className="aspect-square bg-purple-800/50 rounded-xl p-2 flex flex-col items-center justify-center gap-1 hover:bg-purple-700/50 active:scale-95 transition-all"
+                    >
+                      <img
+                        src={`${import.meta.env.BASE_URL}creatures/${creature.id}.png`}
+                        alt={creature.name}
+                        className="w-16 h-16 object-contain"
+                      />
+                      <span className="text-xs text-purple-200 truncate w-full text-center">
+                        {creature.name}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>
