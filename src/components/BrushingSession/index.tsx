@@ -66,8 +66,6 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
     }
   }, [registerVideoElement]);
   
-  const [debugMode, setDebugModeState] = useState(false);
-  
   const { 
     zoneProgress, 
     motionResults, 
@@ -77,8 +75,6 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
     reset: resetMotionProgress,
     isMotionReady,
     setFaceRegion,
-    setDebugMode,
-    getDebugInfo
   } = useMotionDetection({ targetCleaningTime: 25 });
   const { facePosition, startTracking, stopTracking } = useFaceTracking();
   
@@ -182,14 +178,6 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
     
     return captureFrameWithBuddy(buddyOverlay);
   }, [selectedBuddy, captureFrameWithBuddy]);
-
-  const toggleDebugMode = useCallback(() => {
-    setDebugModeState(prev => {
-      const newValue = !prev;
-      setDebugMode(newValue);
-      return newValue;
-    });
-  }, [setDebugMode]);
 
   // Countdown only runs after motion detection has primed (video playing + at least one frame processed).
   useEffect(() => {
@@ -320,13 +308,6 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
     setPauseReason('');
   }, []);
 
-  const handleManualCapture = useCallback(async () => {
-    const frame = await capturePhotoWithBuddy();
-    if (frame) {
-      setPhotos(prev => [...prev, frame]);
-    }
-  }, [capturePhotoWithBuddy]);
-
   const handleCancel = useCallback(() => {
     music.stop();
     stopCamera();
@@ -396,34 +377,49 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
             onVideoReady={handleVideoReady}
             onContainerSize={handleContainerSize}
             activityScore={motionResults.reduce((sum, r) => sum + r.motionLevel, 0) / Math.max(motionResults.length, 1)}
-            debugMode={debugMode}
-            getDebugInfo={getDebugInfo}
           />
 
           {/* Countdown overlay: camera mounts underneath so motion can prime before GO */}
           {phase === 'countdown' && (
-            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
-              <div className="text-center px-4">
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-gradient-to-b from-black/70 via-black/55 to-black/70 backdrop-blur-md px-5">
+              <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-white/5 px-6 py-8 shadow-2xl text-center">
                 {!isMotionReady ? (
                   <>
-                    <div className="text-4xl mb-4 animate-pulse">📷</div>
-                    <div className="text-xl font-semibold text-white drop-shadow">Preparing motion detection…</div>
-                    <div className="text-sm text-white/70 mt-2">Keep the camera visible</div>
+                    <div className="text-5xl mb-5" aria-hidden>📷</div>
+                    <h2 className="text-2xl font-bold text-white tracking-tight">Almost ready</h2>
+                    <p className="text-white/75 mt-2 text-base leading-snug">
+                      We&apos;re lining up the camera so we can see you brush. Stay where we can see you!
+                    </p>
+                    <div className="mt-6 flex justify-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-white/40 animate-pulse" />
+                      <span className="w-2 h-2 rounded-full bg-white/40 animate-pulse [animation-delay:150ms]" />
+                      <span className="w-2 h-2 rounded-full bg-white/40 animate-pulse [animation-delay:300ms]" />
+                    </div>
                   </>
                 ) : (
                   <>
-                    <div className="text-6xl font-bold text-white animate-bounce-gentle drop-shadow-lg">
+                    <p className="text-sm font-semibold uppercase tracking-widest text-cyan-200/90">Starting in</p>
+                    <div
+                      key={countdown}
+                      className="mt-4 text-7xl sm:text-8xl font-black text-white tabular-nums drop-shadow-[0_4px_24px_rgba(0,0,0,0.45)] animate-bounce-gentle"
+                    >
                       {countdown > 0 ? countdown : 'GO!'}
                     </div>
-                    <div className="text-xl text-white/80 mt-4 drop-shadow">Get ready to brush!</div>
+                    <p className="text-lg text-white/85 mt-4 font-medium">Grab your toothbrush — here we go!</p>
                     {creature && (
-                      <div className="mt-6">
-                        <div className="text-lg text-white/70">Today&apos;s creature:</div>
-                        <div className={`text-2xl font-bold ${
-                          creature.rarity === 'mythic' ? 'text-orange-400 animate-pulse' :
-                          creature.rarity === 'legendary' ? 'text-yellow-400 animate-pulse' :
-                          creature.rarity === 'rare' ? 'text-purple-400' : 'text-white'
-                        }`}>
+                      <div className="mt-6 rounded-2xl bg-black/25 border border-white/10 px-4 py-3">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-white/50">Mystery buddy</div>
+                        <div
+                          className={`mt-1 text-xl font-bold ${
+                            creature.rarity === 'mythic'
+                              ? 'text-orange-300'
+                              : creature.rarity === 'legendary'
+                                ? 'text-amber-300'
+                                : creature.rarity === 'rare'
+                                  ? 'text-violet-300'
+                                  : 'text-white'
+                          }`}
+                        >
                           {creature.name}
                         </div>
                       </div>
@@ -431,42 +427,23 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
                   </>
                 )}
               </div>
-              <button
-                onClick={handleCancel}
-                className="mt-8 px-6 py-2 text-white/80 bg-black/40 rounded-xl backdrop-blur-sm"
-              >
-                Cancel
-              </button>
             </div>
           )}
           
-          <div className="absolute top-2 left-2 right-2 flex justify-between items-start pointer-events-auto z-20">
+          <div
+            className={`absolute top-2 left-2 right-2 flex justify-between items-start pointer-events-auto ${
+              phase === 'countdown' ? 'z-40' : 'z-20'
+            }`}
+          >
             <button
               onClick={handleCancel}
               className="px-3 py-1.5 text-sm text-white/80 bg-black/50 rounded-xl backdrop-blur-sm pointer-events-auto"
+              type="button"
             >
               ✕
             </button>
             {phase === 'brushing' && (
-            <Timer timeRemaining={timeRemaining} totalTime={sessionDuration} />
-            )}
-            {phase === 'brushing' && (
-            <div className="flex gap-1">
-              <button
-                onClick={toggleDebugMode}
-                className={`px-2 py-1.5 text-sm rounded-xl active:scale-95 backdrop-blur-sm pointer-events-auto ${
-                  debugMode ? 'text-yellow-400 bg-yellow-900/80' : 'text-white/60 bg-black/50'
-                }`}
-              >
-                🔧
-              </button>
-              <button
-                onClick={handleManualCapture}
-                className="px-2 py-1.5 text-sm text-white bg-pink-600/80 rounded-xl active:scale-95 backdrop-blur-sm pointer-events-auto"
-              >
-                📸
-              </button>
-            </div>
+              <Timer timeRemaining={timeRemaining} totalTime={sessionDuration} />
             )}
           </div>
         </div>
