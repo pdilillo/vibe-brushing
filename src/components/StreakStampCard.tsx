@@ -26,14 +26,14 @@ export function StreakStampCard({ userProgress, onOpenPrize }: StreakStampCardPr
         <h2 className="text-sm font-bold text-purple-100 uppercase tracking-wide">7-day sparkle streak</h2>
         <span className="text-xs text-purple-300">Brush once per day</span>
       </div>
-      <div className="flex justify-center gap-1.5 sm:gap-2 flex-wrap pb-4">
+      <div className="flex flex-nowrap justify-center gap-0.5 sm:gap-1 pb-4">
         {Array.from({ length: 7 }, (_, i) => {
           const filled = i < filledSlots;
           const isToday = showTodayMarker && i === todaySlotIndex;
           return (
             <div
               key={i}
-              className={`relative flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl border-2 text-lg sm:text-xl transition-all ${
+              className={`relative flex h-8 w-8 shrink-0 sm:h-9 sm:w-9 items-center justify-center rounded-lg border-2 text-base sm:text-lg transition-all ${
                 filled
                   ? 'border-amber-400/80 bg-gradient-to-br from-amber-500/30 to-orange-600/20 shadow-[0_0_12px_rgba(251,191,36,0.35)]'
                   : isToday

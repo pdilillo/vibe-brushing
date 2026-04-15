@@ -128,12 +128,6 @@ export function Home({ userProgress, currentProfile, onStartBrushing, onViewColl
           Make your teeth sparkle and catch amazing creatures!
         </p>
 
-        {streakDoneToday && (
-          <p className="text-sm text-emerald-300/95 font-medium max-w-sm -mt-2">
-            You already brushed today — your streak is counted for this day.
-          </p>
-        )}
-
         <StreakStampCard
           userProgress={userProgress}
           onOpenPrize={() => setPrizeModalOpen(true)}
