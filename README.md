@@ -56,6 +56,10 @@ npm run deploy
 - Dexie.js (IndexedDB)
 - Vite PWA Plugin
 
+## Developer documentation
+
+Maintainer guides (architecture, camera/motion, persistence, creatures, deploy, and more) live in **[docs/](./docs/README.md)**.
+
 ## Project Structure
 
 ```
