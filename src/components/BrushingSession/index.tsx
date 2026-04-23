@@ -23,7 +23,6 @@ interface BrushingSessionProps {
     region: Region;
     creature: Creature | null;
   }) => void;
-  onCancel: () => void;
 }
 
 const NO_MOTION_PAUSE_THRESHOLD = 3000;
@@ -34,7 +33,7 @@ function getPhotoIntervals(duration: number): number[] {
   return [45, 90, 135];
 }
 
-export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete, onCancel }: BrushingSessionProps) {
+export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete }: BrushingSessionProps) {
   const sessionDuration = useMemo(() => getSessionDurationSeconds(), []);
   const photoIntervals = useMemo(() => getPhotoIntervals(sessionDuration), [sessionDuration]);
   
@@ -43,6 +42,7 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
   const [timeRemaining, setTimeRemaining] = useState(sessionDuration);
   const [photos, setPhotos] = useState<string[]>([]);
   const [pauseReason, setPauseReason] = useState<string>('');
+  const [pauseSource, setPauseSource] = useState<'manual' | 'motion' | null>(null);
   
   const [region] = useState<Region>(() => getRandomRegion());
   const [creature, setCreature] = useState<Creature | null>(null);
@@ -167,6 +167,7 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
       const timeSinceMotion = Date.now() - lastMotionTime.current;
       
       if (timeSinceMotion > NO_MOTION_PAUSE_THRESHOLD) {
+        setPauseSource('motion');
         setPauseReason("Can't see you brushing! Move closer to the camera.");
         setPhase('paused');
       }
@@ -329,19 +330,55 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
     lastMotionTime.current = Date.now();
     setPhase('brushing');
     setPauseReason('');
+    setPauseSource(null);
   }, []);
 
-  const handleCancel = useCallback(() => {
-    music.stop();
-    stopCamera();
-    onCancel();
-  }, [stopCamera, onCancel, music]);
+  const handleManualPause = useCallback(() => {
+    setPauseSource('manual');
+    setPauseReason('');
+    setPhase('paused');
+  }, []);
 
   const activeZones = motionResults
     .filter(r => r.hasMotion)
     .map(r => r.zoneId);
 
   if (phase === 'paused') {
+    if (pauseSource === 'manual') {
+      return (
+        <div className="relative flex flex-col items-center justify-center h-full p-6 overflow-hidden">
+          <div className="absolute inset-0">
+            <RegionBackground region={region} />
+          </div>
+          <div
+            className="absolute inset-0 z-[5] bg-black/50 backdrop-blur-sm"
+            aria-hidden
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="manual-pause-title"
+            className="relative z-10 w-full max-w-sm rounded-3xl border border-white/15 bg-zinc-900/95 px-6 py-8 shadow-2xl text-center"
+          >
+            <div className="text-5xl mb-4" aria-hidden>
+              ⏸️
+            </div>
+            <h1 id="manual-pause-title" className="text-2xl font-bold text-white mb-2">
+              Paused
+            </h1>
+            <p className="text-white/75 text-base mb-6">Tap OK when you&apos;re ready to keep brushing.</p>
+            <button
+              onClick={handleResume}
+              type="button"
+              className="w-full py-3.5 text-lg font-semibold text-white bg-gradient-to-r from-cyan-600 to-blue-600 rounded-2xl shadow-lg active:scale-95 transition-transform"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="relative flex flex-col items-center justify-center h-full p-6 overflow-hidden">
         <div className="absolute inset-0">
@@ -373,14 +410,7 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
             onClick={handleResume}
             className="w-full max-w-xs py-4 text-xl font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg active:scale-95 transition-transform mb-3"
           >
-            I'm Ready! ▶️
-          </button>
-          
-          <button
-            onClick={handleCancel}
-            className="w-full max-w-xs py-3 text-lg text-white/80 bg-black/30 rounded-xl backdrop-blur-sm"
-          >
-            Stop Session
+            I&apos;m Ready! ▶️
           </button>
         </div>
       </div>
@@ -459,17 +489,19 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
               phase === 'countdown' ? 'z-40' : 'z-20'
             }`}
           >
-            <button
-              onClick={handleCancel}
-              className="absolute left-0 top-0 z-10 px-3 py-1.5 text-sm text-white/80 bg-black/50 rounded-xl backdrop-blur-sm pointer-events-auto"
-              type="button"
-            >
-              ✕
-            </button>
             {phase === 'brushing' && (
-              <div className="flex justify-center w-full pointer-events-auto">
-                <Timer timeRemaining={timeRemaining} totalTime={sessionDuration} />
-              </div>
+              <>
+                <button
+                  onClick={handleManualPause}
+                  className="absolute left-0 top-0 z-10 px-3 py-1.5 text-sm text-white/90 font-medium bg-black/50 rounded-xl backdrop-blur-sm pointer-events-auto"
+                  type="button"
+                >
+                  Pause
+                </button>
+                <div className="flex justify-center w-full pointer-events-auto">
+                  <Timer timeRemaining={timeRemaining} totalTime={sessionDuration} />
+                </div>
+              </>
             )}
           </div>
         </div>

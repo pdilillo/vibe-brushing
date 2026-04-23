@@ -236,7 +236,6 @@ function App() {
           selectedBuddy={selectedBuddy}
           capturedCreatureIds={userProgress.capturedCreatures.map(c => c.id)}
           onComplete={handleBrushingComplete}
-          onCancel={handleGoHome}
         />
       )}
       
