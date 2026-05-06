@@ -180,21 +180,21 @@ export const ALL_BUDDIES: Buddy[] = [
   {
     id: 'angler-visor',
     name: 'Angler Visor',
-    imageUrl: `${base}creatures/hat-prism-visor.png`,
+    imageUrl: `${base}creatures/buddy-angler-visor.png`,
     unlockCondition: 'series',
     unlockSeries: 4
   },
   {
     id: 'titan-lure',
     name: 'Titan Lure Helm',
-    imageUrl: `${base}creatures/hat-fossil-helmet.png`,
+    imageUrl: `${base}creatures/buddy-titan-lure-helm.png`,
     unlockCondition: 'series',
     unlockSeries: 4
   },
   {
     id: 'abyss-captain',
     name: 'Abyss Captain',
-    imageUrl: `${base}creatures/hat-pirate.png`,
+    imageUrl: `${base}creatures/buddy-abyss-captain.png`,
     unlockCondition: 'series',
     unlockSeries: 4
   },
@@ -203,21 +203,21 @@ export const ALL_BUDDIES: Buddy[] = [
   {
     id: 'deck-rigger',
     name: 'Deck Rigger',
-    imageUrl: `${base}creatures/hat-cowboy.png`,
+    imageUrl: `${base}creatures/buddy-deck-rigger.png`,
     unlockCondition: 'sessions',
     unlockThreshold: 140
   },
   {
     id: 'storm-angler',
     name: 'Storm Angler',
-    imageUrl: `${base}creatures/hat-wizard.png`,
+    imageUrl: `${base}creatures/buddy-storm-angler.png`,
     unlockCondition: 'streak',
     unlockThreshold: 45
   },
   {
     id: 'deep-seeker',
     name: 'Deep Seeker',
-    imageUrl: `${base}creatures/buddy-fire-frog.png`,
+    imageUrl: `${base}creatures/buddy-deep-seeker.png`,
     unlockCondition: 'creature',
     unlockThreshold: 90
   },
