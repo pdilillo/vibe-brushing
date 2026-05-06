@@ -330,6 +330,7 @@ const AVAILABLE_CREATURES = [
   // Coastal Legendary
   's4-leviathan-rig',
   's4-admiral-abyss',
+  's4-steel-megalodon',
   // Lava Common
   's4-slag-hyena',
   's4-blast-iguana',

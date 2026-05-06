@@ -321,7 +321,7 @@ export const SERIES_4_CREATURES: Creature[] = [
     weight: 14500,
     series: 4,
   },
-  // Legendary (2)
+  // Legendary (3)
   {
     id: 's4-leviathan-rig',
     name: 'Riggathor',
@@ -344,6 +344,18 @@ export const SERIES_4_CREATURES: Creature[] = [
     monsterType: 'legendary-abyss-lord',
     height: 1650,
     weight: 42000,
+    series: 4,
+  },
+  {
+    id: 's4-steel-megalodon',
+    name: 'Ferrodoom',
+    region: 'coastal',
+    rarity: 'legendary',
+    description: 'The ancient apex predator reborn as a warship-class killing machine. Its titanium jaws have shattered submarine hulls and its cracked armor vents superheated steam with every strike.',
+    robotParts: ['warship-hull', 'titanium-jaw-array', 'heat-vent-maw', 'targeting-sensors', 'carbon-blade-fins'],
+    monsterType: 'legendary-mecha-megalodon',
+    height: 3400,
+    weight: 98000,
     series: 4,
   },
 
