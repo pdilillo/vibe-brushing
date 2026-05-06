@@ -57,7 +57,8 @@ export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete
   const containerSizeRef = useRef({ width: 0, height: 0 });
   
   const creatureRarity = creature?.rarity || 'common';
-  const music = useRegionMusic(region, creatureRarity);
+  const creatureSeries = creature?.series ?? 1;
+  const music = useRegionMusic(region, creatureRarity, creatureSeries);
   
   const setPauseVideoRef = useCallback((el: HTMLVideoElement | null) => {
     pauseVideoRef.current = el;

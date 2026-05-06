@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect, useState } from 'react';
-import type { Region } from '../types';
+import type { Region, CreatureSeries } from '../types';
 
 type CreatureRarity = 'common' | 'rare' | 'legendary' | 'mythic';
 
@@ -751,6 +751,154 @@ const MYTHIC_MUSIC: RegionMusicConfig[] = [
   },
 ];
 
+const SERIES_4_MUSIC: Record<Region, RegionMusicConfig[]> = {
+  grassland: [
+    {
+      tempo: { calm: 122, excited: 156 },
+      melodyCalm: [
+        [NOTE_FREQS.E4, NOTE_FREQS.G4, NOTE_FREQS.B4, NOTE_FREQS.D5, NOTE_FREQS.B4, NOTE_FREQS.G4, NOTE_FREQS.E4, NOTE_FREQS.D4],
+        [NOTE_FREQS.D4, NOTE_FREQS['F#4'], NOTE_FREQS.A4, NOTE_FREQS.C5, NOTE_FREQS.A4, NOTE_FREQS['F#4'], NOTE_FREQS.D4, NOTE_FREQS.C4],
+      ],
+      melodyExcited: [
+        [NOTE_FREQS.E5, NOTE_FREQS.G5, NOTE_FREQS.B5, NOTE_FREQS.D6, NOTE_FREQS.B5, NOTE_FREQS.G5, NOTE_FREQS.E5, NOTE_FREQS.D5],
+        [NOTE_FREQS.D5, NOTE_FREQS['F#5'], NOTE_FREQS.A5, NOTE_FREQS.C6, NOTE_FREQS.A5, NOTE_FREQS['F#5'], NOTE_FREQS.D5, NOTE_FREQS.C5],
+      ],
+      bassCalm: [[NOTE_FREQS.E2, NOTE_FREQS.E2, NOTE_FREQS.B2, 0, NOTE_FREQS.D2, NOTE_FREQS.D2, NOTE_FREQS.A2, 0]],
+      bassExcited: [[NOTE_FREQS.E2, NOTE_FREQS.E2, NOTE_FREQS.E2, NOTE_FREQS.B2, NOTE_FREQS.D2, NOTE_FREQS.D2, NOTE_FREQS.A2, NOTE_FREQS.B2]],
+      arpCalm: [[0, 3, 7, 10, 12, 10, 7, 3]],
+      arpExcited: [[0, 3, 7, 10, 12, 15, 19, 15, 12, 10, 7, 3]],
+      pulseWidth: 0.2,
+      drumStyle: 'punchy',
+      melodyWave: 'sawtooth',
+      bassWave: 'square',
+      arpWave: 'square',
+      vibratoRate: 6,
+      vibratoDepth: 0.002,
+      filterFreq: 4600,
+      filterType: 'lowpass',
+      attackTime: 0.004,
+      releaseTime: 0.18,
+      arpSpeed: 0.8,
+    },
+  ],
+  coastal: [
+    {
+      tempo: { calm: 116, excited: 150 },
+      melodyCalm: [
+        [NOTE_FREQS.A4, NOTE_FREQS.B4, NOTE_FREQS.D5, NOTE_FREQS.E5, NOTE_FREQS.D5, NOTE_FREQS.B4, NOTE_FREQS.A4, NOTE_FREQS.E4],
+        [NOTE_FREQS['F#4'], NOTE_FREQS.A4, NOTE_FREQS.B4, NOTE_FREQS.D5, NOTE_FREQS.B4, NOTE_FREQS.A4, NOTE_FREQS['F#4'], NOTE_FREQS.E4],
+      ],
+      melodyExcited: [
+        [NOTE_FREQS.A5, NOTE_FREQS.B5, NOTE_FREQS.D6, NOTE_FREQS.E6, NOTE_FREQS.D6, NOTE_FREQS.B5, NOTE_FREQS.A5, NOTE_FREQS.E5],
+        [NOTE_FREQS['F#5'], NOTE_FREQS.A5, NOTE_FREQS.B5, NOTE_FREQS.D6, NOTE_FREQS.B5, NOTE_FREQS.A5, NOTE_FREQS['F#5'], NOTE_FREQS.E5],
+      ],
+      bassCalm: [[NOTE_FREQS.A2, 0, NOTE_FREQS.E3, 0, NOTE_FREQS.D3, 0, NOTE_FREQS.E3, 0]],
+      bassExcited: [[NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.E3, NOTE_FREQS.E3, NOTE_FREQS.D3, NOTE_FREQS.D3, NOTE_FREQS.E3, NOTE_FREQS.E3]],
+      arpCalm: [[0, 4, 7, 11, 14, 11, 7, 4]],
+      arpExcited: [[0, 4, 7, 11, 14, 18, 14, 11, 7, 4]],
+      pulseWidth: 0.25,
+      drumStyle: 'electronic',
+      melodyWave: 'triangle',
+      bassWave: 'sawtooth',
+      arpWave: 'triangle',
+      vibratoRate: 5,
+      vibratoDepth: 0.003,
+      filterFreq: 4200,
+      filterType: 'lowpass',
+      attackTime: 0.01,
+      releaseTime: 0.22,
+      arpSpeed: 0.95,
+    },
+  ],
+  lava: [
+    {
+      tempo: { calm: 152, excited: 188 },
+      melodyCalm: [
+        [NOTE_FREQS.C4, NOTE_FREQS['Eb4'], NOTE_FREQS.G4, NOTE_FREQS.Bb4, NOTE_FREQS.G4, NOTE_FREQS['Eb4'], NOTE_FREQS.C4, NOTE_FREQS.Bb3],
+        [NOTE_FREQS.D4, NOTE_FREQS.F4, NOTE_FREQS.A4, NOTE_FREQS.C5, NOTE_FREQS.A4, NOTE_FREQS.F4, NOTE_FREQS.D4, NOTE_FREQS.C4],
+      ],
+      melodyExcited: [
+        [NOTE_FREQS.C5, NOTE_FREQS['Eb5'], NOTE_FREQS.G5, NOTE_FREQS.Bb5, NOTE_FREQS.G5, NOTE_FREQS['Eb5'], NOTE_FREQS.C5, NOTE_FREQS.Bb4],
+        [NOTE_FREQS.D5, NOTE_FREQS.F5, NOTE_FREQS.A5, NOTE_FREQS.C6, NOTE_FREQS.A5, NOTE_FREQS.F5, NOTE_FREQS.D5, NOTE_FREQS.C5],
+      ],
+      bassCalm: [[NOTE_FREQS.C2, NOTE_FREQS.C2, NOTE_FREQS.G2, NOTE_FREQS.G2, NOTE_FREQS['Bb2'], NOTE_FREQS['Bb2'], NOTE_FREQS.F2, NOTE_FREQS.F2]],
+      bassExcited: [[NOTE_FREQS.C2, NOTE_FREQS.C2, NOTE_FREQS.C2, NOTE_FREQS.G2, NOTE_FREQS.Bb2, NOTE_FREQS.Bb2, NOTE_FREQS.F2, NOTE_FREQS.G2]],
+      arpCalm: [[0, 3, 7, 10, 12, 10, 7, 3]],
+      arpExcited: [[0, 3, 7, 10, 12, 15, 17, 15, 12, 10, 7, 3]],
+      pulseWidth: 0.1,
+      drumStyle: 'heavy',
+      melodyWave: 'sawtooth',
+      bassWave: 'sawtooth',
+      arpWave: 'sawtooth',
+      vibratoRate: 7,
+      vibratoDepth: 0.0015,
+      filterFreq: 5600,
+      filterType: 'lowpass',
+      attackTime: 0.001,
+      releaseTime: 0.1,
+      arpSpeed: 0.55,
+    },
+  ],
+  city: [
+    {
+      tempo: { calm: 130, excited: 164 },
+      melodyCalm: [
+        [NOTE_FREQS.B4, NOTE_FREQS.D5, NOTE_FREQS['F#5'], NOTE_FREQS.A5, NOTE_FREQS['F#5'], NOTE_FREQS.D5, NOTE_FREQS.B4, NOTE_FREQS.A4],
+        [NOTE_FREQS.A4, NOTE_FREQS.C5, NOTE_FREQS.E5, NOTE_FREQS.G5, NOTE_FREQS.E5, NOTE_FREQS.C5, NOTE_FREQS.A4, NOTE_FREQS.G4],
+      ],
+      melodyExcited: [
+        [NOTE_FREQS.B5, NOTE_FREQS.D6, NOTE_FREQS['F#6'], NOTE_FREQS.A6, NOTE_FREQS['F#6'], NOTE_FREQS.D6, NOTE_FREQS.B5, NOTE_FREQS.A5],
+        [NOTE_FREQS.A5, NOTE_FREQS.C6, NOTE_FREQS.E6, NOTE_FREQS.G6, NOTE_FREQS.E6, NOTE_FREQS.C6, NOTE_FREQS.A5, NOTE_FREQS.G5],
+      ],
+      bassCalm: [[NOTE_FREQS.B2, 0, NOTE_FREQS['F#3'], 0, NOTE_FREQS.A2, 0, NOTE_FREQS.E3, 0]],
+      bassExcited: [[NOTE_FREQS.B2, NOTE_FREQS.B2, NOTE_FREQS['F#3'], NOTE_FREQS['F#3'], NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.E3, NOTE_FREQS['F#3']]],
+      arpCalm: [[0, 4, 7, 11, 14, 11, 7, 4]],
+      arpExcited: [[0, 4, 7, 11, 14, 18, 21, 18, 14, 11, 7, 4]],
+      pulseWidth: 0.3,
+      drumStyle: 'electronic',
+      melodyWave: 'sawtooth',
+      bassWave: 'square',
+      arpWave: 'square',
+      vibratoRate: 9,
+      vibratoDepth: 0.001,
+      filterFreq: 6200,
+      filterType: 'lowpass',
+      attackTime: 0.001,
+      releaseTime: 0.16,
+      arpSpeed: 0.5,
+    },
+  ],
+  sky: [
+    {
+      tempo: { calm: 104, excited: 138 },
+      melodyCalm: [
+        [NOTE_FREQS.G4, NOTE_FREQS.B4, NOTE_FREQS.D5, NOTE_FREQS.G5, NOTE_FREQS.D5, NOTE_FREQS.B4, NOTE_FREQS.G4, NOTE_FREQS.D4],
+        [NOTE_FREQS.A4, NOTE_FREQS.C5, NOTE_FREQS.E5, NOTE_FREQS.A5, NOTE_FREQS.E5, NOTE_FREQS.C5, NOTE_FREQS.A4, NOTE_FREQS.E4],
+      ],
+      melodyExcited: [
+        [NOTE_FREQS.G5, NOTE_FREQS.B5, NOTE_FREQS.D6, NOTE_FREQS.G6, NOTE_FREQS.D6, NOTE_FREQS.B5, NOTE_FREQS.G5, NOTE_FREQS.D5],
+        [NOTE_FREQS.A5, NOTE_FREQS.C6, NOTE_FREQS.E6, NOTE_FREQS.A6, NOTE_FREQS.E6, NOTE_FREQS.C6, NOTE_FREQS.A5, NOTE_FREQS.E5],
+      ],
+      bassCalm: [[NOTE_FREQS.G2, 0, NOTE_FREQS.D3, 0, NOTE_FREQS.A2, 0, NOTE_FREQS.E3, 0]],
+      bassExcited: [[NOTE_FREQS.G2, NOTE_FREQS.G2, NOTE_FREQS.D3, NOTE_FREQS.D3, NOTE_FREQS.A2, NOTE_FREQS.A2, NOTE_FREQS.E3, NOTE_FREQS.D3]],
+      arpCalm: [[0, 4, 7, 12, 16, 12, 7, 4]],
+      arpExcited: [[0, 4, 7, 12, 16, 19, 24, 19, 16, 12, 7, 4]],
+      pulseWidth: 0.24,
+      drumStyle: 'punchy',
+      melodyWave: 'triangle',
+      bassWave: 'triangle',
+      arpWave: 'sine',
+      vibratoRate: 4,
+      vibratoDepth: 0.005,
+      filterFreq: 3600,
+      filterType: 'lowpass',
+      attackTime: 0.012,
+      releaseTime: 0.28,
+      arpSpeed: 1.0,
+    },
+  ],
+};
+
 const TITLE_THEME_CONFIG: RegionMusicConfig = {
   tempo: { calm: 95, excited: 95 },
   melodyCalm: [
@@ -784,30 +932,38 @@ const TITLE_THEME_CONFIG: RegionMusicConfig = {
   arpSpeed: 1.15,
 };
 
-function getMusicConfig(region: Region, rarity: CreatureRarity): RegionMusicConfig {
+function getMusicConfig(region: Region, rarity: CreatureRarity, series: CreatureSeries = 1): RegionMusicConfig {
   let musicArray: RegionMusicConfig[];
-  
-  switch (rarity) {
-    case 'mythic':
-      musicArray = MYTHIC_MUSIC;
-      break;
-    case 'legendary':
-      musicArray = LEGENDARY_MUSIC;
-      break;
-    case 'rare':
-      musicArray = RARE_MUSIC[region];
-      break;
-    case 'common':
-    default:
-      musicArray = REGION_MUSIC[region];
-      break;
+
+  if (series === 4) {
+    musicArray = SERIES_4_MUSIC[region];
+  } else {
+    switch (rarity) {
+      case 'mythic':
+        musicArray = MYTHIC_MUSIC;
+        break;
+      case 'legendary':
+        musicArray = LEGENDARY_MUSIC;
+        break;
+      case 'rare':
+        musicArray = RARE_MUSIC[region];
+        break;
+      case 'common':
+      default:
+        musicArray = REGION_MUSIC[region];
+        break;
+    }
   }
   
   const randomIndex = Math.floor(Math.random() * musicArray.length);
   return musicArray[randomIndex];
 }
 
-export function useRegionMusic(region: Region, rarity: CreatureRarity = 'common'): BrushingMusicController {
+export function useRegionMusic(
+  region: Region,
+  rarity: CreatureRarity = 'common',
+  series: CreatureSeries = 1
+): BrushingMusicController {
   const audioContextRef = useRef<AudioContext | null>(null);
   const isPlayingRef = useRef(false);
   const intensityRef = useRef<'calm' | 'excited'>('calm');
@@ -818,14 +974,14 @@ export function useRegionMusic(region: Region, rarity: CreatureRarity = 'common'
   const barCountRef = useRef(0);
   const regionRef = useRef(region);
   const rarityRef = useRef(rarity);
-  const musicConfigRef = useRef<RegionMusicConfig>(getMusicConfig(region, rarity));
+  const musicConfigRef = useRef<RegionMusicConfig>(getMusicConfig(region, rarity, series));
   const wasPlayingBeforeHideRef = useRef(false);
 
   useEffect(() => {
     regionRef.current = region;
     rarityRef.current = rarity;
-    musicConfigRef.current = getMusicConfig(region, rarity);
-  }, [region, rarity]);
+    musicConfigRef.current = getMusicConfig(region, rarity, series);
+  }, [region, rarity, series]);
 
   const getAudioContext = useCallback(() => {
     if (!audioContextRef.current) {

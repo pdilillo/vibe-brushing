@@ -176,6 +176,52 @@ export const ALL_BUDDIES: Buddy[] = [
     unlockSeries: 3
   },
 
+  // ==================== SERIES 4 COMPLETION BUDDIES ====================
+  {
+    id: 'angler-visor',
+    name: 'Angler Visor',
+    imageUrl: `${base}creatures/hat-prism-visor.png`,
+    unlockCondition: 'series',
+    unlockSeries: 4
+  },
+  {
+    id: 'titan-lure',
+    name: 'Titan Lure Helm',
+    imageUrl: `${base}creatures/hat-fossil-helmet.png`,
+    unlockCondition: 'series',
+    unlockSeries: 4
+  },
+  {
+    id: 'abyss-captain',
+    name: 'Abyss Captain',
+    imageUrl: `${base}creatures/hat-pirate.png`,
+    unlockCondition: 'series',
+    unlockSeries: 4
+  },
+
+  // ==================== SERIES 4 PROGRESSION BUDDIES ====================
+  {
+    id: 'deck-rigger',
+    name: 'Deck Rigger',
+    imageUrl: `${base}creatures/hat-cowboy.png`,
+    unlockCondition: 'sessions',
+    unlockThreshold: 140
+  },
+  {
+    id: 'storm-angler',
+    name: 'Storm Angler',
+    imageUrl: `${base}creatures/hat-wizard.png`,
+    unlockCondition: 'streak',
+    unlockThreshold: 45
+  },
+  {
+    id: 'deep-seeker',
+    name: 'Deep Seeker',
+    imageUrl: `${base}creatures/buddy-fire-frog.png`,
+    unlockCondition: 'creature',
+    unlockThreshold: 90
+  },
+
   // ==================== PERFECT SESSION BUDDIES ====================
   {
     id: 'fire-frog',

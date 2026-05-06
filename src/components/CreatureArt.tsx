@@ -294,6 +294,93 @@ const AVAILABLE_CREATURES = [
   // ==================== MYTHIC ====================
   'binsters-claymars',
   'leaf-kong',
+
+  // ==================== SERIES 4 ====================
+  // Grassland Common
+  's4-iron-wolf',
+  's4-razor-stag',
+  's4-bunker-boar',
+  's4-servo-mantis',
+  's4-drill-badger',
+  's4-rail-hornet',
+  's4-carbon-rhino',
+  's4-plate-viper',
+  // Grassland Rare
+  's4-warden-basilisk',
+  's4-siege-minotaur',
+  's4-titan-treant',
+  's4-thorn-mech',
+  // Grassland Legendary
+  's4-iron-sovereign',
+  's4-verdant-dreadnought',
+  // Coastal Common
+  's4-harpoon-pike',
+  's4-anchor-maw',
+  's4-reef-shredder',
+  's4-keel-crab',
+  's4-torpedo-eel',
+  's4-rivet-seahorse',
+  's4-abyss-lobster',
+  's4-iron-barracuda',
+  // Coastal Rare
+  's4-trench-kraken',
+  's4-dockbreaker-whale',
+  's4-cyclone-ray',
+  's4-abyss-juggernaut',
+  // Coastal Legendary
+  's4-leviathan-rig',
+  's4-admiral-abyss',
+  // Lava Common
+  's4-slag-hyena',
+  's4-blast-iguana',
+  's4-cinder-scorpion',
+  's4-forge-ram',
+  's4-smelt-cobra',
+  's4-rivet-gorger',
+  's4-lava-bulldog',
+  's4-crucible-hawk',
+  // Lava Rare
+  's4-volcanic-behemoth',
+  's4-ash-colossus',
+  's4-pyro-wyvern',
+  's4-core-sabertooth',
+  // Lava Legendary
+  's4-hellforge-monarch',
+  's4-mantle-executor',
+  // City Common
+  's4-siren-jackal',
+  's4-concrete-mauler',
+  's4-subway-jaw',
+  's4-grid-panther',
+  's4-drone-vulture',
+  's4-rust-gator',
+  's4-cyber-bull',
+  's4-shock-baboon',
+  // City Rare
+  's4-overpass-goliath',
+  's4-raid-chimera',
+  's4-metal-cerberus',
+  's4-barricade-giant',
+  // City Legendary
+  's4-urban-overlord',
+  's4-neon-warlord',
+  // Sky Common
+  's4-gale-raider',
+  's4-jet-harrier',
+  's4-steel-albatross',
+  's4-thunder-roc',
+  's4-gyro-hydra',
+  's4-rail-falcon',
+  's4-void-osprey',
+  's4-storm-jaguar',
+  // Sky Rare
+  's4-typhoon-drake',
+  's4-orbital-griffin',
+  's4-tempest-leviathan',
+  's4-sky-annihilator',
+  // Sky Legendary
+  's4-aether-dominator',
+  's4-celestial-destroyer',
 ];
 
 const POSSESSED_VARIANTS = [
