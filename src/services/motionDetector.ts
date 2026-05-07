@@ -1,7 +1,7 @@
 import type { MouthZone } from '../types';
 
 // Single default zone centered on face area (fallback when no face detected)
-const DEFAULT_ZONE: MouthZone = { id: 'faceZone', label: 'Face', x: 0.30, y: 0.25, w: 0.40, h: 0.50 };
+const DEFAULT_ZONE: MouthZone = { id: 'faceZone', label: 'Face', x: 0.20, y: 0.15, w: 0.60, h: 0.75 };
 
 // Export single zone array for external use
 export const MOUTH_ZONES: MouthZone[] = [DEFAULT_ZONE];
@@ -95,10 +95,9 @@ export class MotionDetector {
 
     const fc = this.smoothedFaceCenter;
     
-    // Single zone dimensions: covers the face area with some padding
-    // Zone is slightly larger than face to capture brushing motion around it
-    const zoneW = Math.max(0.30, Math.min(0.50, fc.w * 1.4));
-    const zoneH = Math.max(0.35, Math.min(0.55, fc.h * 1.2));
+    // Single zone dimensions: covers the face area with padding (~20% wider, taller)
+    const zoneW = Math.max(0.36, Math.min(0.60, fc.w * 1.68));
+    const zoneH = Math.max(0.55, Math.min(0.80, fc.h * 1.80));
     
     // Center zone on face
     const zoneX = fc.x - zoneW / 2;
@@ -158,10 +157,10 @@ export class MotionDetector {
       return y > 0.2;
     }
     
-    const brushX = face.x - face.w * 1.0;
-    const brushY = face.y - face.h * 0.1;
-    const brushW = face.w * 3.0;
-    const brushH = face.h * 2.5;
+    const brushX = face.x - face.w * 1.2;
+    const brushY = face.y - face.h * 0.2;
+    const brushW = face.w * 3.6;
+    const brushH = face.h * 3.5;
     
     return x >= brushX && x <= brushX + brushW &&
            y >= brushY && y <= brushY + brushH;
@@ -182,10 +181,10 @@ export class MotionDetector {
       };
     }
     
-    const brushX = face.x - face.w * 1.0;
-    const brushY = face.y - face.h * 0.1;
-    const brushW = face.w * 3.0;
-    const brushH = face.h * 2.5;
+    const brushX = face.x - face.w * 1.2;
+    const brushY = face.y - face.h * 0.2;
+    const brushW = face.w * 3.6;
+    const brushH = face.h * 3.5;
     
     return {
       x: Math.max(0, brushX * videoWidth),
