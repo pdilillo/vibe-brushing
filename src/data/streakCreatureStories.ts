@@ -7,10 +7,12 @@ export interface StreakCreatureStory {
 }
 
 /**
- * Seven creature ids from series 1–3 (diverse regions / seasons). Order here is pool membership only;
- * unlock order is random at claim time.
+ * Creature ids from series 1–3 plus a mythic finale (diverse regions / seasons). Order here is pool
+ * membership only; unlock order is random at claim time. The first seven are the original tales; the
+ * remaining "legend" tales keep the streak rewarding once the starter set is collected.
  */
 export const STREAK_STORY_POOL: string[] = [
+  // Original tales
   'gear-bunny',
   'turbo-turtle',
   's2-crystal-caterpillar',
@@ -18,6 +20,14 @@ export const STREAK_STORY_POOL: string[] = [
   's3-dino-beetle',
   'mecha-moth',
   'magma-core',
+  // Legend tales — unlocked after the starter tales as the streak keeps going
+  'natura-prime',
+  'ocean-emperor',
+  'celestial-phoenix',
+  's2-internet-spirit',
+  's2-aurora-whale',
+  's3-rex-supreme',
+  'binsters-claymars',
 ];
 
 export const STREAK_CREATURE_STORIES: Record<string, StreakCreatureStory> = {
@@ -41,6 +51,27 @@ export const STREAK_CREATURE_STORIES: Record<string, StreakCreatureStory> = {
   },
   'magma-core': {
     body: `Molite’s heart was never meant to be cozy—it was a furnace built for heroes. But Molite decided warmth was a better job than roaring. It wandered the lava fields handing out heat packs made of cooled lava glass, and the volcanoes learned to whisper instead of shout. The Sparkle Range says if you brush long enough, Molite will warm your toothbrush from three ridges away, just to say “I noticed you.”`,
+  },
+  'natura-prime': {
+    body: `Long after the first seven tales were told, the Sparkle Grasslands stirred awake a legend: Seedatron, grown from the very first seed wrapped around the very first circuit. It does not hurry, because forests taught it that the best things take seasons. When a tired sprout forgets how to grow, Seedatron presses one giant finger to the soil and hums the oldest song there is—part lullaby, part instruction manual. Kids who keep their streak alive swear they can feel that hum in their toothbrush, like roots cheering quietly underground.`,
+  },
+  'ocean-emperor': {
+    body: `Leviatron is half whale, half submarine, and entirely too polite to brag about either. It patrols the deepest trenches with a sonar crown that pings every lost thing back toward home—lost floaties, lost ships, lost confidence. The Sparkle Coast says it only surfaces for two reasons: a storm that needs calming, and a kid who kept a long, long streak. When it breaches, the spray spells “proud of you” in salt and starlight before the wave even lands.`,
+  },
+  'celestial-phoenix': {
+    body: `Solarnix is stitched from solar wind and the patient kind of starlight that takes ages to arrive. Most creatures glow; Solarnix collects glow and gives it back on cloudy days. It circles the highest reaches of the Sparkle Sky, dropping warm feathers that turn into sunrise wherever they land. Legend says a streak strong enough to wake Solarnix earns you one of those feathers—and that anyone who carries it will never, ever forget to smile.`,
+  },
+  's2-internet-spirit': {
+    body: `Webweaver is laughter that learned to travel at the speed of light. It lives in the hum between every screen, collecting the jokes people forgot to finish and the kind messages they were too shy to send. When a streak stretches long enough, Webweaver weaves all those little kindnesses into a single bright thread and ties it gently to your wrist. You can’t see it, but it tugs—just a little—every time you do something brave, like brushing the back teeth nobody else remembers.`,
+  },
+  's2-aurora-whale': {
+    body: `Borealisk swims through air thinner than water, painting the polar night in slow ribbons of green and violet. It is shy, so it only shows up where someone has been quietly consistent—coming back, night after night, doing the small good thing. The Sparkle Sky says Borealisk reads streaks the way other creatures read maps, and that the brightest auroras are simply Borealisk saying, to one specific kid, “I saw every single day. Well done.”`,
+  },
+  's3-rex-supreme': {
+    body: `Tyrannotron was supposed to be the scariest thing in the Sparkle Range, and for about a week it tried very hard to be. Then it met a streak—a real one, kept by someone smaller and far more stubborn than any dinosaur—and decided that showing up every day was more impressive than any roar. Now its plasma jaws are mostly used for grinning, and its giant footprints fill with rainwater that fossils love to splash in. It calls long streaks “the only kind of power worth stomping for.”`,
+  },
+  'binsters-claymars': {
+    body: `Binsters Claymars is the six-headed dragon of perfect dental hygiene, and it almost never appears. Each head guards a different corner of your smile, and together they only wake for the rarest thing in any world: a streak that simply would not quit. When all the other tales have been told and all the legends collected, Binsters unfurls its rainbow belly across the whole sky and says, in six voices at once, the thing every Sparkle creature has been trying to tell you all along—“You kept going. That’s the magic. That was always the magic.”`,
   },
 };
 

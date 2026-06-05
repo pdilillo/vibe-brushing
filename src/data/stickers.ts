@@ -75,9 +75,17 @@ export const ALL_STICKERS: Sticker[] = [
   { id: 'streak-5', name: 'Star Medal', imageUrl: '🥇', category: 'streak', streakReward: true },
   { id: 'streak-6', name: 'Trophy Tooth', imageUrl: '🏆', category: 'streak', streakReward: true },
   { id: 'streak-7', name: 'Shooting Sparkle', imageUrl: '🌠', category: 'streak', streakReward: true },
+  // Legend streak prizes — keep the streak rewarding after the first seven are earned
+  { id: 'streak-8', name: 'Galaxy Swirl', imageUrl: '🌌', category: 'streak', streakReward: true },
+  { id: 'streak-9', name: 'Cosmic Comet', imageUrl: '☄️', category: 'streak', streakReward: true },
+  { id: 'streak-10', name: 'Crown Jewel', imageUrl: '👑', category: 'streak', streakReward: true },
+  { id: 'streak-11', name: 'Magic Wand', imageUrl: '🪄', category: 'streak', streakReward: true },
+  { id: 'streak-12', name: 'Crystal Orb', imageUrl: '🔮', category: 'streak', streakReward: true },
+  { id: 'streak-13', name: 'Sparkle Unicorn', imageUrl: '🦄', category: 'streak', streakReward: true },
+  { id: 'streak-14', name: 'Golden Medal', imageUrl: '🎖️', category: 'streak', streakReward: true },
 ];
 
-/** Order in which streak prizes are granted (repeat after all unlocked — then random remaining). */
+/** Order in which streak prizes are granted, one per completed streak cycle. */
 export const STREAK_PRIZE_STICKER_IDS: string[] = [
   'streak-1',
   'streak-2',
@@ -86,6 +94,13 @@ export const STREAK_PRIZE_STICKER_IDS: string[] = [
   'streak-5',
   'streak-6',
   'streak-7',
+  'streak-8',
+  'streak-9',
+  'streak-10',
+  'streak-11',
+  'streak-12',
+  'streak-13',
+  'streak-14',
 ];
 
 export function isStickerUnlockedForEditor(sticker: Sticker, unlockedStickerIds: string[]): boolean {
