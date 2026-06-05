@@ -26,9 +26,10 @@ Never remove an upgrade block lightly; some users have old DB versions.
 | Key | Purpose |
 |-----|---------|
 | `sparkle-brush-current-profile` | Current profile id (see `getCurrentProfileId` / `setCurrentProfileId`) |
-| `sparkle-app-settings` | JSON for `AppSettings` (`sessionDurationSeconds`: 60 \| 90 \| 120) |
+| `sparkle-app-settings-{profileId}` | Per-profile JSON for `AppSettings` (`sessionDurationSeconds`: 60 \| 90 \| 120) |
+| `sparkle-app-settings` | Legacy global settings key (read as fallback only if a profile has no saved settings yet) |
 
-**Settings** live in `src/services/settings.ts` with merge defaults and try/catch around JSON parse.
+**Settings** live in `src/services/settings.ts`. Brushing duration is stored per profile so each user on the device can choose their own timer.
 
 ## Streaks and session save
 

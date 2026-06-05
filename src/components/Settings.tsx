@@ -6,6 +6,7 @@ import { version } from '../../package.json';
 const DEVELOPER_TOOLS_PASSWORD = 'sparkle4242';
 
 interface SettingsProps {
+  profileId: string;
   onBack: () => void;
   /** Prize opening animation demo (no progress saved). */
   onPrizeOpeningDemo?: () => void;
@@ -17,6 +18,7 @@ interface SettingsProps {
 }
 
 export function Settings({
+  profileId,
   onBack,
   onPrizeOpeningDemo,
   onSparkleTalesView,
@@ -24,7 +26,7 @@ export function Settings({
   onGraphicsDebug,
   onPhotoDebug
 }: SettingsProps) {
-  const [settings, setSettings] = useState<AppSettings>(getSettings);
+  const [settings, setSettings] = useState<AppSettings>(() => getSettings(profileId));
   /** Always starts locked; no persistence — enter password each time you open Settings. */
   const [devToolsUnlocked, setDevToolsUnlocked] = useState(false);
   const [devToolsPassword, setDevToolsPassword] = useState('');
@@ -35,8 +37,8 @@ export function Settings({
   const hasDeveloperToolsSection = hasDemoHandlers || hasDebugMenuHandlers;
 
   useEffect(() => {
-    saveSettings(settings);
-  }, [settings]);
+    setSettings(getSettings(profileId));
+  }, [profileId]);
 
   const handleDeveloperToolsUnlock = (e: FormEvent) => {
     e.preventDefault();
@@ -51,7 +53,9 @@ export function Settings({
   };
 
   const handleDurationChange = (seconds: 60 | 90 | 120) => {
-    setSettings(prev => ({ ...prev, sessionDurationSeconds: seconds }));
+    const next = { ...settings, sessionDurationSeconds: seconds };
+    setSettings(next);
+    saveSettings(profileId, next);
   };
 
   const durationOptions: { value: 60 | 90 | 120; label: string; description: string }[] = [

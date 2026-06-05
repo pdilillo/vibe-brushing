@@ -14,6 +14,7 @@ import { Timer } from './Timer';
 import type { Buddy, ZoneProgress as ZoneProgressType, Region, Creature } from '../../types';
 
 interface BrushingSessionProps {
+  profileId: string;
   selectedBuddy: Buddy | null;
   capturedCreatureIds: string[];
   onComplete: (results: {
@@ -33,8 +34,8 @@ function getPhotoIntervals(duration: number): number[] {
   return [45, 90, 135];
 }
 
-export function BrushingSession({ selectedBuddy, capturedCreatureIds, onComplete }: BrushingSessionProps) {
-  const sessionDuration = useMemo(() => getSessionDurationSeconds(), []);
+export function BrushingSession({ profileId, selectedBuddy, capturedCreatureIds, onComplete }: BrushingSessionProps) {
+  const sessionDuration = useMemo(() => getSessionDurationSeconds(profileId), [profileId]);
   const photoIntervals = useMemo(() => getPhotoIntervals(sessionDuration), [sessionDuration]);
   
   const [phase, setPhase] = useState<'countdown' | 'brushing' | 'paused' | 'complete'>('countdown');

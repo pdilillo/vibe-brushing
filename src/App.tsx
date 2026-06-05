@@ -207,6 +207,7 @@ function App() {
       
       {phase === 'settings' && (
         <Settings
+          profileId={currentProfile.id}
           onBack={handleGoHome}
           onPrizeOpeningDemo={handleStreakPrizeDebug}
           onSparkleTalesView={handleSparkleTalesDebug}
@@ -233,6 +234,7 @@ function App() {
       
       {phase === 'brushing' && (
         <BrushingSession
+          profileId={currentProfile.id}
           selectedBuddy={selectedBuddy}
           capturedCreatureIds={userProgress.capturedCreatures.map(c => c.id)}
           onComplete={handleBrushingComplete}
