@@ -382,6 +382,180 @@ const AVAILABLE_CREATURES = [
   // Sky Legendary
   's4-aether-dominator',
   's4-celestial-destroyer',
+
+  // ==================== SERIES 5 - Venom Eden ====================
+  // Grassland Common
+  's5-bloom-wolf',
+  's5-spore-rabbit',
+  's5-thorn-boar',
+  's5-vine-gecko',
+  's5-nettle-deer',
+  's5-fungal-bear',
+  's5-acid-fox',
+  's5-weed-turtle',
+  // Grassland Rare
+  's5-carnivore-treant',
+  's5-miasma-wolf',
+  's5-acid-rhino',
+  's5-blight-eagle',
+  // Grassland Legendary
+  's5-eden-sovereign',
+  's5-venom-colossus',
+  // Coastal Common
+  's5-kelp-eel',
+  's5-bloom-crab',
+  's5-venom-shark',
+  's5-jelly-beast',
+  's5-mangrove-turtle',
+  's5-algae-ray',
+  's5-spore-puffer',
+  's5-anemone-beast',
+  // Coastal Rare
+  's5-blight-whale',
+  's5-bloom-kraken',
+  's5-toxic-serpent',
+  's5-coral-giant',
+  // Coastal Legendary
+  's5-tide-sovereign',
+  's5-abyss-bloom',
+  // Lava Common
+  's5-magma-spore',
+  's5-ash-petal',
+  's5-fire-vine',
+  's5-slag-cap',
+  's5-ember-boar',
+  's5-toxic-salamander',
+  's5-blaze-cactus',
+  's5-lava-spore',
+  // Lava Rare
+  's5-volcano-bloom',
+  's5-inferno-treant',
+  's5-pyro-bloom',
+  's5-heat-bloom',
+  // Lava Legendary
+  's5-hellbloom-monarch',
+  's5-magma-sovereign',
+  // City Common
+  's5-sewer-vine',
+  's5-neon-spore',
+  's5-oxide-flower',
+  's5-concrete-creeper',
+  's5-smog-shroom',
+  's5-cable-vine',
+  's5-alley-bloom',
+  's5-pipe-spore',
+  // City Rare
+  's5-city-bloom',
+  's5-toxic-titan',
+  's5-smog-warden',
+  's5-neon-bloom',
+  // City Legendary
+  's5-urban-sovereign',
+  's5-metro-eden',
+  // Sky Common
+  's5-pollen-hawk',
+  's5-spore-eagle',
+  's5-acid-dove',
+  's5-vine-osprey',
+  's5-cloud-drake',
+  's5-sky-lily',
+  's5-petal-phoenix',
+  's5-miasma-bat',
+  // Sky Rare
+  's5-sky-bloom',
+  's5-storm-bloom',
+  's5-cloud-treant',
+  's5-pollen-leviathan',
+  // Sky Legendary
+  's5-sky-sovereign',
+  's5-aether-bloom',
+
+  // ==================== SERIES 6 - Starfall Genesis ====================
+  // Grassland Common
+  's6-star-wolf',
+  's6-comet-rabbit',
+  's6-nebula-boar',
+  's6-galaxy-gecko',
+  's6-nova-deer',
+  's6-stellar-bear',
+  's6-astral-fox',
+  's6-cosmic-turtle',
+  // Grassland Rare
+  's6-constellation-wolf',
+  's6-nebula-rhino',
+  's6-pulsar-treant',
+  's6-dark-matter-eagle',
+  // Grassland Legendary
+  's6-astral-sovereign',
+  's6-cosmic-colossus',
+  // Coastal Common
+  's6-star-eel',
+  's6-comet-crab',
+  's6-nova-shark',
+  's6-nebula-jelly',
+  's6-galaxy-turtle',
+  's6-pulsar-ray',
+  's6-stellar-puffer',
+  's6-astral-squid',
+  // Coastal Rare
+  's6-nebula-whale',
+  's6-cosmic-kraken',
+  's6-star-serpent',
+  's6-galaxy-giant',
+  // Coastal Legendary
+  's6-tide-sovereign',
+  's6-abyss-star',
+  // Lava Common
+  's6-star-lizard',
+  's6-nova-hawk',
+  's6-pulsar-salamander',
+  's6-solar-boar',
+  's6-stellar-serpent',
+  's6-cosmic-beetle',
+  's6-astral-scorpion',
+  's6-nebula-bull',
+  // Lava Rare
+  's6-solar-behemoth',
+  's6-nova-wyvern',
+  's6-pulsar-sabertooth',
+  's6-star-titan',
+  // Lava Legendary
+  's6-solar-monarch',
+  's6-nova-sovereign',
+  // City Common
+  's6-astral-jackal',
+  's6-cosmic-bull',
+  's6-nebula-panther',
+  's6-star-vulture',
+  's6-pulsar-gator',
+  's6-nova-baboon',
+  's6-stellar-hound',
+  's6-galaxy-rat',
+  // City Rare
+  's6-cosmic-goliath',
+  's6-nebula-chimera',
+  's6-star-cerberus',
+  's6-astral-giant',
+  // City Legendary
+  's6-cosmic-sovereign',
+  's6-nebula-warlord',
+  // Sky Common
+  's6-star-hawk',
+  's6-cosmic-eagle',
+  's6-nebula-osprey',
+  's6-pulsar-falcon',
+  's6-astral-hydra',
+  's6-nova-roc',
+  's6-galaxy-drake',
+  's6-stellar-jaguar',
+  // Sky Rare
+  's6-cosmic-drake',
+  's6-nebula-griffin',
+  's6-pulsar-leviathan',
+  's6-astral-annihilator',
+  // Sky Legendary
+  's6-star-dominator',
+  's6-cosmic-destroyer',
 ];
 
 const POSSESSED_VARIANTS = [

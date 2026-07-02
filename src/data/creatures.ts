@@ -1,5 +1,7 @@
 import type { Creature, Region, CreatureSeries } from '../types';
 import { SERIES_4_CREATURES } from './series4Creatures';
+import { SERIES_5_CREATURES } from './series5Creatures';
+import { SERIES_6_CREATURES } from './series6Creatures';
 
 export function getElementType(region: Region | 'all'): string {
   const mapping: Record<Region | 'all', string> = {
@@ -2631,6 +2633,8 @@ export const ALL_CREATURES: Creature[] = [
   ...SERIES_2_CREATURES,
   ...SERIES_3_CREATURES,
   ...SERIES_4_CREATURES,
+  ...SERIES_5_CREATURES,
+  ...SERIES_6_CREATURES,
   ...MYTHIC_CREATURES,
 ];
 
@@ -2661,6 +2665,14 @@ export function getUnlockedSeries(capturedIds: string[]): CreatureSeries[] {
 
   if (isSeriesComplete(3, capturedIds)) {
     unlockedSeries.push(4);
+  }
+
+  if (isSeriesComplete(4, capturedIds)) {
+    unlockedSeries.push(5);
+  }
+
+  if (isSeriesComplete(5, capturedIds)) {
+    unlockedSeries.push(6);
   }
   
   return unlockedSeries;
@@ -2699,7 +2711,9 @@ export function getRandomCreatureForScore(
   const allSeriesComplete = isSeriesComplete(1, capturedIds) && 
                             isSeriesComplete(2, capturedIds) && 
                             isSeriesComplete(3, capturedIds) &&
-                            isSeriesComplete(4, capturedIds);
+                            isSeriesComplete(4, capturedIds) &&
+                            isSeriesComplete(5, capturedIds) &&
+                            isSeriesComplete(6, capturedIds);
   const mythicAlreadyCaptured = mythicCreature && capturedIds.includes(mythicCreature.id);
   
   if (allSeriesComplete && !mythicAlreadyCaptured && score >= 95 && mythicCreature) {

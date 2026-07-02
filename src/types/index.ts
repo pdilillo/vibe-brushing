@@ -28,7 +28,7 @@ export interface RegionData {
   particles: string[];
 }
 
-export type CreatureSeries = 1 | 2 | 3 | 4;
+export type CreatureSeries = 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface Creature {
   id: string;

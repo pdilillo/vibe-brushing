@@ -20,6 +20,8 @@ const SERIES_INFO: Record<CreatureSeries, { name: string; subtitle: string; icon
   2: { name: 'Series 2', subtitle: 'Crystal Caverns', icon: '💎', color: 'from-cyan-500 to-emerald-500' },
   3: { name: 'Series 3', subtitle: 'Prehistoric Tech', icon: '🦖', color: 'from-orange-500 to-red-500' },
   4: { name: 'Series 4', subtitle: 'Iron Tide Protocol', icon: '🎣', color: 'from-slate-700 to-cyan-700' },
+  5: { name: 'Series 5', subtitle: 'Venom Eden', icon: '☣️', color: 'from-lime-600 to-purple-700' },
+  6: { name: 'Series 6', subtitle: 'Starfall Genesis', icon: '🌌', color: 'from-indigo-900 to-violet-500' },
 };
 
 export function Collection({
@@ -93,7 +95,7 @@ export function Collection({
       </div>
 
       <div className="flex gap-2 px-4 pt-3 pb-2 bg-purple-900/30">
-        {([1, 2, 3, 4] as CreatureSeries[]).map(series => {
+        {([1, 2, 3, 4, 5, 6] as CreatureSeries[]).map(series => {
           const info = SERIES_INFO[series];
           const isLocked = isSeriesLocked(series);
           const isActive = activeSeries === series;
