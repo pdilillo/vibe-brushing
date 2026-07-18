@@ -17,8 +17,10 @@ export function computeStreakPrizeAfterSession(
     UserProgress,
     'streakPrizeStampCount' | 'streakPrizePending' | 'lastStreakStampLocalDate' | 'lastSessionDate'
   >,
-  now: Date = new Date()
+  now: Date = new Date(),
+  options?: { streakFreezeEnabled?: boolean }
 ): StreakPrizeFields {
+  const streakFreezeActive = options?.streakFreezeEnabled ?? false;
   const todayStr = formatLocalDateString(now);
   const lastStamp = progress.lastStreakStampLocalDate;
   const count = progress.streakPrizeStampCount ?? 0;
@@ -52,7 +54,10 @@ export function computeStreakPrizeAfterSession(
   }
 
   const lastStampDate = new Date(lastStamp + 'T12:00:00');
-  const gap = calendarDaysBetween(lastStampDate, now);
+  let gap = calendarDaysBetween(lastStampDate, now);
+  if (gap > 1 && streakFreezeActive) {
+    gap = 1;
+  }
 
   if (gap === 1) {
     if (count >= 6) {

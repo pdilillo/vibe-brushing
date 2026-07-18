@@ -35,6 +35,7 @@ export function Home({ userProgress, currentProfile, onStartBrushing, onViewColl
   const hasToothBuddy = userProgress.unlockedBuddies.some(b => b.id === 'tooth-buddy');
   const toothBuddy = ALL_BUDDIES.find(b => b.id === 'tooth-buddy');
   const streakDoneToday = hasBrushedToday(userProgress.lastSessionDate);
+  const streakFreezeActive = userProgress.streakFreezeEnabled ?? false;
 
   const handleToothClick = useCallback(() => {
     if (toothFlying || toothFlown) return;
@@ -138,11 +139,16 @@ export function Home({ userProgress, currentProfile, onStartBrushing, onViewColl
             className={`rounded-xl px-4 py-2 transition-shadow ${
               streakDoneToday
                 ? 'bg-emerald-950/40 ring-2 ring-emerald-400/50 shadow-[0_0_20px_rgba(52,211,153,0.15)]'
-                : 'bg-purple-800/50'
+                : streakFreezeActive
+                  ? 'bg-cyan-950/40 ring-2 ring-cyan-400/50'
+                  : 'bg-purple-800/50'
             }`}
           >
             <div className="text-2xl font-bold text-yellow-400">{userProgress.currentStreak}</div>
             <div className="text-sm text-purple-300">Day Streak</div>
+            {streakFreezeActive && !streakDoneToday && (
+              <div className="text-xs font-semibold text-cyan-300 mt-1">🧊 Freeze active</div>
+            )}
             {streakDoneToday && (
               <div className="text-xs font-semibold text-emerald-300 mt-1">Done today ✓</div>
             )}

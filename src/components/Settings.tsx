@@ -1,9 +1,8 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { getSettings, saveSettings, type AppSettings } from '../services/settings';
+import { getUserProgress, setStreakFreezeEnabled } from '../services/database';
+import { PARENT_CONTROLS_PASSWORD } from '../constants/passwords';
 import { version } from '../../package.json';
-
-/** Password required to reveal Developer Tools (demos, graphics, buddy, photo debug). */
-const DEVELOPER_TOOLS_PASSWORD = 'sparkle4242';
 
 interface SettingsProps {
   profileId: string;
@@ -27,7 +26,11 @@ export function Settings({
   onPhotoDebug
 }: SettingsProps) {
   const [settings, setSettings] = useState<AppSettings>(() => getSettings(profileId));
+  const [streakFreezeEnabled, setStreakFreezeEnabledState] = useState(false);
   /** Always starts locked; no persistence — enter password each time you open Settings. */
+  const [parentControlsUnlocked, setParentControlsUnlocked] = useState(false);
+  const [parentControlsPassword, setParentControlsPassword] = useState('');
+  const [parentControlsPasswordError, setParentControlsPasswordError] = useState(false);
   const [devToolsUnlocked, setDevToolsUnlocked] = useState(false);
   const [devToolsPassword, setDevToolsPassword] = useState('');
   const [devToolsPasswordError, setDevToolsPasswordError] = useState(false);
@@ -38,11 +41,35 @@ export function Settings({
 
   useEffect(() => {
     setSettings(getSettings(profileId));
+    getUserProgress(profileId)
+      .then(progress => setStreakFreezeEnabledState(progress.streakFreezeEnabled ?? false))
+      .catch(err => console.error('Failed to load streak freeze state:', err));
   }, [profileId]);
+
+  const handleParentControlsUnlock = (e: FormEvent) => {
+    e.preventDefault();
+    const ok = parentControlsPassword.trim() === PARENT_CONTROLS_PASSWORD;
+    if (ok) {
+      setParentControlsUnlocked(true);
+      setParentControlsPassword('');
+      setParentControlsPasswordError(false);
+    } else {
+      setParentControlsPasswordError(true);
+    }
+  };
+
+  const handleStreakFreezeToggle = async (enabled: boolean) => {
+    try {
+      await setStreakFreezeEnabled(enabled, profileId);
+      setStreakFreezeEnabledState(enabled);
+    } catch (err) {
+      console.error('Failed to update streak freeze:', err);
+    }
+  };
 
   const handleDeveloperToolsUnlock = (e: FormEvent) => {
     e.preventDefault();
-    const ok = devToolsPassword.trim() === DEVELOPER_TOOLS_PASSWORD;
+    const ok = devToolsPassword.trim() === PARENT_CONTROLS_PASSWORD;
     if (ok) {
       setDevToolsUnlocked(true);
       setDevToolsPassword('');
@@ -128,6 +155,91 @@ export function Settings({
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="bg-purple-900/30 rounded-2xl p-4 mb-4">
+          <h2 className="text-lg font-bold mb-1">Parent controls</h2>
+          <p className="text-xs text-purple-400 mb-3">
+            Password required. Streak freeze keeps streaks alive through any number of missed days and turns off after the next completed brushing session.
+          </p>
+
+          {!parentControlsUnlocked && (
+            <form onSubmit={handleParentControlsUnlock} className="space-y-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <label htmlFor="parent-controls-password" className="sr-only">
+                  Parent controls password
+                </label>
+                <input
+                  id="parent-controls-password"
+                  type="password"
+                  autoComplete="off"
+                  value={parentControlsPassword}
+                  onChange={e => {
+                    setParentControlsPassword(e.target.value);
+                    if (parentControlsPasswordError) setParentControlsPasswordError(false);
+                  }}
+                  placeholder="Password"
+                  className="flex-1 px-3 py-2 rounded-xl bg-purple-950/80 border border-purple-600 text-purple-100 placeholder:text-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-purple-700 text-white font-medium hover:bg-purple-600 transition-colors"
+                >
+                  Unlock
+                </button>
+              </div>
+              {parentControlsPasswordError && (
+                <p className="text-xs text-red-400" role="alert">
+                  Incorrect password.
+                </p>
+              )}
+            </form>
+          )}
+
+          {parentControlsUnlocked && (
+            <>
+              <div className="flex justify-end mb-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setParentControlsUnlocked(false);
+                    setParentControlsPassword('');
+                    setParentControlsPasswordError(false);
+                  }}
+                  className="text-xs text-purple-500 hover:text-purple-300"
+                >
+                  Lock parent controls
+                </button>
+              </div>
+
+              <div className="p-4 rounded-xl bg-purple-800/50">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="font-bold flex items-center gap-2">
+                      <span>🧊</span>
+                      <span>Streak freeze</span>
+                    </div>
+                    <p className="text-xs text-purple-300 mt-1">
+                      {streakFreezeEnabled
+                        ? 'Active — streaks stay protected through missed days until the next completed session.'
+                        : 'Off — enable before time away to keep streaks from resetting.'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleStreakFreezeToggle(!streakFreezeEnabled)}
+                    className={`shrink-0 px-4 py-2 rounded-xl font-semibold transition-colors ${
+                      streakFreezeEnabled
+                        ? 'bg-amber-600 hover:bg-amber-500 text-white'
+                        : 'bg-purple-600 hover:bg-purple-500 text-white'
+                    }`}
+                  >
+                    {streakFreezeEnabled ? 'Disable' : 'Enable'}
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="bg-purple-900/30 rounded-2xl p-4 mb-4">
