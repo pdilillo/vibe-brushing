@@ -202,6 +202,10 @@ export async function getUserProgress(profileId?: string): Promise<UserProgress>
   return progress;
 }
 
+export async function setStreakFreezeEnabled(enabled: boolean, profileId?: string): Promise<void> {
+  await updateUserProgress({ streakFreezeEnabled: enabled }, profileId);
+}
+
 export async function updateUserProgress(updates: Partial<UserProgress>, profileId?: string): Promise<void> {
   const targetProfileId = profileId || getCurrentProfileId();
   if (!targetProfileId) {
@@ -225,6 +229,8 @@ export async function addSession(session: BrushingSession): Promise<void> {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
+  const streakFreezeActive = progress.streakFreezeEnabled ?? false;
+
   let newStreak = progress.currentStreak;
   if (progress.lastSessionDate) {
     const lastDate = new Date(progress.lastSessionDate);
@@ -232,6 +238,8 @@ export async function addSession(session: BrushingSession): Promise<void> {
     const dayDiff = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
     
     if (dayDiff === 1) {
+      newStreak += 1;
+    } else if (dayDiff > 1 && streakFreezeActive) {
       newStreak += 1;
     } else if (dayDiff > 1) {
       newStreak = 1;
@@ -241,7 +249,9 @@ export async function addSession(session: BrushingSession): Promise<void> {
   }
   
   const now = new Date();
-  const streakPrizeUpdate = computeStreakPrizeAfterSession(progress, now);
+  const streakPrizeUpdate = computeStreakPrizeAfterSession(progress, now, {
+    streakFreezeEnabled: streakFreezeActive,
+  });
 
   await updateUserProgress({
     totalSessions: progress.totalSessions + 1,
@@ -249,7 +259,8 @@ export async function addSession(session: BrushingSession): Promise<void> {
     longestStreak: Math.max(progress.longestStreak, newStreak),
     lastSessionDate: now,
     ...streakPrizeUpdate,
-    unlockedStickerIds: progress.unlockedStickerIds ?? []
+    unlockedStickerIds: progress.unlockedStickerIds ?? [],
+    ...(streakFreezeActive ? { streakFreezeEnabled: false } : {}),
   }, profileId);
 
   const isPerfectBrush = Math.round(session.cleaningPercentage) >= 100;

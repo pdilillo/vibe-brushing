@@ -104,6 +104,8 @@ export interface UserProgress {
   unlockedStickerIds?: string[];
   /** Creature ids whose streak tale has been unlocked (random order; pool in streakCreatureStories) */
   unlockedCreatureStoryIds?: string[];
+  /** When true, missed days won't break streaks until disabled or next completed session */
+  streakFreezeEnabled?: boolean;
 }
 
 export interface DecoratedPhoto {
