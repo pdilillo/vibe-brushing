@@ -83,6 +83,23 @@ export const ALL_STICKERS: Sticker[] = [
   { id: 'streak-12', name: 'Crystal Orb', imageUrl: '🔮', category: 'streak', streakReward: true },
   { id: 'streak-13', name: 'Sparkle Unicorn', imageUrl: '🦄', category: 'streak', streakReward: true },
   { id: 'streak-14', name: 'Golden Medal', imageUrl: '🎖️', category: 'streak', streakReward: true },
+  // Epic streak prizes — deeper into the long streak journey
+  { id: 'streak-15', name: 'Blossom Badge', imageUrl: '🌺', category: 'streak', streakReward: true },
+  { id: 'streak-16', name: 'Flutter Medal', imageUrl: '🦋', category: 'streak', streakReward: true },
+  { id: 'streak-17', name: 'Shield Star', imageUrl: '🛡️', category: 'streak', streakReward: true },
+  { id: 'streak-18', name: 'Sakura Spark', imageUrl: '🌸', category: 'streak', streakReward: true },
+  { id: 'streak-19', name: 'Dizzy Star', imageUrl: '💫', category: 'streak', streakReward: true },
+  { id: 'streak-20', name: 'Bullseye Badge', imageUrl: '🎯', category: 'streak', streakReward: true },
+  { id: 'streak-21', name: 'Sunflower Seal', imageUrl: '🌻', category: 'streak', streakReward: true },
+  { id: 'streak-22', name: 'Circus Crown', imageUrl: '🎪', category: 'streak', streakReward: true },
+  { id: 'streak-23', name: 'Candy Crown', imageUrl: '🍭', category: 'streak', streakReward: true },
+  { id: 'streak-24', name: 'Star Performer', imageUrl: '🎭', category: 'streak', streakReward: true },
+  { id: 'streak-25', name: 'Cupcake Crown', imageUrl: '🧁', category: 'streak', streakReward: true },
+  { id: 'streak-26', name: 'Moonbeam Medal', imageUrl: '🌙', category: 'streak', streakReward: true },
+  { id: 'streak-27', name: 'Fleur Sparkle', imageUrl: '⚜️', category: 'streak', streakReward: true },
+  { id: 'streak-28', name: 'Music Note Medal', imageUrl: '🎵', category: 'streak', streakReward: true },
+  { id: 'streak-29', name: 'Peacock Prize', imageUrl: '🦚', category: 'streak', streakReward: true },
+  { id: 'streak-30', name: 'Legend Leaf', imageUrl: '🍃', category: 'streak', streakReward: true },
 ];
 
 /** Order in which streak prizes are granted, one per completed streak cycle. */
@@ -101,6 +118,22 @@ export const STREAK_PRIZE_STICKER_IDS: string[] = [
   'streak-12',
   'streak-13',
   'streak-14',
+  'streak-15',
+  'streak-16',
+  'streak-17',
+  'streak-18',
+  'streak-19',
+  'streak-20',
+  'streak-21',
+  'streak-22',
+  'streak-23',
+  'streak-24',
+  'streak-25',
+  'streak-26',
+  'streak-27',
+  'streak-28',
+  'streak-29',
+  'streak-30',
 ];
 
 export function isStickerUnlockedForEditor(sticker: Sticker, unlockedStickerIds: string[]): boolean {

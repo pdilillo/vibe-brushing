@@ -7,9 +7,10 @@ export interface StreakCreatureStory {
 }
 
 /**
- * Creature ids from series 1–3 plus a mythic finale (diverse regions / seasons). Order here is pool
+ * Creature ids from series 1–4 plus mythic finales (diverse regions / seasons). Order here is pool
  * membership only; unlock order is random at claim time. The first seven are the original tales; the
- * remaining "legend" tales keep the streak rewarding once the starter set is collected.
+ * next seven are legend tales; the remaining epic tales (and Foliape as the final mythic) keep the
+ * streak rewarding through thirty completed cycles.
  */
 export const STREAK_STORY_POOL: string[] = [
   // Original tales
@@ -28,6 +29,23 @@ export const STREAK_STORY_POOL: string[] = [
   's2-aurora-whale',
   's3-rex-supreme',
   'binsters-claymars',
+  // Epic tales — unlocked as the streak journey continues toward thirty
+  'prism-fox',
+  'echo-owl',
+  'bloom-guardian',
+  'storm-ray',
+  'kraken-kit',
+  'tide-titan',
+  'volcano-drake',
+  'infernal-titan',
+  'neon-dragon',
+  'metro-mind',
+  'aurora-serpent',
+  'star-whale',
+  's2-crystal-guardian',
+  's2-deep-crystal',
+  's3-spirit-king',
+  'leaf-kong',
 ];
 
 export const STREAK_CREATURE_STORIES: Record<string, StreakCreatureStory> = {
@@ -72,6 +90,54 @@ export const STREAK_CREATURE_STORIES: Record<string, StreakCreatureStory> = {
   },
   'binsters-claymars': {
     body: `Binsters Claymars is the six-headed dragon of perfect dental hygiene, and it almost never appears. Each head guards a different corner of your smile, and together they only wake for the rarest thing in any world: a streak that simply would not quit. When all the other tales have been told and all the legends collected, Binsters unfurls its rainbow belly across the whole sky and says, in six voices at once, the thing every Sparkle creature has been trying to tell you all along—“You kept going. That’s the magic. That was always the magic.”`,
+  },
+  'prism-fox': {
+    body: `Spectravix was born when a rainbow got tired of being looked at and decided to run instead. Its tail splits light into tiny data streams that spell out compliments only the brave can read. The Sparkle Grasslands say if you brush with extra care, Spectravix leaves a single color on your mirror—just for you—like a secret sticker the world forgot to peel off. It calls long streaks “the best kind of light,” because they shine even when nobody is watching.`,
+  },
+  'echo-owl': {
+    body: `Sonarhoot does not hoot—it pings. Every ping is a tiny “hello” bounced off the moon and returned with a sticker’s worth of encouragement. It patrols the treetops at bedtime, listening for the soft click of a toothbrush finishing its job. Kids who keep their streak alive say Sonarhoot’s eyes glow a little brighter on night seven, like twin porch lights that mean “I heard you. Good job.”`,
+  },
+  'bloom-guardian': {
+    body: `Floratron was once a single daisy that refused to wilt during a drought. It grew bark armor, circuit leaves, and a heart made of patience. Now it walks the meadow slowly—not because it is tired, but because it likes to notice things. When someone keeps a streak going, Floratron plants a flower in their honor that blooms only in their imagination, which is the most real place flowers grow anyway.`,
+  },
+  'storm-ray': {
+    body: `Voltamanta glides through the Sparkle Coast with wings that crackle like friendly static. It does not chase storms—it herds them away from sandcastles and sleepy seagulls. Sailors say a long streak sounds like Voltamanta’s hum: steady, electric, and impossible to ignore once you feel it. It believes the bravest thing you can do at the end of a long day is still show up and brush.`,
+  },
+  'kraken-kit': {
+    body: `Tentabot is a baby kraken who thinks every toothbrush is a tentacle practice buddy. It ties itself in cheerful knots on the ocean floor and untangles only for kids who remembered to brush. The Sparkle Coast keeps a tally of Tentabot sightings, and every sighting lines up with someone who did not skip a day. It says consistency is just kindness aimed at your future self.`,
+  },
+  'tide-titan': {
+    body: `Wavezilla is enormous, which is awkward when you are also gentle. It used to knock over piers by accident until it learned to surf its own waves instead. Now it carries lost beach toys home and leaves foam letters on the sand that spell “proud.” A streak long enough to wake Wavezilla is, it says, the only tide worth turning.`,
+  },
+  'volcano-drake': {
+    body: `Rocketdrake was hatched inside a launch pad that someone left running. It roared once, decided roaring was overrated, and became the Sparkle Range’s loudest cheerleader instead. Its jet-boosters only fire for celebrations—birthdays, first wiggly teeth, and streaks that refuse to break. Rocketdrake insists every brave habit is a small launch toward something bigger.`,
+  },
+  'infernal-titan': {
+    body: `Eruptor could have been the scariest volcano in the Sparkle Range, but it chose warmth over thunder. It melts worry into lava glass bracelets and hands them out to anyone who kept going when quitting felt easier. The mountains say Eruptor only stirs for streaks that glow from the inside—and that is the only kind of fire worth keeping lit.`,
+  },
+  'neon-dragon': {
+    body: `Glodragon sleeps curled around the tallest billboard in the Sparkle City, dreaming in scrolling lights. It wakes when someone’s streak outshines the neon—quiet, steady, day after day. Then it unfurls and paints the skyline in colors that spell “you did it” in a language only night owls and dedicated brushers can read. Glodragon says glow is earned, not given.`,
+  },
+  'metro-mind': {
+    body: `Urbatron is the city’s memory made metal—a mind that remembers every small good habit anyone ever tried. It rides the subways without a ticket because the trains owe it favors. When a streak stretches long enough, Urbatron leaves a transfer pass on your pillow: good for one ride to anywhere you have been brave. It calls that “proof you are going places.”`,
+  },
+  'aurora-serpent': {
+    body: `Prismdrake coils through the northern sky, stitching auroras together with a tail that hums in seven colors. It is shy, so it only appears where someone has been quietly consistent. The Sparkle Sky says Prismdrake reads streaks the way snakes read warmth—and that the prettiest lights are simply Prismdrake whispering, “I saw every single day.”`,
+  },
+  'star-whale': {
+    body: `Cosmolub swims between constellations, singing a song so low only streaks can hear it. It collects falling stars that nobody wished on and returns them as second chances. Kids who keep brushing say Cosmolub’s song feels like a hug from space—vast, patient, and sure you are worth the trip. It believes the universe is mostly made of people who came back tomorrow.`,
+  },
+  's2-crystal-guardian': {
+    body: `Geodiatron stood at the mouth of the Crystal Caverns so long it became part of the wall—and then decided walls were too boring. Now it walks with gem fists that heal cracked quartz and cracked confidence alike. A streak strong enough to wake Geodiatron earns a pebble that glows in your pocket, warm as a handshake from the earth itself.`,
+  },
+  's2-deep-crystal': {
+    body: `Abyssalith lives where light forgets to go, holding a lantern made from the first pearl ever found. It does not fear the dark because it brought its own sparkle. Divers say Abyssalith only rises for streaks that dive deep—past “I’ll do it later,” past “just this once,” all the way to “I showed up again.” That is the depth where real treasure lives.`,
+  },
+  's3-spirit-king': {
+    body: `Phantomarch wears a crown of mist and manners. It rules the Phantom Realm with a velvet voice and a strict law: no haunting before bedtime, and no skipping teeth. Long streaks ring its throne room like polite applause. Phantomarch says the bravest kings are not the loudest—they are the ones who keep their promises to themselves, one small night at a time.`,
+  },
+  'leaf-kong': {
+    body: `Foliape is the last tale—the mythic one—and it almost never speaks. It is every forest, every season, every leaf that ever learned to hold on through wind. When a streak reaches the kind of length that makes other creatures stop and stare, Foliape opens one enormous hand and offers a single green leaf that never wilts. Keep it in your heart, it says without saying, and you will always know how to grow back.`,
   },
 };
 
